@@ -70,3 +70,4 @@ add_subdirectory(Patchouli)
 add_subdirectory(Sandbox)
 
 # Add third-party library
+add_third_party(mimalloc)

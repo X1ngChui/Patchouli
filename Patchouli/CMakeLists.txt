@@ -2,7 +2,7 @@
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 
 # Create executable target
-add_library(Patchouli STATIC ${SOURCE_FILES} "pch/PatchouliPch.h")
+add_library(Patchouli STATIC ${SOURCE_FILES})
 
 # Find external package
 find_package(Vulkan REQUIRED)
@@ -15,15 +15,19 @@ target_include_directories(Patchouli
 PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
+	"${CMAKE_SOURCE_DIR}/third-party/mimalloc/include"
 	"${Vulkan_INCLUDE_DIRS}"
 INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
 )
 
 # Link the static library
 target_link_libraries(Patchouli
 PRIVATE
 	${Vulkan_LIBRARIES}
+	mimalloc-static
 )
 
 # Specify the precompiled header file
