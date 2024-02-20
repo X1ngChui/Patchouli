@@ -1,3 +1,8 @@
+# Directories
+.vs/
+bin/
+out/
+
 # Prerequisites
 *.d
 
