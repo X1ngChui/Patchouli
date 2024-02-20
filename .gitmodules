@@ -1,0 +1,3 @@
+[submodule "third-party/mimalloc"]
+	path = third-party/mimalloc
+	url = https://github.com/X1ngChui/mimalloc
