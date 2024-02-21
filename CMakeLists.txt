@@ -71,3 +71,5 @@ add_subdirectory(Sandbox)
 
 # Add third-party library
 add_third_party(mimalloc)
+add_third_party(fmt)
+add_third_party(spdlog)

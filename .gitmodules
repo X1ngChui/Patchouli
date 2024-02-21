@@ -1,3 +1,9 @@
 [submodule "third-party/mimalloc"]
 	path = third-party/mimalloc
 	url = https://github.com/X1ngChui/mimalloc
+[submodule "third-party/fmt"]
+	path = third-party/fmt
+	url = https://github.com/X1ngChui/fmt
+[submodule "third-party/spdlog"]
+	path = third-party/spdlog
+	url = https://github.com/X1ngChui/spdlog

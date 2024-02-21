@@ -1,27 +1,21 @@
-#include "Patchouli.h"
-#include <iostream>
+#include "Sandbox.h"
 
-class SObject : public Patchouli::PObject
+namespace Sandbox
 {
-public:
-	SObject()
+	Sandbox::Sandbox(const Patchouli::ApplicationInfo& info)
+		: Application(info)
 	{
-		std::cout << "Create PObject" << std::endl;
 	}
-
-	virtual ~SObject()
-	{
-		std::cout << "Destroy PObject" << std::endl;
-	}
-};
+}
 
 int main()
 {
-	Patchouli::WeakRef<SObject> wref;
-	{
-		Patchouli::Ref<SObject> ref = Patchouli::makeRef<SObject>();
-		wref = ref;
-		std::cout << (wref.expired() ? "expired" : "not expired") << std::endl;
-	}
-	std::cout << (wref.expired() ? "expired" : "not expired") << std::endl;
+	Patchouli::ApplicationInfo info = {
+		.appName = "Sandbox",
+		.version = Patchouli::version(0, 0, 0, 0)
+	};
+
+	Sandbox::Sandbox* app = new Sandbox::Sandbox(info);
+
+	app->run();
 }

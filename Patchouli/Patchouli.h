@@ -1,3 +1,6 @@
 #pragma once
 
-#include "PObject/PObject.h"
+#include "Core/PObject.h"
+#include "Core/Application.h"
+
+#include "Log/Console.h"

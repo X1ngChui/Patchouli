@@ -1,12 +1,12 @@
 #pragma once
 
 #include "PatchouliPch.h"
-#include "PObject/UUID.h"
-#include "PObject/IntrusivePtr.h"
+#include "Util/intrusive_ptr.h"
 
 namespace Patchouli
 {
 	/* Pointer wrappers */
+
 	template <typename T>
 	using Scope = std::unique_ptr<T>;
 
@@ -30,18 +30,16 @@ namespace Patchouli
 
 	/**
 	 * @brief Base class representing a Patchouli object.
-	 *
-	 * This class serves as the base class for all Patchouli objects and provides
-	 * functionality for uniquely identifying objects using UUIDs (Universally Unique Identifiers).
+     *
+	 * This class serves as the foundation for all Patchouli objects,
+	 * offering integrated memory pooling and reference counting features.
 	 */
 	class PObject : public std::intrusive_base<PObject>
 	{
 	public:
 		virtual ~PObject() = default;
 
-		bool operator==(const PObject& other) const { return this->uuid == other.uuid; }
-		bool operator!=(const PObject& other) const { return this->uuid != other.uuid; }
-
+		/* Memory pooling */
 		void* operator new(std::size_t size);
 		void* operator new[](std::size_t size);
 		void* operator new(std::size_t size, const std::nothrow_t& tag) noexcept;
@@ -53,23 +51,5 @@ namespace Patchouli
 		void operator delete[](void* ptr, const std::nothrow_t&) noexcept;
 	protected:
 		PObject() = default;
-
-		PObject(const PObject& other) = delete;
-		PObject& operator=(const PObject& other) = delete;
-	private:
-		friend struct std::hash<PObject>;
-		UUID uuid;	/**< The UUID (Universally Unique Identifier) of the Patchouli object. */
-	};
-}
-
-namespace std {
-
-	template <>
-	struct hash<Patchouli::PObject>
-	{
-		std::size_t operator()(const Patchouli::PObject& obj) const
-		{
-			return std::hash<Patchouli::UUID>()(obj.uuid);
-		}
 	};
 }

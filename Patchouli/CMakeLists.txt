@@ -13,14 +13,18 @@ endif()
 # Add include directory
 target_include_directories(Patchouli
 PRIVATE
-	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/third-party/mimalloc/include"
+	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
+	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
 	"${Vulkan_INCLUDE_DIRS}"
 INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
+	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
+	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
 )
 
 # Link the static library

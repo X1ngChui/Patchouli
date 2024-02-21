@@ -1,4 +1,4 @@
-#include "PObject/PObject.h"
+#include "Core/PObject.h"
 #include "mimalloc.h"
 
 namespace Patchouli
