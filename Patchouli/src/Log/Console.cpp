@@ -8,8 +8,12 @@ namespace Patchouli
 
 	void Console::init(const char* name)
 	{
+#ifdef PATCHOULI_CONSOLE_ENABLE
 		spdlog::set_pattern("%^[%T] [%l] [%n] %v%$");
 		coreLogger = spdlog::stdout_color_mt("Patchouli");
 		clientLogger = spdlog::stdout_color_mt(name);
+#else
+		(void)(name);
+#endif
 	}
 }

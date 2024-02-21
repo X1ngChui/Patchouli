@@ -25,6 +25,9 @@ namespace Patchouli
 	// Console::coreInfo("{0} = {1}.", "Cirno", 9);					(Output: Cirno = 9)
 	// Console::coreAssert(false, "{0} = {1}.", "Cirno", 9);		(Output: Cirno = 9)
 	public:
+		Console() = delete;
+		~Console() = delete;
+
 		static void init(const char* name);
 
 		template <typename... Args>

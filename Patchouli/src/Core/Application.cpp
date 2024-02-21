@@ -3,8 +3,6 @@
 
 namespace Patchouli
 {
-	Ref<Application> Application::instance = nullptr;
-
 	Application::Application(const ApplicationInfo& info)
 		: running(false), appInfo(info)
 	{
@@ -20,9 +18,22 @@ namespace Patchouli
 
 	void Application::init()
 	{
-#ifdef PATCHOULI_CONSOLE_ENABLE
-		Console::init(appInfo.appName);
-		Console::coreInfo("Hello Patchouli!");
-#endif
+		uint32_t subsystems = appInfo.subsystems;
+		while (subsystems)
+		{
+			// Extract the lowest bit representing a subsystem
+			uint32_t subsys = subsystems & (-subsystems);
+			// Clear the lowest bit representing the subsystem
+			subsystems &= ~subsys;
+
+			// Initialize each subsystem based on the extracted subsystem bit.
+			switch (subsys)
+			{
+			case Subsystem::Logging:
+				Console::init(appInfo.appName);
+				Console::coreInfo("Hello Patchouli!");
+				break;
+			}
+		}
 	}
 }
