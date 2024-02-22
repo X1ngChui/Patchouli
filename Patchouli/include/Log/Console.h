@@ -1,6 +1,7 @@
 #pragma once
 
 #include "spdlog/spdlog.h"
+#include "Core/Base.h"
 
 #ifdef _MSC_VER
 #define trap() __debugbreak()
@@ -9,16 +10,12 @@
 #define trap() __builtin_trap();
 #endif
 
-#if defined(PATCHOULI_DEBUG_MODE) || defined(PATCHOULI_TESTING_MODE)
-#define PATCHOULI_CONSOLE_ENABLE
-#endif
-
 namespace Patchouli
 {
 	/*
 	 * @brief A utility class for logging messages using the spdlog library.
 	 */
-	class Console
+	class PATCHOULI_API Console
 	{
 	// Example of using logging functions:
 	// Console::coreError("Cirno = 9");								(Output: Cirno = 9)
@@ -30,11 +27,14 @@ namespace Patchouli
 
 		static void init(const char* name);
 
+		static std::shared_ptr<spdlog::logger> getCoreLogger();
+		static std::shared_ptr<spdlog::logger> getClientLogger();
+
 		template <typename... Args>
 		static void coreTrace(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->trace(fmt, std::forward<Args>(args)...);
+			getCoreLogger()->trace(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
@@ -42,7 +42,7 @@ namespace Patchouli
 		static void coreTrace(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->trace(std::forward<T>(msg));
+			getCoreLogger()->trace(std::forward<T>(msg));
 #endif
 		}
 
@@ -50,7 +50,7 @@ namespace Patchouli
 		static void coreInfo(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->info(fmt, std::forward<Args>(args)...);
+			getCoreLogger()->info(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
@@ -58,7 +58,7 @@ namespace Patchouli
 		static void coreInfo(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->info(std::forward<T>(msg));
+			getCoreLogger()->info(std::forward<T>(msg));
 #endif
 		}
 
@@ -66,7 +66,7 @@ namespace Patchouli
 		static void coreWarn(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->warn(fmt, std::forward<Args>(args)...);
+			getCoreLogger()->warn(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
@@ -74,7 +74,7 @@ namespace Patchouli
 		static void coreWarn(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->warn(std::forward<T>(msg));
+			getCoreLogger()->warn(std::forward<T>(msg));
 #endif
 		}
 
@@ -82,7 +82,7 @@ namespace Patchouli
 		static void coreError(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->error(fmt, std::forward<Args>(args)...);
+			getCoreLogger()->error(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
@@ -90,7 +90,7 @@ namespace Patchouli
 		static void coreError(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->error(std::forward<T>(msg));
+			getCoreLogger()->error(std::forward<T>(msg));
 #endif
 		}
 
@@ -98,7 +98,7 @@ namespace Patchouli
 		static void coreCritical(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->critical(fmt, std::forward<Args>(args)...);
+			getCoreLogger()->critical(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
@@ -106,7 +106,7 @@ namespace Patchouli
 		static void coreCritical(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			coreLogger->critical(std::forward<T>(msg));
+			getCoreLogger()->critical(std::forward<T>(msg));
 #endif
 		}
 
@@ -116,7 +116,7 @@ namespace Patchouli
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
-				coreLogger->error(fmt, std::forward<Args>(args)...);
+				getCoreLogger()->error(fmt, std::forward<Args>(args)...);
 				trap();
 			}
 #endif
@@ -128,111 +128,114 @@ namespace Patchouli
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
-				coreLogger->error(std::forward<T>(msg));
+				getCoreLogger()->error(std::forward<T>(msg));
 				trap();
 			}
 #endif
 		}
 
 		template <typename... Args>
-		static void clientTrace(spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void trace(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->trace(fmt, std::forward<Args>(args)...);
+			getClientLogger()->trace(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
 		template <typename T>
-		static void clientTrace(T&& msg)
+		static void trace(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->trace(std::forward<T>(msg));
+			getClientLogger()->trace(std::forward<T>(msg));
 #endif
 		}
 
 		template <typename... Args>
-		static void clientInfo(spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void info(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->info(fmt, std::forward<Args>(args)...);
+			getClientLogger()->info(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
 		template <typename T>
-		static void clientInfo(T&& msg)
+		static void info(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->info(std::forward<T>(msg));
+			getClientLogger()->info(std::forward<T>(msg));
 #endif
 		}
 
 		template <typename... Args>
-		static void clientWarn(spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void warn(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->warn(fmt, std::forward<Args>(args)...);
+			getClientLogger()->warn(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
 		template <typename T>
-		static void clientWarn(T&& msg)
+		static void warn(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->warn(std::forward<T>(msg));
+			getClientLogger()->warn(std::forward<T>(msg));
 #endif
 		}
 
 		template <typename... Args>
-		static void clientError(spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void error(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->error(fmt, std::forward<Args>(args)...);
+			getClientLogger()->error(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
 		template <typename T>
-		static void clientError(T&& msg)
+		static void error(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->error(std::forward<T>(msg));
+			getClientLogger()->error(std::forward<T>(msg));
 #endif
 		}
 
 		template <typename... Args>
-		static void clientCritical(spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void critical(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->critical(fmt, std::forward<Args>(args)...);
+			getClientLogger()->critical(fmt, std::forward<Args>(args)...);
 #endif
 		}
 
 		template <typename T>
-		static void clientCritical(T&& msg)
+		static void critical(T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-			clientLogger->critical(std::forward<T>(msg));
+			getClientLogger()->critical(std::forward<T>(msg));
 #endif
 		}
 
+#ifdef assert
+	#undef assert
+#endif
 		template <typename... Args>
-		static void clientAssert(bool assertion, spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void assert(bool assertion, spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
-				clientLogger->error(fmt, std::forward<Args>(args)...);
+				getClientLogger()->error(fmt, std::forward<Args>(args)...);
 				trap();
 			}
 #endif
 		}
 
 		template <typename T>
-		static void clientAssert(bool assertion, T&& msg)
+		static void assert(bool assertion, T&& msg)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
-				clientLogger->error(std::forward<T>(msg));
+				getClientLogger()->error(std::forward<T>(msg));
 				trap();
 			}
 #endif

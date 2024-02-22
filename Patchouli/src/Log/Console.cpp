@@ -16,4 +16,14 @@ namespace Patchouli
 		(void)(name);
 #endif
 	}
+
+	std::shared_ptr<spdlog::logger> Console::getCoreLogger()
+	{
+		return coreLogger;
+	}
+
+	std::shared_ptr<spdlog::logger> Console::getClientLogger()
+	{
+		return clientLogger;
+	}
 }

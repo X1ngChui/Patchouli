@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 3.20)
 # Project name
 project("Patchouli")
 
+# Build options
+option(PATCHOULI_BUILD_STATIC "Build static library" OFF)
+option(PATCHOULI_BUILD_SHARED "Build shared library" ON)
+option(PATCHOULI_CONSOLE_ENABLE "Enable console logging" ON)
+
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PatchouliPch.h"
+#include "Core/Base.h"
 #include "Util/intrusive_ptr.h"
 
 namespace Patchouli
@@ -34,7 +35,7 @@ namespace Patchouli
 	 * This class serves as the foundation for all Patchouli objects,
 	 * offering integrated memory pooling and reference counting features.
 	 */
-	class PObject : public std::intrusive_base<PObject>
+	class PATCHOULI_API PObject : public std::intrusive_base<PObject>
 	{
 	public:
 		virtual ~PObject() = default;

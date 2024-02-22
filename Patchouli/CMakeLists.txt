@@ -1,8 +1,19 @@
 # Add source files
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 
-# Create executable target
-add_library(Patchouli STATIC ${SOURCE_FILES})
+# Create library target
+if (PATCHOULI_BUILD_STATIC)
+	message("build static library")
+	add_library(Patchouli STATIC ${SOURCE_FILES})
+	target_compile_definitions(Patchouli PUBLIC PATCHOULI_STATIC_LIBRARY)
+endif()
+
+if (PATCHOULI_BUILD_SHARED)
+	message("build shared library")
+	add_library(Patchouli SHARED ${SOURCE_FILES})
+	target_compile_definitions(Patchouli PUBLIC PATCHOULI_SHARED_LIBRARY)
+	target_compile_definitions(Patchouli PRIVATE PATCHOULI_SHARED_LIBRARY_EXPORT)
+endif()
 
 # Find external package
 find_package(Vulkan REQUIRED)
@@ -29,9 +40,11 @@ INTERFACE
 
 # Link the static library
 target_link_libraries(Patchouli
-PRIVATE
+PUBLIC
 	${Vulkan_LIBRARIES}
 	mimalloc-static
+	spdlog
+	fmt
 )
 
 # Specify the precompiled header file
@@ -39,3 +52,6 @@ target_precompile_headers(Patchouli PRIVATE "pch/PatchouliPch.h")
 
 # Define configuration-specific macros
 define_config_macros(Patchouli)
+if (PATCHOULI_CONSOLE_ENABLE)
+	target_compile_definitions(Patchouli PUBLIC PATCHOULI_CONSOLE_ENABLE)
+endif()

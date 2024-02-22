@@ -16,7 +16,7 @@ int main()
 		.subsystems = Patchouli::Subsystem::Logging
 	};
 
-	Sandbox::Sandbox* app = new Sandbox::Sandbox(info);
-
+	Patchouli::Ref<Sandbox::Sandbox> app = Patchouli::makeRef<Sandbox::Sandbox>(info);
+	Patchouli::Console::info("This is Sandbox.");
 	app->run();
 }
