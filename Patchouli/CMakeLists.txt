@@ -40,11 +40,12 @@ INTERFACE
 
 # Link the static library
 target_link_libraries(Patchouli
-PUBLIC
+PRIVATE
 	${Vulkan_LIBRARIES}
 	mimalloc-static
-	spdlog
-	fmt
+PUBLIC
+	spdlog_header_only
+	fmt-header-only
 )
 
 # Specify the precompiled header file

@@ -29,16 +29,10 @@ namespace Patchouli
 	template <typename T>
 	using WeakRef = std::intrusive_weak_ptr<T>;
 
-	/**
-	 * @brief Base class representing a Patchouli object.
-     *
-	 * This class serves as the foundation for all Patchouli objects,
-	 * offering integrated memory pooling and reference counting features.
-	 */
-	class PATCHOULI_API PObject : public std::intrusive_base<PObject>
+	class PATCHOULI_API FastMemory
 	{
 	public:
-		virtual ~PObject() = default;
+		virtual ~FastMemory() = default;
 
 		/* Memory pooling */
 		void* operator new(std::size_t size);
@@ -50,6 +44,20 @@ namespace Patchouli
 		void operator delete[](void* ptr);
 		void operator delete(void* ptr, const std::nothrow_t&) noexcept;
 		void operator delete[](void* ptr, const std::nothrow_t&) noexcept;
+	protected:
+		FastMemory() = default;
+	};
+
+	/**
+	 * @brief Base class representing a Patchouli object.
+     *
+	 * This class serves as the foundation for all Patchouli objects,
+	 * offering integrated memory pooling and reference counting features.
+	 */
+	class PATCHOULI_API PObject : public std::intrusive_base<PObject>, public FastMemory
+	{
+	public:
+		virtual ~PObject() = default;
 	protected:
 		PObject() = default;
 	};

@@ -2,6 +2,7 @@
 
 #include "Core/Base.h"
 #include "Core/PObject.h"
+#include "Core/Layer.h"
 
 #define PATCHOULI_SUBSYSTEM_FLAG(x) (1 << (x))
 #define PATCHOULI_SUBSYSTEM_ALL (0xffffffff)
@@ -15,25 +16,28 @@ namespace Patchouli
 	}
 
 	/* Enum representing various subsystems of the application */
-	enum Subsystem : uint32_t
+	namespace Subsystem
 	{
-		None		= 0,
-		Logging		= PATCHOULI_SUBSYSTEM_FLAG(0),
-		Graphics	= PATCHOULI_SUBSYSTEM_FLAG(1),
-		Physics		= PATCHOULI_SUBSYSTEM_FLAG(2),
-		Audio		= PATCHOULI_SUBSYSTEM_FLAG(3),
-		Input		= PATCHOULI_SUBSYSTEM_FLAG(4),
-		Resource	= PATCHOULI_SUBSYSTEM_FLAG(5),
-		Networking	= PATCHOULI_SUBSYSTEM_FLAG(6),
-		All			= PATCHOULI_SUBSYSTEM_ALL
-	};
+		enum subsystem_t : uint32_t
+		{
+			None = 0,
+			Logging = PATCHOULI_SUBSYSTEM_FLAG(0),
+			Graphics = PATCHOULI_SUBSYSTEM_FLAG(1),
+			Physics = PATCHOULI_SUBSYSTEM_FLAG(2),
+			Audio = PATCHOULI_SUBSYSTEM_FLAG(3),
+			Input = PATCHOULI_SUBSYSTEM_FLAG(4),
+			Resource = PATCHOULI_SUBSYSTEM_FLAG(5),
+			Networking = PATCHOULI_SUBSYSTEM_FLAG(6),
+			All = PATCHOULI_SUBSYSTEM_ALL
+		};
+	}
 
 	/* Structure representing information about the application */
 	struct ApplicationInfo
 	{
 		const char* appName = "Patchouli";			/* Name of the application */
 		uint32_t version = 0;						/* Version of the application */
-		uint32_t subsystems = Subsystem::None;		/* Subsystems enabled for the application */
+		uint32_t subsystems = 0;					/* Subsystems enabled for the application */
 	};
 
 	/* Class representing the application. */
@@ -55,8 +59,14 @@ namespace Patchouli
 		/* Function to initialize the application and its subsystems */
 		void init();
 
+		void pushLayer(Layer* layer);
+		void popLayer(Layer* layer);
+		void pushOverlay(Overlay* overlay);
+		void popOverlay(Overlay* overlay);
+
 	private:
 		bool running;								/* Flag indicating whether the application is running */
 		ApplicationInfo appInfo;					/* Information about the application */
+		LayerStack layerStack;						/* Layer stack */
 	};
 }

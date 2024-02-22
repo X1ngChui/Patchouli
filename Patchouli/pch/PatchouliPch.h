@@ -15,6 +15,7 @@
 #include <thread>
 #include <iterator>
 #include <compare>
+#include <ranges>
 
 // Standard C Library Headers
 #include <cstdint>

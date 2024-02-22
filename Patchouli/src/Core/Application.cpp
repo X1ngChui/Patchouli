@@ -36,4 +36,28 @@ namespace Patchouli
 			}
 		}
 	}
+
+	void Application::pushLayer(Layer* layer)
+	{
+		layerStack.pushLayer(layer);
+		layer->onAttach();
+	}
+
+	void Application::popLayer(Layer* layer)
+	{
+		layerStack.popLayer(layer);
+		layer->onDetach();
+	}
+
+	void Application::pushOverlay(Overlay* overlay)
+	{
+		layerStack.pushOverlay(overlay);
+		overlay->onAttach();
+	}
+
+	void Application::popOverlay(Overlay* overlay)
+	{
+		layerStack.popOverlay(overlay);
+		overlay->onDetach();
+	}
 }
