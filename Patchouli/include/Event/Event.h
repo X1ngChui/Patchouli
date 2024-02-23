@@ -2,7 +2,7 @@
 
 #include "PatchouliPch.h"
 #include "Core/Base.h"
-#include "Core/PObject.h"
+#include "Util/Util.h"
 #include "fmt/format.h"
 
 #define PATCHOULI_EVENTCATEGORY_FLAGS(x) (1 << x)
@@ -22,20 +22,20 @@ namespace Patchouli
 	// Bitmask-based enumeration defining event categories
 	enum EventCategory
 	{
-		None						= 0,
-		EventCategoryApp			= PATCHOULI_EVENTCATEGORY_FLAGS(0),
-		EventCategoryWindow			= PATCHOULI_EVENTCATEGORY_FLAGS(1),
-		EventCategoryInput			= PATCHOULI_EVENTCATEGORY_FLAGS(2),
-		EventCategoryKeyboard		= PATCHOULI_EVENTCATEGORY_FLAGS(3),
-		EventCategoryMouse			= PATCHOULI_EVENTCATEGORY_FLAGS(4),
-		EventCategoryMouseButton	= PATCHOULI_EVENTCATEGORY_FLAGS(5)
+		None = 0,
+		EventCategoryApp = PATCHOULI_EVENTCATEGORY_FLAGS(0),
+		EventCategoryWindow = PATCHOULI_EVENTCATEGORY_FLAGS(1),
+		EventCategoryInput = PATCHOULI_EVENTCATEGORY_FLAGS(2),
+		EventCategoryKeyboard = PATCHOULI_EVENTCATEGORY_FLAGS(3),
+		EventCategoryMouse = PATCHOULI_EVENTCATEGORY_FLAGS(4),
+		EventCategoryMouseButton = PATCHOULI_EVENTCATEGORY_FLAGS(5)
 	};
 
 	// Abstract base class for events
-	class PATCHOULI_API Event : public FastMemory
+	class PATCHOULI_API Event : public FastAllocated
 	{
 	public:
-		constexpr Event() = default;
+		Event() = default;
 		virtual ~Event() = default;
 
 		virtual EventType getEventType() const = 0;

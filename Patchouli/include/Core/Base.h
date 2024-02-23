@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef PATCHOULI_SHARED_LIBRARY
 	#ifdef _MSC_VER
 		#ifdef PATCHOULI_SHARED_LIBRARY_EXPORT

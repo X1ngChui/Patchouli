@@ -2,17 +2,13 @@
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 
 # Create library target
-if (PATCHOULI_BUILD_STATIC)
-	message("build static library")
-	add_library(Patchouli STATIC ${SOURCE_FILES})
-	target_compile_definitions(Patchouli PUBLIC PATCHOULI_STATIC_LIBRARY)
-endif()
-
-if (PATCHOULI_BUILD_SHARED)
-	message("build shared library")
+if (PATCHOULI_LIBRARY_TYPE)
 	add_library(Patchouli SHARED ${SOURCE_FILES})
 	target_compile_definitions(Patchouli PUBLIC PATCHOULI_SHARED_LIBRARY)
 	target_compile_definitions(Patchouli PRIVATE PATCHOULI_SHARED_LIBRARY_EXPORT)
+else()
+	add_library(Patchouli STATIC ${SOURCE_FILES})
+	target_compile_definitions(Patchouli PUBLIC PATCHOULI_STATIC_LIBRARY)
 endif()
 
 # Find external package

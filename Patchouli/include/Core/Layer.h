@@ -1,12 +1,13 @@
 #pragma once
-#include "Core/Base.h"
+#include "Core/Base.h"  
 #include "Event/Event.h"
+#include "Util/Util.h"
 
 namespace Patchouli
 {
 	// Layers can be attached to or detached from the applicaiton,
 	// responsible for updating, rendering, and handling events.
-	class PATCHOULI_API Layer : public FastMemory
+	class PATCHOULI_API Layer : public FastAllocated
 	{
 	public:
 		Layer(const char* name = "New Layer");

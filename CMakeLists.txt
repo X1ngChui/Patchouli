@@ -5,8 +5,7 @@ cmake_minimum_required(VERSION 3.20)
 project("Patchouli")
 
 # Build options
-option(PATCHOULI_BUILD_STATIC "Build static library" OFF)
-option(PATCHOULI_BUILD_SHARED "Build shared library" ON)
+option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
 option(PATCHOULI_CONSOLE_ENABLE "Enable console logging" ON)
 
 # Set language standard

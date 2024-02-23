@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Core/PObject.h"
 #include "Core/Layer.h"
+#include "Util/UUID.h"
 
 #define PATCHOULI_SUBSYSTEM_FLAG(x) (1 << (x))
 #define PATCHOULI_SUBSYSTEM_ALL (0xffffffff)
@@ -22,12 +22,6 @@ namespace Patchouli
 		{
 			None = 0,
 			Logging = PATCHOULI_SUBSYSTEM_FLAG(0),
-			Graphics = PATCHOULI_SUBSYSTEM_FLAG(1),
-			Physics = PATCHOULI_SUBSYSTEM_FLAG(2),
-			Audio = PATCHOULI_SUBSYSTEM_FLAG(3),
-			Input = PATCHOULI_SUBSYSTEM_FLAG(4),
-			Resource = PATCHOULI_SUBSYSTEM_FLAG(5),
-			Networking = PATCHOULI_SUBSYSTEM_FLAG(6),
 			All = PATCHOULI_SUBSYSTEM_ALL
 		};
 	}
@@ -41,7 +35,7 @@ namespace Patchouli
 	};
 
 	/* Class representing the application. */
-	class PATCHOULI_API Application : public PObject
+	class PATCHOULI_API Application
 	{
 	public:
 		virtual ~Application() = default;
@@ -52,6 +46,7 @@ namespace Patchouli
 		/* Function to start running the application */
 		void run();
 
+		UUID uuid;
 	protected:
 		Application(const ApplicationInfo& info);
 
@@ -68,5 +63,7 @@ namespace Patchouli
 		bool running;								/* Flag indicating whether the application is running */
 		ApplicationInfo appInfo;					/* Information about the application */
 		LayerStack layerStack;						/* Layer stack */
+
+		
 	};
 }

@@ -34,8 +34,3 @@
 // Standard Library Headers
 #include <atomic>
 #include <random>
-
-// Windows-specific Header (conditional)
-#ifdef _WIN64
-#include <Windows.h>
-#endif
