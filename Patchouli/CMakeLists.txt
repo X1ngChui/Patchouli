@@ -52,3 +52,7 @@ define_config_macros(Patchouli)
 if (PATCHOULI_CONSOLE_ENABLE)
 	target_compile_definitions(Patchouli PUBLIC PATCHOULI_CONSOLE_ENABLE)
 endif()
+
+if (PATCHOULI_INTERNAL_LOGGING)
+	target_compile_definitions(Patchouli PRIVATE PATCHOULI_INTERNAL_LOGGING)
+endif()

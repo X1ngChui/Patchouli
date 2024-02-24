@@ -18,6 +18,10 @@ namespace Patchouli
 
 	void Application::init()
 	{
+		// Initialize the internal subsystem
+		Console::coreInit();
+
+		// Initialize the custom subsystem
 		uint32_t subsystems = appInfo.subsystems;
 		while (subsystems)
 		{
@@ -31,7 +35,6 @@ namespace Patchouli
 			{
 			case Subsystem::Logging:
 				Console::init(appInfo.appName);
-				Console::coreInfo("Hello Patchouli!");
 				break;
 			}
 		}

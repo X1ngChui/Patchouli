@@ -17,7 +17,11 @@ int main()
 	};
 
 	auto* app = new Sandbox::Sandbox(info);
+
 	Patchouli::Console::info("{0} = {1}.", "Cirno", 9);
-	Patchouli::Console::info((app->uuid).toString());
-	// app->run();
+	Patchouli::Logger logger("logger", "log.log", Patchouli::LogLevel::Warn);
+	logger.info("Hello Patchouli!");
+
+	app->run();
+	delete app;
 }

@@ -1,23 +1,25 @@
 #include "Log/Console.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-
-#ifdef max
-	#undef max
-#endif
 
 namespace Patchouli
 {
-	std::shared_ptr<spdlog::logger> Console::coreLogger;
-	std::shared_ptr<spdlog::logger> Console::clientLogger;
-
-	void Console::init(const char* name)
+	void Console::init(const char* name, const LogLevel level)
 	{
 #ifdef PATCHOULI_CONSOLE_ENABLE
-		spdlog::set_pattern("%^[%T] [%n] [%l] %v%$");
-		coreLogger = spdlog::stdout_color_mt("Patchouli");
 		clientLogger = spdlog::stdout_color_mt(name);
+		clientLogger->set_pattern("%^[%T][%n][%l] %v%$");
+		clientLogger->set_level((spdlog::level::level_enum)(level));
 #else
 		(void)(name);
 #endif
+	}
+
+	void Console::setLevel(const LogLevel level)
+	{
+		clientLogger->set_level((spdlog::level::level_enum)(level));
+	}
+
+	void Console::setCoreLevel(const LogLevel level)
+	{
+		coreLogger->set_level((spdlog::level::level_enum)(level));
 	}
 }

@@ -7,6 +7,7 @@ project("Patchouli")
 # Build options
 option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
 option(PATCHOULI_CONSOLE_ENABLE "Enable console logging" ON)
+option(PATCHOULI_INTERNAL_LOGGING "Enable internal logging" ON)
 
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)

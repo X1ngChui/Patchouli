@@ -3,7 +3,7 @@
 #include "PatchouliPch.h"
 #include "Core/Base.h"
 #include "Util/Util.h"
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 #define PATCHOULI_EVENTCATEGORY_FLAGS(x) (1 << x)
 

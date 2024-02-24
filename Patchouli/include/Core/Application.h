@@ -22,6 +22,7 @@ namespace Patchouli
 		{
 			None = 0,
 			Logging = PATCHOULI_SUBSYSTEM_FLAG(0),
+			Graphics = PATCHOULI_SUBSYSTEM_FLAG(1),
 			All = PATCHOULI_SUBSYSTEM_ALL
 		};
 	}
@@ -45,8 +46,6 @@ namespace Patchouli
 
 		/* Function to start running the application */
 		void run();
-
-		UUID uuid;
 	protected:
 		Application(const ApplicationInfo& info);
 
@@ -63,7 +62,5 @@ namespace Patchouli
 		bool running;								/* Flag indicating whether the application is running */
 		ApplicationInfo appInfo;					/* Information about the application */
 		LayerStack layerStack;						/* Layer stack */
-
-		
 	};
 }

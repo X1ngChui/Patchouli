@@ -14,6 +14,6 @@
 			#define PATCHOULI_API
 		#endif
 	#endif
-#else
+#elif defined(PATCHOULI_STATIC_LIBRARY)
 	#define PATCHOULI_API
 #endif

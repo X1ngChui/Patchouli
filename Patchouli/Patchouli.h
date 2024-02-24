@@ -5,5 +5,6 @@
 #include "Core/Application.h"
 
 #include "Log/Console.h"
+#include "Log/Logger.h"
 
 #include "Util/Util.h"
