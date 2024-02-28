@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Util/FastAllocated.h"
 #include <fmt/format.h>
 
 #ifdef _WIN64
@@ -17,7 +16,7 @@ namespace Patchouli
 	/* @brief This class represents Universally Unique Identifiers(UUIDs).
 	 * It provides functionality to generate, compare, and convert UUIDs to string format.
 	 */
-	class PATCHOULI_API UUID : public FastAllocated
+	class PATCHOULI_API UUID
 	{
 	public:
 		UUID();

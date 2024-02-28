@@ -25,6 +25,7 @@ PRIVATE
 	"${CMAKE_SOURCE_DIR}/third-party/mimalloc/include"
 	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
 	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
+	"${CMAKE_SOURCE_DIR}/third-party/glfw/include"
 	"${Vulkan_INCLUDE_DIRS}"
 INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -39,6 +40,7 @@ target_link_libraries(Patchouli
 PRIVATE
 	${Vulkan_LIBRARIES}
 	mimalloc-static
+	glfw
 PUBLIC
 	spdlog_header_only
 	fmt-header-only
@@ -51,8 +53,4 @@ target_precompile_headers(Patchouli PRIVATE "pch/PatchouliPch.h")
 define_config_macros(Patchouli)
 if (PATCHOULI_CONSOLE_ENABLE)
 	target_compile_definitions(Patchouli PUBLIC PATCHOULI_CONSOLE_ENABLE)
-endif()
-
-if (PATCHOULI_INTERNAL_LOGGING)
-	target_compile_definitions(Patchouli PRIVATE PATCHOULI_INTERNAL_LOGGING)
 endif()

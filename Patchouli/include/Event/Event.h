@@ -2,7 +2,6 @@
 
 #include "PatchouliPch.h"
 #include "Core/Base.h"
-#include "Util/Util.h"
 #include <fmt/format.h>
 
 #define PATCHOULI_EVENTCATEGORY_FLAGS(x) (1 << x)
@@ -32,7 +31,7 @@ namespace Patchouli
 	};
 
 	// Abstract base class for events
-	class PATCHOULI_API Event : public FastAllocated
+	class PATCHOULI_API Event
 	{
 	public:
 		Event() = default;

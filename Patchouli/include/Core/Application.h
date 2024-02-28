@@ -2,7 +2,8 @@
 
 #include "Core/Base.h"
 #include "Core/Layer.h"
-#include "Util/UUID.h"
+#include "Graphics/Window.h"
+#include "Graphics/GraphicsContext.h"
 
 #define PATCHOULI_SUBSYSTEM_FLAG(x) (1 << (x))
 #define PATCHOULI_SUBSYSTEM_ALL (0xffffffff)
@@ -21,8 +22,7 @@ namespace Patchouli
 		enum subsystem_t : uint32_t
 		{
 			None = 0,
-			Logging = PATCHOULI_SUBSYSTEM_FLAG(0),
-			Graphics = PATCHOULI_SUBSYSTEM_FLAG(1),
+			Graphics = PATCHOULI_SUBSYSTEM_FLAG(0),
 			All = PATCHOULI_SUBSYSTEM_ALL
 		};
 	}
@@ -31,7 +31,7 @@ namespace Patchouli
 	struct ApplicationInfo
 	{
 		const char* appName = "Patchouli";			/* Name of the application */
-		uint32_t version = 0;						/* Version of the application */
+		uint32_t appVersion = 0;						/* Version of the application */
 		uint32_t subsystems = 0;					/* Subsystems enabled for the application */
 	};
 
@@ -46,6 +46,9 @@ namespace Patchouli
 
 		/* Function to start running the application */
 		void run();
+
+		void onEvent(Event& event);
+
 	protected:
 		Application(const ApplicationInfo& info);
 
@@ -61,6 +64,9 @@ namespace Patchouli
 	private:
 		bool running;								/* Flag indicating whether the application is running */
 		ApplicationInfo appInfo;					/* Information about the application */
-		LayerStack layerStack;						/* Layer stack */
+		LayerStack layerStack;						
+		
+		Ref<Window> window;
+		Ref<GraphicsContext> graphicsContext;
 	};
 }

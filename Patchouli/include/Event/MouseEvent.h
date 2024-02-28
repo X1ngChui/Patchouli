@@ -65,15 +65,15 @@ namespace Patchouli
 	class MouseMovedEvent : public Event
 	{
 	public:
-		MouseMovedEvent(int x, int y)
+		MouseMovedEvent(float x, float y)
 			: posX(x), posY(y)
 		{
 		}
 		virtual ~MouseMovedEvent() = default;
 
-		int getPosX() const { return posX; }
-		int getPosY() const { return posY; }
-		std::pair<int, int> getPos() const { return { posX, posY }; }
+		float getPosX() const { return posX; }
+		float getPosY() const { return posY; }
+		std::pair<float, float> getPos() const { return { posX, posY }; }
 
 		virtual constexpr int getCategoryFlag() const override
 		{
@@ -88,21 +88,21 @@ namespace Patchouli
 			return fmt::format("MouseMovedEvent (Pos: ({}, {}))", posX, posY);
 		}
 	private:
-		int posX, posY;
+		float posX, posY;
 	};
 
 	class MouseScrolledEvent : public Event
 	{
 	public:
-		MouseScrolledEvent(int offsetX, int offsetY)
+		MouseScrolledEvent(float offsetX, float offsetY)
 			: offsetX(offsetX), offsetY(offsetY)
 		{
 		}
 		virtual ~MouseScrolledEvent() = default;
 
-		int getOffsetX() const { return offsetX; }
-		int getOffsetY() const { return offsetY; }
-		std::pair<int, int> getOffset() const { return { offsetX, offsetY }; }
+		float getOffsetX() const { return offsetX; }
+		float getOffsetY() const { return offsetY; }
+		std::pair<float, float> getOffset() const { return { offsetX, offsetY }; }
 
 		virtual constexpr int getCategoryFlag() const override 
 		{
@@ -118,6 +118,6 @@ namespace Patchouli
 		}
 
 	private:
-		int offsetX, offsetY;
+		float offsetX, offsetY;
 	};
 }

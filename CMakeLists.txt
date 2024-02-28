@@ -6,8 +6,7 @@ project("Patchouli")
 
 # Build options
 option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
-option(PATCHOULI_CONSOLE_ENABLE "Enable console logging" ON)
-option(PATCHOULI_INTERNAL_LOGGING "Enable internal logging" ON)
+option(PATCHOULI_CONSOLE_ENABLE "Enable console" ON)
 
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)
@@ -61,9 +60,6 @@ else()
     # Release mode settings (no pdb, optimization enabled)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast")
-
-    # Enable additional compiler warnings
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 endif()
 
 # Include custom fuctions
@@ -78,3 +74,4 @@ add_subdirectory(Sandbox)
 add_third_party(mimalloc)
 add_third_party(fmt)
 add_third_party(spdlog)
+add_third_party(glfw)

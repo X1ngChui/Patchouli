@@ -6,10 +6,10 @@
 #include "Log/Common.h"
 
 #ifdef _MSC_VER
-#define trap __debugbreak
+	#define trap __debugbreak
 #endif
 #if defined(__GNUC__) || defined(__clang__)
-#define trap __builtin_trap;
+	#define trap __builtin_trap;
 #endif
 
 namespace Patchouli
@@ -27,8 +27,8 @@ namespace Patchouli
 		Console() = delete;
 		~Console() = delete;
 		
-		// Initialization function for the client logger
-		static void init(const char* name, const LogLevel level = LogLevel::Info);
+		// Initialization function
+		static void init(const char* appName, const LogLevel level = LogLevel::Info);
 
 		// --------------------------------------------------
 		// User Logging Functions
@@ -123,7 +123,9 @@ namespace Patchouli
 	#undef assert
 #endif
 		template <typename... Args>
-		static void assert(bool assertion, spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void assert(bool assertion,
+			spdlog::format_string_t<Args...> fmt,
+			Args&&... args)
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
@@ -146,17 +148,6 @@ namespace Patchouli
 #endif
 		}
 
-
-		// Initialization function for the core logger
-		static void coreInit(const LogLevel level = LogLevel::Info)
-		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
-			coreLogger = spdlog::stdout_color_mt("Patchouli");
-			coreLogger->set_pattern("%^[%T][%n][%l] %v%$");
-			coreLogger->set_level((spdlog::level::level_enum)(level));
-#endif
-		}
-
 		// --------------------------------------------------
 		// Core Logging Functions
 
@@ -169,7 +160,7 @@ namespace Patchouli
 		template <typename... Args>
 		static void coreTrace(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->trace(fmt, std::forward<Args>(args)...);
 #endif
 		}
@@ -177,7 +168,7 @@ namespace Patchouli
 		template <typename T>
 		static void coreTrace(T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->trace(std::forward<T>(msg));
 #endif
 		}
@@ -185,7 +176,7 @@ namespace Patchouli
 		template <typename... Args>
 		static void coreInfo(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->info(fmt, std::forward<Args>(args)...);
 #endif
 		}
@@ -193,7 +184,7 @@ namespace Patchouli
 		template <typename T>
 		static void coreInfo(T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->info(std::forward<T>(msg));
 #endif
 		}
@@ -201,7 +192,7 @@ namespace Patchouli
 		template <typename... Args>
 		static void coreWarn(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->warn(fmt, std::forward<Args>(args)...);
 #endif
 		}
@@ -209,7 +200,7 @@ namespace Patchouli
 		template <typename T>
 		static void coreWarn(T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->warn(std::forward<T>(msg));
 #endif
 		}
@@ -217,7 +208,7 @@ namespace Patchouli
 		template <typename... Args>
 		static void coreError(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->error(fmt, std::forward<Args>(args)...);
 #endif
 		}
@@ -225,7 +216,7 @@ namespace Patchouli
 		template <typename T>
 		static void coreError(T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->error(std::forward<T>(msg));
 #endif
 		}
@@ -233,7 +224,7 @@ namespace Patchouli
 		template <typename... Args>
 		static void coreCritical(spdlog::format_string_t<Args...> fmt, Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->critical(fmt, std::forward<Args>(args)...);
 #endif
 		}
@@ -241,15 +232,17 @@ namespace Patchouli
 		template <typename T>
 		static void coreCritical(T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->critical(std::forward<T>(msg));
 #endif
 		}
 
 		template <typename... Args>
-		static void coreAssert(bool assertion, spdlog::format_string_t<Args...> fmt, Args&&... args)
+		static void coreAssert(bool assertion,
+			spdlog::format_string_t<Args...> fmt,
+			Args&&... args)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
 				coreLogger->error(fmt, std::forward<Args>(args)...);
@@ -261,7 +254,7 @@ namespace Patchouli
 		template <typename T>
 		static void coreAssert(bool assertion, T&& msg)
 		{
-#if defined(PATCHOULI_CONSOLE_ENABLE) && defined(PATCHOULI_INTERNAL_LOGGING)
+#ifdef PATCHOULI_CONSOLE_ENABLE
 			if (!assertion)
 			{
 				coreLogger->error(std::forward<T>(msg));

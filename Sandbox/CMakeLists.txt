@@ -21,3 +21,8 @@ PRIVATE
 
 # Define configuration-specific macros
 define_config_macros(Sandbox)
+
+# Platform-specific settings
+if (WIN32 AND NOT PATCHOULI_CONSOLE_ENABLE)
+	set_target_properties(Sandbox PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()

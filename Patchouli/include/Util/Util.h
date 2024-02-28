@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Util/intrusive_ptr.h"
-#include "Util/FastAllocated.h"
 #include "Util/UUID.h"
 
 namespace Patchouli

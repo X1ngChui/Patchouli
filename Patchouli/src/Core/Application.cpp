@@ -1,5 +1,9 @@
 #include "Core/Application.h"
 #include "Log/Console.h"
+#include "Event/ApplicationEvent.h"
+#include "Event/KeyboardEvent.h"
+#include "Event/MouseEvent.h"
+#include "Event/WindowEvent.h"
 
 namespace Patchouli
 {
@@ -13,13 +17,27 @@ namespace Patchouli
 	{
 		running = true;
 
-		while (running);
+		while (running)
+		{
+			window->onUpdate();
+		}
+	}
+
+	void Application::onEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.dispatch<WindowCloseEvent>([this](WindowCloseEvent& event) -> bool {
+			this->running = false;
+			return true;
+		});
 	}
 
 	void Application::init()
 	{
-		// Initialize the internal subsystem
-		Console::coreInit();
+		// Initialize the console subsystem for debugging'
+#ifdef PATCHOULI_CONSOLE_ENABLE
+		Console::init(appInfo.appName);
+#endif
 
 		// Initialize the custom subsystem
 		uint32_t subsystems = appInfo.subsystems;
@@ -30,11 +48,23 @@ namespace Patchouli
 			// Clear the lowest bit representing the subsystem
 			subsystems &= ~subsys;
 
-			// Initialize each subsystem based on the extracted subsystem bit.
+			// Initialize each subsystem based on the extracted subsystem bit
 			switch (subsys)
 			{
-			case Subsystem::Logging:
-				Console::init(appInfo.appName);
+			case Subsystem::Graphics:
+				WindowInfo windowInfo = {
+					.title = appInfo.appName,
+					.width = 1920,
+					.height = 1080
+				};
+				window = Window::create(windowInfo);
+				window->setEventCallback([this](Event* event) { this->onEvent(*event); });
+
+				GraphicsInfo graphicsInfo = {
+					.appName = appInfo.appName,
+					.appVersion = appInfo.appVersion
+				};
+				graphicsContext = GraphicsContext::create(graphicsInfo);
 				break;
 			}
 		}
