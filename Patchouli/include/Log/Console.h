@@ -12,6 +12,10 @@
 	#define trap __builtin_trap;
 #endif
 
+#ifdef PATCHOULI_DEBUG_MODE
+	#define PATCHOULI_CONSOLE_ENABLE
+#endif
+
 namespace Patchouli
 {
 	/*

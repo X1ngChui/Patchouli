@@ -11,7 +11,7 @@ namespace Patchouli
 		uint32_t height;
 	};
 
-	class PATCHOULI_API Window : public RefCounted<Window>
+	class PATCHOULI_API Window : public RefBase<Window>
 	{
 	public:
 		Window() = default;

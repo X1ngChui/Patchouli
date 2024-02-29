@@ -16,7 +16,7 @@ namespace Patchouli
 	}
 
 	template <typename T, typename D = std::default_delete<T>>
-	using RefCounted = std::intrusive_base<T, D>;
+	using RefBase = std::intrusive_base<T, D>;
 
 	template <typename T>
 	using Ref = std::intrusive_ptr<T>;

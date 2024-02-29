@@ -51,6 +51,3 @@ target_precompile_headers(Patchouli PRIVATE "pch/PatchouliPch.h")
 
 # Define configuration-specific macros
 define_config_macros(Patchouli)
-if (PATCHOULI_CONSOLE_ENABLE)
-	target_compile_definitions(Patchouli PUBLIC PATCHOULI_CONSOLE_ENABLE)
-endif()

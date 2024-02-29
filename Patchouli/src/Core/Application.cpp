@@ -62,7 +62,8 @@ namespace Patchouli
 
 				GraphicsInfo graphicsInfo = {
 					.appName = appInfo.appName,
-					.appVersion = appInfo.appVersion
+					.appVersion = appInfo.appVersion,
+					.windowAPI = WindowAPI::GLFW
 				};
 				graphicsContext = GraphicsContext::create(graphicsInfo);
 				break;

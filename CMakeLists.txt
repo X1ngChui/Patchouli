@@ -6,7 +6,6 @@ project("Patchouli")
 
 # Build options
 option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
-option(PATCHOULI_CONSOLE_ENABLE "Enable console" ON)
 
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)

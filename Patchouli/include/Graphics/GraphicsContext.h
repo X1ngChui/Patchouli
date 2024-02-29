@@ -4,13 +4,19 @@
 
 namespace Patchouli
 {
+	enum class WindowAPI
+	{
+		None = 0, GLFW
+	};
+
 	struct GraphicsInfo
 	{
 		const char* appName;
 		uint32_t appVersion;
+		WindowAPI windowAPI;
 	};
 
-	class PATCHOULI_API GraphicsContext : public RefCounted<GraphicsContext>
+	class PATCHOULI_API GraphicsContext : public RefBase<GraphicsContext>
 	{
 	public:
 		GraphicsContext() = default;

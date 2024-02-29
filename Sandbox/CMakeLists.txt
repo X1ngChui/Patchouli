@@ -23,6 +23,6 @@ PRIVATE
 define_config_macros(Sandbox)
 
 # Platform-specific settings
-if (WIN32 AND NOT PATCHOULI_CONSOLE_ENABLE)
+if (WIN32 AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(Sandbox PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
