@@ -13,7 +13,7 @@ namespace Sandbox
 		};
 
 		graphicsContext = Patchouli::GraphicsContext::create(graphicsInfo);
-		auto devices = graphicsContext->getDevices();
+		//auto devices = graphicsContext->getDevices();
 	}
 }
 

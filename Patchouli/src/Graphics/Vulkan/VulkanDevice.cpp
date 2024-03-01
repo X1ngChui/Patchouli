@@ -33,13 +33,9 @@ namespace Patchouli
 		vkEnumeratePhysicalDevices(*instance, &nDevices, physicalDevices.data());
 
 		std::vector<Ref<GraphicsDevice>> devices;
-		devices.reserve(nDevices);
 
-		for (uint32_t i = 0; i < nDevices; i++)
-		{
-			Ref<GraphicsDevice> device = makeRef<VulkanDevice>(physicalDevices[i]);
-			devices.push_back(device);
-		}
+		for (auto physicalDevice : physicalDevices)
+			devices.push_back(makeRef<VulkanDevice>(physicalDevice));
 		
 		return devices;
 	}
