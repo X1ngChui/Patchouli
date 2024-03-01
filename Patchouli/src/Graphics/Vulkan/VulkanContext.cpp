@@ -19,4 +19,14 @@ namespace Patchouli
         vkDebugMessenger = makeRef<VulkanDebugMessenger>(vkInstance, vkAllocator);
 #endif
     }
+
+    std::vector<Ref<GraphicsDevice>> VulkanContext::getDevices() const
+    {
+        return VulkanDevice::getDevices(vkInstance);
+    }
+
+    void VulkanContext::selectDevice(Ref<GraphicsDevice> device)
+    {
+        vkDevice = std::dynamic_pointer_cast<VulkanDevice>(device);
+    }
 }

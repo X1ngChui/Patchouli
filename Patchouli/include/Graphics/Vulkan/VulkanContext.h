@@ -1,8 +1,10 @@
 #pragma once
+#include "PatchouliPch.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Graphics/Vulkan/VulkanDebugMessenger.h"
+#include "Graphics/Vulkan/VulkanDevice.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -20,6 +22,12 @@ namespace Patchouli
         // Therefore, vkAllocator, being the last member declared, is destructed last.
         virtual ~VulkanContext() = default;
 
+        // Function to retrieve a list of Vulkan graphics devices.
+        virtual std::vector<Ref<GraphicsDevice>> getDevices() const override;
+
+        // Function to select a specific Vulkan graphics device.
+        virtual void selectDevice(Ref<GraphicsDevice> device) override;
+
     private:
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member
@@ -27,7 +35,7 @@ namespace Patchouli
         Ref<VulkanAllocator> vkAllocator;
 
         // Vulkan instance.
-        // Note: vkAllocator must be placed as the second member
+        // Note: vkInstance must be placed as the second member
         // to ensure correct destruction order specified by the standard.
         Ref<VulkanInstance> vkInstance;
 
@@ -35,5 +43,7 @@ namespace Patchouli
         // Vulkan debug messenger (optional, enabled by preprocessor macro).
         Ref<VulkanDebugMessenger> vkDebugMessenger;
 #endif
+
+        Ref<VulkanDevice> vkDevice; // Vulkan device used by the context
     };
 }

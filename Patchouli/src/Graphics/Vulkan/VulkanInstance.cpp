@@ -46,8 +46,7 @@ namespace Patchouli
         };
 
         // Create Vulkan instance
-        VkAllocationCallbacks allocationCallbacks = *vkAllocator.lock();
-        VkResult result = vkCreateInstance(&instanceInfo, &allocationCallbacks, &(this->vkInstance));
+        VkResult result = vkCreateInstance(&instanceInfo, *vkAllocator.lock(), &(this->vkInstance));
         Console::coreAssert(result == VK_SUCCESS, "Vulkan instance creation failed.");
     }
 
@@ -56,8 +55,7 @@ namespace Patchouli
     VulkanInstance::~VulkanInstance()
     {
         // Destroy Vulkan instance
-        VkAllocationCallbacks allocationCallbacks = *vkAllocator.lock();
-        vkDestroyInstance(this->vkInstance, &allocationCallbacks);
+        vkDestroyInstance(this->vkInstance, *vkAllocator.lock());
     }
 
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.

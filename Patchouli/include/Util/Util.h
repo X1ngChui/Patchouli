@@ -19,14 +19,14 @@ namespace Patchouli
 	using RefBase = std::intrusive_base<T, D>;
 
 	template <typename T>
-	using Ref = std::intrusive_ptr<T>;
+	using Ref = std::shared_ptr<T>;
 
 	template <typename T, typename... Args>
 	constexpr Ref<T> makeRef(Args&&... args)
 	{
-		return std::make_intrusive<T>(std::forward<Args>(args)...);
+		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 
 	template <typename T>
-	using WeakRef = std::intrusive_weak_ptr<T>;
+	using WeakRef = std::weak_ptr<T>;
 }

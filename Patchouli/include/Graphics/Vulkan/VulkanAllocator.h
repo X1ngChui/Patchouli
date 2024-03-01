@@ -1,27 +1,23 @@
 #pragma once
-
-#include "Util/Util.h"
+#include "Graphics/GraphicsObject.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
 {
     // VulkanAllocator class is responsible for managing Vulkan memory allocation.
-    class VulkanAllocator : public RefBase<VulkanAllocator>
+    class VulkanAllocator : public GraphicsObject
     {
     public:
-        // Conversion operator to VkAllocationCallbacks.
+        // Constructor initializes Vulkan allocation callbacks.
+        VulkanAllocator();
+
+        ~VulkanAllocator() = default;
+
+        // Conversion operator to const VkAllocationCallbacks*.
         // This allows VulkanAllocator objects to be used directly as Vulkan allocation callbacks.
-        inline constexpr operator VkAllocationCallbacks() const
+        inline operator const VkAllocationCallbacks* () const
         {
-            VkAllocationCallbacks result = {
-                .pUserData = (void*)this,
-                .pfnAllocation = &allocation,
-                .pfnReallocation = &reallocation,
-                .pfnFree = &free,
-                .pfnInternalAllocation = nullptr,
-                .pfnInternalFree = nullptr
-            };
-            return result;
+            return &vkCallbacks;
         }
 
     private:
@@ -48,5 +44,8 @@ namespace Patchouli
         {
             return static_cast<VulkanAllocator*>(pUserData)->freeImpl(pMemory);
         }
+    private:
+        // Vulkan allocation callbacks structure.
+        VkAllocationCallbacks vkCallbacks;
     };
 }

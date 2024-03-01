@@ -7,5 +7,7 @@ namespace Sandbox
 	public:
 		Sandbox(const Patchouli::ApplicationInfo& info);
 		virtual ~Sandbox() = default;
+	private:
+		Patchouli::Ref<Patchouli::GraphicsContext> graphicsContext;
 	};
 }

@@ -39,8 +39,8 @@ INTERFACE
 target_link_libraries(Patchouli
 PRIVATE
 	${Vulkan_LIBRARIES}
-	mimalloc-static
 	glfw
+	mimalloc-static
 PUBLIC
 	spdlog_header_only
 	fmt-header-only

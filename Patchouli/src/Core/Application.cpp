@@ -23,13 +23,15 @@ namespace Patchouli
 		}
 	}
 
-	void Application::onEvent(Event& event)
+	void Application::onEvent(Event* event)
 	{
-		EventDispatcher dispatcher(event);
+		EventDispatcher dispatcher(*event);
 		dispatcher.dispatch<WindowCloseEvent>([this](WindowCloseEvent& event) -> bool {
 			this->running = false;
 			return true;
 		});
+
+		delete event;
 	}
 
 	void Application::init()
@@ -37,6 +39,7 @@ namespace Patchouli
 		// Initialize the console subsystem for debugging'
 #ifdef PATCHOULI_CONSOLE_ENABLE
 		Console::init(appInfo.appName);
+		Console::coreInfo("Hello {}!", appInfo.appName);
 #endif
 
 		// Initialize the custom subsystem
@@ -52,20 +55,13 @@ namespace Patchouli
 			switch (subsys)
 			{
 			case Subsystem::Graphics:
-				WindowInfo windowInfo = {
+				Patchouli::WindowInfo windowInfo = {
 					.title = appInfo.appName,
 					.width = 1920,
 					.height = 1080
 				};
-				window = Window::create(windowInfo);
-				window->setEventCallback([this](Event* event) { this->onEvent(*event); });
-
-				GraphicsInfo graphicsInfo = {
-					.appName = appInfo.appName,
-					.appVersion = appInfo.appVersion,
-					.windowAPI = WindowAPI::GLFW
-				};
-				graphicsContext = GraphicsContext::create(graphicsInfo);
+				window = Patchouli::Window::create(windowInfo);
+				window->setEventCallback([this](Patchouli::Event* event) { this->onEvent(event); });
 				break;
 			}
 		}

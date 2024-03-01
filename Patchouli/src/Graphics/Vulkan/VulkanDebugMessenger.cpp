@@ -20,7 +20,6 @@ namespace Patchouli
         };
 
         VkResult result = VK_SUCCESS;
-        VkAllocationCallbacks allocationCallbacks = *vkAllocator.lock();
 
         // Retrieve function pointer for vkCreateDebugUtilsMessengerEXT
         auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance.lock(), "vkCreateDebugUtilsMessengerEXT");
@@ -32,7 +31,7 @@ namespace Patchouli
         }
 
         // Create Vulkan debug messenger
-        result = createDebugMessenger(*vkInstance.lock(), &info, &allocationCallbacks, &debugMessenger);
+        result = createDebugMessenger(*vkInstance.lock(), &info, *vkAllocator.lock(), &debugMessenger);
 
     error:
         // Assert if Vulkan debug messenger creation fails
@@ -43,27 +42,21 @@ namespace Patchouli
     // It cleans up Vulkan debug messenger resources.
     VulkanDebugMessenger::~VulkanDebugMessenger()
     {
-        VkResult result = VK_SUCCESS;
-        VkAllocationCallbacks allocationCallbacks = *vkAllocator.lock();
-
         // Retrieve function pointer for vkDestroyDebugUtilsMessengerEXT
         auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance.lock(), "vkDestroyDebugUtilsMessengerEXT");
 
-        if (destroyDebugMessenger == nullptr)
-        {
-            result = VK_ERROR_EXTENSION_NOT_PRESENT;
-            // Assert if function pointer retrieval fails
-            Console::coreAssert(false, "Vulkan Debug Messenger destruction function loading failed.");
-        }
+        // Assert if function pointer retrieval fails
+        Console::coreAssert(destroyDebugMessenger != nullptr, "Vulkan Debug Messenger destruction function loading failed.");
 
         // Destroy Vulkan debug messenger
-        destroyDebugMessenger(*vkInstance.lock(), debugMessenger, &allocationCallbacks);
+        destroyDebugMessenger(*vkInstance.lock(), debugMessenger, *vkAllocator.lock());
     }
 
     // Member function for handling Vulkan debug messages.
     // It logs the debug message to the console.
     void VulkanDebugMessenger::consoleImpl(VkDebugUtilsMessageSeverityFlagBitsEXT severity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* message)
     {
+        (void)messageType;
         switch (severity)
         {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
