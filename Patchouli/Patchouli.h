@@ -8,3 +8,6 @@
 #include "Log/Logger.h"
 
 #include "Util/Util.h"
+
+#include "Graphics/GraphicsContext.h"
+#include "Graphics/GraphicsDevice.h"

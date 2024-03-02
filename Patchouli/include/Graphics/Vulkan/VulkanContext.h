@@ -13,8 +13,8 @@ namespace Patchouli
     class VulkanContext : public GraphicsContext
     {
     public:
-        // Constructor accepting GraphicsInfo object.
-        VulkanContext(const GraphicsInfo& info);
+        // Constructor for VulkanContext.
+        VulkanContext();
 
         // Destructor for VulkanContext.
         // Note: According to the C++ standard (ISO/IEC 14882:2011, ¡ì12.4.10),
@@ -27,22 +27,27 @@ namespace Patchouli
 
         // Function to select a specific Vulkan graphics device.
         virtual void selectDevice(Ref<GraphicsDevice> device) override;
+
+        // Static status getter function.
+        static WindowAPI getWindowAPI() { return GraphicsContext::data.windowAPI; }
+        static const char* getAppName() { return GraphicsContext::data.appName; }
+        static uint32_t getAppVersion() { return GraphicsContext::data.appVersion; }
     private:
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member
         // to ensure correct destruction order specified by the standard.
-        Ref<VulkanAllocator> vkAllocator;
+        Ref<VulkanAllocator> vkAllocator = nullptr;
 
         // Vulkan instance.
         // Note: vkInstance must be placed as the second member
         // to ensure correct destruction order specified by the standard.
-        Ref<VulkanInstance> vkInstance;
+        Ref<VulkanInstance> vkInstance = nullptr;
 
 #ifdef PATCHOULI_VULKAN_VALIDATION
         // Vulkan debug messenger (optional, enabled by preprocessor macro).
-        Ref<VulkanDebugMessenger> vkDebugMessenger;
+        Ref<VulkanDebugMessenger> vkDebugMessenger = nullptr;
 #endif
 
-        Ref<VulkanDevice> vkDevice; // Vulkan device used by the context
+        Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
     };
 }

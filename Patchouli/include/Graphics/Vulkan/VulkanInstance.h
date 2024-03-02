@@ -13,8 +13,8 @@ namespace Patchouli
     {
     public:
         // Constructor for VulkanInstance.
-        // It creates a Vulkan instance using the provided GraphicsInfo and VulkanAllocator.
-        VulkanInstance(const GraphicsInfo& info, Ref<VulkanAllocator> allocator);
+        // It creates a Vulkan instance using the VulkanAllocator.
+        VulkanInstance(Ref<VulkanAllocator> allocator);
 
         // Destructor for VulkanInstance.
         // It cleans up Vulkan instance resources.
@@ -28,11 +28,13 @@ namespace Patchouli
         // Private member function to retrieve required Vulkan extensions based on WindowAPI.
         std::vector<const char*> getExtensions(WindowAPI windowAPI) const;
 
+        std::vector<const char*> getLayers() const;
+
         // Private member function to check if specified Vulkan layers are supported.
         bool checkLayers(std::vector<const char*>& layers) const;
 
     private:
-        VkInstance vkInstance;                      // Vulkan instance handle
-        WeakRef<VulkanAllocator> vkAllocator;       // Weak reference to Vulkan allocator for memory management
+        VkInstance vkInstance; // Vulkan instance handle
+        WeakRef<VulkanAllocator> vkAllocator = nullptr; // Weak reference to Vulkan allocator for memory management
     };
 }

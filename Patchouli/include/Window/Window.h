@@ -4,11 +4,19 @@
 
 namespace Patchouli
 {
+	// Enum representing different windowing APIs
+	enum class WindowAPI
+	{
+		None = 0,   // No window
+		GLFW        // GLFW windowing API
+	};
+
 	struct WindowInfo
 	{
-		const char* title;
-		uint32_t width;
-		uint32_t height;
+		WindowAPI windowAPI = WindowAPI::GLFW;
+		const char* windowTitle = "Patchouli";
+		uint32_t windowWidth = 1280;
+		uint32_t windowHeight = 720;
 	};
 
 	class PATCHOULI_API Window : public RefBase<Window>

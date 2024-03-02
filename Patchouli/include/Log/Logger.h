@@ -2,7 +2,7 @@
 
 #include "PatchouliPch.h"
 #include "Core/Base.h"
-#include "Log/Common.h"
+#include "Log/LogBase.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 

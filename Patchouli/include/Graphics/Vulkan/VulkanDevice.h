@@ -63,14 +63,14 @@ namespace Patchouli
 
     private:
         VkPhysicalDevice vkPhysicalDevice; // Vulkan physical device
-        VkDevice vkDevice; // Vulkan logical device
+        VkDevice vkDevice = VK_NULL_HANDLE; // Vulkan logical device
 
         bool selected = false; // Flag indicating whether the device is selected
 
         // --------------------
         // Valid when selected
         // --------------------
-        Scope<Queues> queues; // Scoped pointer to Vulkan queues associated with the device
-        WeakRef<VulkanAllocator> vkAllocator; // Weak reference to Vulkan allocator associated with the device
+        Scope<Queues> queues = nullptr; // Scoped pointer to Vulkan queues associated with the device
+        WeakRef<VulkanAllocator> vkAllocator = nullptr; // Weak reference to Vulkan allocator
     };
 }

@@ -1,4 +1,4 @@
-#include "Graphics/glfw/GLFWWindow.h"
+#include "Window/glfw/GLFWWindow.h"
 #include "Log/Console.h"
 #include "Event/ApplicationEvent.h"
 #include "Event/KeyboardEvent.h"
@@ -18,7 +18,7 @@ namespace Patchouli
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-		this->window = glfwCreateWindow(info.width, info.height, info.title, nullptr, nullptr);
+		this->window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle, nullptr, nullptr);
 		assert(this->window);
 
 		glfwSetWindowUserPointer(this->window, &(this->attribute));

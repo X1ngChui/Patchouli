@@ -1,23 +1,22 @@
 #pragma once
 #include "Core/Base.h"
+#include "Window/Window.h"
 #include "Graphics/GraphicsObject.h"
 #include "Graphics/GraphicsDevice.h"
 
 namespace Patchouli
 {
-    // Enum representing different windowing APIs
-    enum class WindowAPI
+    // Enum representing different graphics APIs
+    enum class GraphicsAPI
     {
-        None = 0,   // No window
-        GLFW        // GLFW windowing API
+        None = 0,
+        Vulkan
     };
 
     // Structure holding graphics-related information
     struct GraphicsInfo
     {
-        const char* appName;    // Name of the application
-        uint32_t appVersion;    // Version of the application
-        WindowAPI windowAPI;    // Windowing API used by the application
+        GraphicsAPI graphicsAPI = GraphicsAPI::Vulkan;
     };
 
     // Abstract base class representing a graphics context
@@ -35,5 +34,16 @@ namespace Patchouli
 
         // Static function to create a graphics context
         static Ref<GraphicsContext> create(const GraphicsInfo& info);
+
+    protected:
+        friend class Application;
+        struct GraphicsContextData
+        {
+            const char* appName;
+            uint32_t appVersion;
+            WindowAPI windowAPI;
+        };
+
+        inline static GraphicsContextData data; // Static status for context initialization
     };
 }

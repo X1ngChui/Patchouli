@@ -1,4 +1,5 @@
 #include "Graphics/Vulkan/VulkanBase.h"
+#include "Graphics/Vulkan/VulkanContext.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Log/Console.h"
 #include <GLFW/glfw3.h>
@@ -7,18 +8,12 @@ namespace Patchouli
 {
     // Constructor for VulkanInstance.
     // It initializes Vulkan instance based on the provided GraphicsInfo and VulkanAllocator.
-    VulkanInstance::VulkanInstance(const GraphicsInfo& info, Ref<VulkanAllocator> allocator)
+    VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator)
         : vkAllocator(allocator)
     {
-        // Get required Vulkan extensions based on the WindowAPI
-        std::vector<const char*> extensions = getExtensions(info.windowAPI);
-        std::vector<const char*> layers;
-
-        // Add validation layer and debug extension if PATCHOULI_VULKAN_VALIDATION is defined
-#ifdef PATCHOULI_VULKAN_VALIDATION
-        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        layers.push_back(PATCHOULI_VULKAN_VALIDATION);
-#endif
+        // Get required Vulkan extensions and layers
+        std::vector<const char*> extensions = getExtensions(VulkanContext::getWindowAPI());
+        std::vector<const char*> layers = getLayers();
 
         // Check if all required layers are supported
         assert(checkLayers(layers));
@@ -27,8 +22,8 @@ namespace Patchouli
         VkApplicationInfo appInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = info.appName,
-            .applicationVersion = info.appVersion,
+            .pApplicationName = VulkanContext::getAppName(),
+            .applicationVersion = VulkanContext::getAppVersion(),
             .pEngineName = "Patchouli",
             .engineVersion = VK_MAKE_API_VERSION(0, 0, 0, 0),
             .apiVersion = VK_API_VERSION_1_0
@@ -63,16 +58,31 @@ namespace Patchouli
     std::vector<const char*> VulkanInstance::getExtensions(WindowAPI windowAPI) const
     {
         uint32_t nExtensions = 0;
-        const char** extensions = nullptr;
+        const char** rawExtensions = nullptr;
 
         switch (windowAPI)
         {
         case WindowAPI::GLFW:
-            extensions = glfwGetRequiredInstanceExtensions(&nExtensions);
+            rawExtensions = glfwGetRequiredInstanceExtensions(&nExtensions);
             break;
         }
 
-        return std::vector<const char*>(extensions, extensions + nExtensions);
+        std::vector<const char*> extensions(rawExtensions, rawExtensions + nExtensions);
+#ifdef PATCHOULI_VULKAN_VALIDATION
+        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
+        return extensions;
+    }
+
+    std::vector<const char*> VulkanInstance::getLayers() const
+    {
+        std::vector<const char*> layers;
+
+#ifdef PATCHOULI_VULKAN_VALIDATION
+        layers.push_back(PATCHOULI_VULKAN_VALIDATION);
+#endif
+        return layers;
     }
 
     // Private member function to check if specified Vulkan layers are supported.

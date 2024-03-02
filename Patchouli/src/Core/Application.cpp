@@ -19,7 +19,10 @@ namespace Patchouli
 
 		while (running)
 		{
-			window->onUpdate();
+			if (window.get() != nullptr)
+			{
+				window->onUpdate();
+			}
 		}
 	}
 
@@ -55,16 +58,23 @@ namespace Patchouli
 			switch (subsys)
 			{
 			case Subsystem::Graphics:
-				Patchouli::WindowInfo windowInfo = {
-					.title = appInfo.appName,
-					.width = 1920,
-					.height = 1080
-				};
-				window = Patchouli::Window::create(windowInfo);
-				window->setEventCallback([this](Patchouli::Event* event) { this->onEvent(event); });
+				assert(appInfo.windowInfo != nullptr);
+				graphicsInit(appInfo);
 				break;
 			}
 		}
+	}
+
+	void Application::graphicsInit(const ApplicationInfo& appInfo)
+	{
+		assert(appInfo.windowInfo != nullptr);
+		window = Window::create(*appInfo.windowInfo);
+		window->setEventCallback([this](Event* event) {this->onEvent(event); });
+		GraphicsContext::data = {
+			.appName = appInfo.appName,
+			.appVersion = appInfo.appVersion,
+			.windowAPI = appInfo.windowInfo->windowAPI
+		};
 	}
 
 	void Application::pushLayer(Layer* layer)

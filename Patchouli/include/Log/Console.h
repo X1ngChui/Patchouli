@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include "Core/Base.h"
-#include "Log/Common.h"
+#include "Log/LogBase.h"
 
 #ifdef _MSC_VER
 	#define trap __debugbreak

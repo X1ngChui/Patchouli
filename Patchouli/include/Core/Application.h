@@ -2,7 +2,7 @@
 
 #include "Core/Base.h"
 #include "Core/Layer.h"
-#include "Graphics/Window.h"
+#include "Window/Window.h"
 #include "Graphics/GraphicsContext.h"
 
 #define PATCHOULI_SUBSYSTEM_FLAG(x) (1 << (x))
@@ -33,6 +33,7 @@ namespace Patchouli
 		const char* appName = "Patchouli";			/* Name of the application */
 		uint32_t appVersion = 0;					/* Version of the application */
 		uint32_t subsystems = 0;					/* Subsystems enabled for the application */
+		const WindowInfo* windowInfo = nullptr;
 	};
 
 	/* Class representing the application. */
@@ -52,19 +53,20 @@ namespace Patchouli
 	protected:
 		Application(const ApplicationInfo& info);
 
-	private:
-		/* Function to initialize the application and its subsystems */
-		void init();
-
 		void pushLayer(Layer* layer);
 		void popLayer(Layer* layer);
 		void pushOverlay(Overlay* overlay);
 		void popOverlay(Overlay* overlay);
+	private:
+		/* Function to initialize the application and its subsystems */
+		void init();
 
+		/* Function to initialize the graphics subsystem */
+		void graphicsInit(const ApplicationInfo& appInfo);
 	private:
 		bool running;								/* Flag indicating whether the application is running */
 		ApplicationInfo appInfo;					/* Information about the application */
-		LayerStack layerStack;
-		Ref<Window> window;
+		LayerStack layerStack;						/* Layers container */
+		Ref<Window> window = nullptr;				/* Window pointer */
 	};
 }

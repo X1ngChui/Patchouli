@@ -6,12 +6,9 @@ namespace Sandbox
 	Sandbox::Sandbox(const Patchouli::ApplicationInfo& info)
 		: Application(info)
 	{
-		Patchouli::GraphicsInfo graphicsInfo = {
-			.appName = info.appName,
-			.appVersion = info.appVersion,
-			.windowAPI = Patchouli::WindowAPI::GLFW
+		const Patchouli::GraphicsInfo graphicsInfo = {
+			.graphicsAPI = Patchouli::GraphicsAPI::Vulkan
 		};
-
 		graphicsContext = Patchouli::GraphicsContext::create(graphicsInfo);
 		auto devices = graphicsContext->getDevices();
 		graphicsContext->selectDevice(devices[0]);
@@ -20,13 +17,21 @@ namespace Sandbox
 
 int main()
 {
-	constexpr Patchouli::ApplicationInfo info = {
-		.appName = "Sandbox",
-		.appVersion = Patchouli::version(0, 0, 0, 0),
-		.subsystems = Patchouli::Subsystem::Graphics
+	const Patchouli::WindowInfo windowInfo = {
+		.windowAPI = Patchouli::WindowAPI::GLFW,
+		.windowTitle = "Sandbox",
+		.windowWidth = 1280,
+		.windowHeight = 720
 	};
 
-	auto* app = new Sandbox::Sandbox(info);
+	const Patchouli::ApplicationInfo appInfo = {
+		.appName = "Sandbox",
+		.appVersion = Patchouli::version(0, 0, 0, 0),
+		.subsystems = Patchouli::Subsystem::Graphics,
+		.windowInfo = &windowInfo
+	};
+
+	auto* app = new Sandbox::Sandbox(appInfo);
 	app->run();
 	delete app;
 }

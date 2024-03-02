@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Window.h"
+#include "Window/Window.h"
 #include <GLFW/glfw3.h>
 
 namespace Patchouli
