@@ -1,3 +1,4 @@
+#include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Log/Console.h"
 #include <GLFW/glfw3.h>
@@ -16,11 +17,11 @@ namespace Patchouli
         // Add validation layer and debug extension if PATCHOULI_VULKAN_VALIDATION is defined
 #ifdef PATCHOULI_VULKAN_VALIDATION
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        layers.push_back("VK_LAYER_KHRONOS_validation");
+        layers.push_back(PATCHOULI_VULKAN_VALIDATION);
 #endif
 
         // Check if all required layers are supported
-        Console::coreAssert(checkLayers(layers), "Not all required layers are supported.");
+        assert(checkLayers(layers));
 
         // Fill VkApplicationInfo structure
         VkApplicationInfo appInfo = {
@@ -47,7 +48,7 @@ namespace Patchouli
 
         // Create Vulkan instance
         VkResult result = vkCreateInstance(&instanceInfo, *vkAllocator.lock(), &(this->vkInstance));
-        Console::coreAssert(result == VK_SUCCESS, "Vulkan instance creation failed.");
+        assert(result == VK_SUCCESS);
     }
 
     // Destructor for VulkanInstance.

@@ -35,7 +35,7 @@ namespace Patchouli
 
     error:
         // Assert if Vulkan debug messenger creation fails
-        Console::coreAssert(result == VK_SUCCESS, "Vulkan Debug Messenger creation failed.");
+        assert(result == VK_SUCCESS);
     }
 
     // Destructor for VulkanDebugMessenger.
@@ -46,7 +46,7 @@ namespace Patchouli
         auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance.lock(), "vkDestroyDebugUtilsMessengerEXT");
 
         // Assert if function pointer retrieval fails
-        Console::coreAssert(destroyDebugMessenger != nullptr, "Vulkan Debug Messenger destruction function loading failed.");
+        assert(destroyDebugMessenger != nullptr);
 
         // Destroy Vulkan debug messenger
         destroyDebugMessenger(*vkInstance.lock(), debugMessenger, *vkAllocator.lock());

@@ -27,7 +27,6 @@ namespace Patchouli
 
         // Function to select a specific Vulkan graphics device.
         virtual void selectDevice(Ref<GraphicsDevice> device) override;
-
     private:
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member

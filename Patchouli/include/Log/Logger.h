@@ -77,23 +77,6 @@ namespace Patchouli
 			logger->critical(std::forward<T>(msg));
 		}
 
-#ifdef assert
-	#undef assert
-#endif
-		template <typename... Args>
-		void assert(bool assertion, spdlog::format_string_t<Args...> fmt, Args&&... args)
-		{
-			if (!assertion)
-				logger->error(fmt, std::forward<Args>(args)...);
-		}
-
-		template <typename T>
-		void assert(bool assertion, T&& msg)
-		{
-			if (!assertion)
-				logger->error(std::forward<T>(msg));
-		}
-
 	private:
 		std::shared_ptr<spdlog::logger> logger;
 	};

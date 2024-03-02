@@ -28,5 +28,6 @@ namespace Patchouli
     void VulkanContext::selectDevice(Ref<GraphicsDevice> device)
     {
         vkDevice = std::dynamic_pointer_cast<VulkanDevice>(device);
+        vkDevice->onSelect(vkAllocator);
     }
 }

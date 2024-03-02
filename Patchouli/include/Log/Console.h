@@ -26,7 +26,6 @@ namespace Patchouli
 	// Example of using logging functions:
 	// Console::coreError("Cirno = 9");								(Output: Cirno = 9)
 	// Console::coreInfo("{0} = {1}.", "Cirno", 9);					(Output: Cirno = 9)
-	// Console::coreAssert(false, "{0} = {1}.", "Cirno", 9);		(Output: Cirno = 9)
 	public:
 		Console() = delete;
 		~Console() = delete;
@@ -123,35 +122,6 @@ namespace Patchouli
 #endif
 		}
 
-#ifdef assert
-	#undef assert
-#endif
-		template <typename... Args>
-		static void assert(bool assertion,
-			spdlog::format_string_t<Args...> fmt,
-			Args&&... args)
-		{
-#ifdef PATCHOULI_CONSOLE_ENABLE
-			if (!assertion)
-			{
-				clientLogger->error(fmt, std::forward<Args>(args)...);
-				trap();
-			}
-#endif
-		}
-
-		template <typename T>
-		static void assert(bool assertion, T&& msg)
-		{
-#ifdef PATCHOULI_CONSOLE_ENABLE
-			if (!assertion)
-			{
-				clientLogger->error(std::forward<T>(msg));
-				trap();
-			}
-#endif
-		}
-
 		// --------------------------------------------------
 		// Core Logging Functions
 
@@ -238,32 +208,6 @@ namespace Patchouli
 		{
 #ifdef PATCHOULI_CONSOLE_ENABLE
 			coreLogger->critical(std::forward<T>(msg));
-#endif
-		}
-
-		template <typename... Args>
-		static void coreAssert(bool assertion,
-			spdlog::format_string_t<Args...> fmt,
-			Args&&... args)
-		{
-#ifdef PATCHOULI_CONSOLE_ENABLE
-			if (!assertion)
-			{
-				coreLogger->error(fmt, std::forward<Args>(args)...);
-				trap();
-			}
-#endif
-		}
-
-		template <typename T>
-		static void coreAssert(bool assertion, T&& msg)
-		{
-#ifdef PATCHOULI_CONSOLE_ENABLE
-			if (!assertion)
-			{
-				coreLogger->error(std::forward<T>(msg));
-				trap();
-			}
 #endif
 		}
 

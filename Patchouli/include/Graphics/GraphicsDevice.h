@@ -31,13 +31,9 @@ namespace Patchouli
         virtual ~GraphicsDevice() = default;
 
         // Getter functions for GraphicsDeviceProperties
-        const GraphicsDeviceProperties& getProperties() const { return properties; }
+        virtual GraphicsDeviceProperties getProperties() const = 0;
 
         // Getter functions for GraphicsDeviceFeatures
-        const GraphicsDeviceFeatures& getFeatures() const { return features; }
-
-    protected:
-        GraphicsDeviceProperties properties;    // Properties of the graphics device
-        GraphicsDeviceFeatures features;        // Features supported by the graphics device
+        virtual GraphicsDeviceFeatures getFeatures() const = 0;
     };
 }

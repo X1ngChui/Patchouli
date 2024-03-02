@@ -12,14 +12,14 @@ namespace Patchouli
 		if (!glfwInitialized)
 		{
 			auto status = glfwInit();
-			Console::coreAssert(status == GLFW_TRUE, "GLFW initialization failed.");
+			assert(status == GLFW_TRUE);
 			glfwInitialized = true;
 		}
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 		this->window = glfwCreateWindow(info.width, info.height, info.title, nullptr, nullptr);
-		Console::coreAssert(this->window, "The window creation failed.");
+		assert(this->window);
 
 		glfwSetWindowUserPointer(this->window, &(this->attribute));
 

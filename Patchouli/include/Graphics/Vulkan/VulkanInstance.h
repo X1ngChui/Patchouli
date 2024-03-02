@@ -6,11 +6,6 @@
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include <vulkan/vulkan.h>
 
-// Conditionally define PATCHOULI_VULKAN_VALIDATION macro based on PATCHOULI_DEBUG_MODE
-#ifdef PATCHOULI_DEBUG_MODE
-#define PATCHOULI_VULKAN_VALIDATION
-#endif
-
 namespace Patchouli
 {
     // VulkanInstance class manages Vulkan instance creation and destruction.
