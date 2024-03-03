@@ -1,3 +1,4 @@
+#include "Core/Application.h"
 #include "Graphics/Vulkan/VulkanContext.h"
 #include <GLFW/glfw3.h>
 
@@ -17,6 +18,9 @@ namespace Patchouli
         // Create Vulkan debug messenger for validation purposes, if enabled
         vkDebugMessenger = makeRef<VulkanDebugMessenger>(vkInstance, vkAllocator);
 #endif
+
+        vkSurface = makeRef<VulkanSurface>(vkInstance, vkAllocator,
+            Application::getInstance().getWindow());
     }
 
     std::vector<Ref<GraphicsDevice>> VulkanContext::getDevices() const
@@ -27,6 +31,6 @@ namespace Patchouli
     void VulkanContext::selectDevice(Ref<GraphicsDevice> device)
     {
         vkDevice = std::dynamic_pointer_cast<VulkanDevice>(device);
-        vkDevice->onSelect(vkAllocator);
+        vkDevice->onSelect(vkAllocator, vkSurface);
     }
 }

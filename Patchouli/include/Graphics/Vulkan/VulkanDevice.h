@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
+#include "Graphics/Vulkan/VulkanSurface.h"
 #include <vulkan/vulkan.h>
 
-#define PATCHOULI_VULKAN_QUEUE_FAMILY_NONE 0xffffffff
+#define PATCHOULI_VULKAN_QUEUE_FAMILY_NONE (0xffffffff)
 
 namespace Patchouli
 {
@@ -24,42 +26,20 @@ namespace Patchouli
         // Retrieves device features.
         virtual GraphicsDeviceFeatures getFeatures() const override;
 
+        // Private member function to retrieve required Vulkan device extensions.
+        std::vector<const char*> getEnabledExtensions() const;
+
+        // Private member function to retrieve required Vulkan device layers.
+        std::vector<const char*> getEnabledLayers() const;
+
+        // Private member function to retrieve required Vulkan device features.
+        VkPhysicalDeviceFeatures getEnabledFeatures() const;
+
         // Selects the Vulkan device and initializes its properties.
-        void onSelect(Ref<VulkanAllocator> allocator);
+        void onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface);
 
         // Retrieves a list of Vulkan devices associated with a Vulkan instance.
         static std::vector<Ref<GraphicsDevice>> getDevices(Ref<VulkanInstance> instance);
-
-    private:
-        // Structure to store queue families.
-        struct QueueFamilies
-        {
-            uint32_t graphics = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Graphics queue family index
-            uint32_t compute = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Compute queue family index
-            uint32_t transfer = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Transfer queue family index
-            uint32_t sparseBinding = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Sparse binding queue family index
-        };
-
-        // Structure to store Vulkan queues associated with the device.
-        struct Queues
-        {
-            VkQueue graphics; // Graphics queue
-            VkQueue compute; // Compute queue
-            VkQueue transfer; // Transfer queue
-            VkQueue sparseBinding; // Sparse binding queue
-        };
-
-        // Retrieves queue family properties of the physical device.
-        std::vector<VkQueueFamilyProperties> getQueueFamilyProperties() const;
-
-        // Determines supported functionalities for each queue family.
-        QueueFamilies determineQueueFamilies(const std::vector<VkQueueFamilyProperties>& queueFamilyProperties) const;
-
-        // Creates an array of VkDeviceQueueCreateInfo structs for device creation.
-        std::vector<VkDeviceQueueCreateInfo> createQueueCreateInfoArray(const QueueFamilies& queueFamilies) const;
-
-        // Creates the Vulkan device.
-        void createDevice(const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfoArray, const QueueFamilies& queueFamilies);
 
     private:
         VkPhysicalDevice vkPhysicalDevice; // Vulkan physical device
@@ -70,6 +50,15 @@ namespace Patchouli
         // --------------------
         // Valid when selected
         // --------------------
+        // Structure to store Vulkan queues associated with the device.
+        struct Queues
+        {
+            VkQueue graphics; // Graphics queue
+            VkQueue compute; // Compute queue
+            VkQueue transfer; // Transfer queue
+            VkQueue sparseBinding; // Sparse binding queue
+            VkQueue present; // Present queue
+        };
         Scope<Queues> queues = nullptr; // Scoped pointer to Vulkan queues associated with the device
         WeakRef<VulkanAllocator> vkAllocator = nullptr; // Weak reference to Vulkan allocator
     };

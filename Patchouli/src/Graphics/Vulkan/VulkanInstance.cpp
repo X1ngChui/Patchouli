@@ -13,8 +13,8 @@ namespace Patchouli
         : vkAllocator(allocator)
     {
         // Get required Vulkan extensions and layers
-        std::vector<const char*> extensions = getExtensions(Application::getInstance().getAppInfo().windowInfo.windowAPI);
-        std::vector<const char*> layers = getLayers();
+        std::vector<const char*> extensions = getEnabledExtensions(Application::getInstance().getAppInfo().windowInfo.windowAPI);
+        std::vector<const char*> layers = getEnabledLayers();
 
         // Fill VkApplicationInfo structure
         VkApplicationInfo appInfo = {
@@ -53,7 +53,7 @@ namespace Patchouli
     }
 
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.
-    std::vector<const char*> VulkanInstance::getExtensions(WindowAPI windowAPI) const
+    std::vector<const char*> VulkanInstance::getEnabledExtensions(WindowAPI windowAPI) const
     {
         std::vector<const char*> extensions;
 
@@ -73,7 +73,7 @@ namespace Patchouli
         return extensions;
     }
 
-    std::vector<const char*> VulkanInstance::getLayers() const
+    std::vector<const char*> VulkanInstance::getEnabledLayers() const
     {
         std::vector<const char*> layers;
 

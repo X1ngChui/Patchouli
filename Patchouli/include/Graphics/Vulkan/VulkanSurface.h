@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Graphics/GraphicsSurface.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
@@ -13,6 +15,8 @@ namespace Patchouli
 			Ref<Window> window);
 
 		virtual ~VulkanSurface();
+
+		inline operator VkSurfaceKHR() const { return vkSurface; }
 	private:
 		VkSurfaceKHR vkSurface;
 		WeakRef<VulkanInstance> vkInstance;

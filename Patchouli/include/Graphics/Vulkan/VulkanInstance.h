@@ -26,9 +26,10 @@ namespace Patchouli
 
     private:
         // Private member function to retrieve required Vulkan extensions based on WindowAPI.
-        std::vector<const char*> getExtensions(WindowAPI windowAPI) const;
+        std::vector<const char*> getEnabledExtensions(WindowAPI windowAPI) const;
 
-        std::vector<const char*> getLayers() const;
+        // Private member function to retrieve required Vulkan layers.
+        std::vector<const char*> getEnabledLayers() const;
 
         // Private member function to check if specified Vulkan layers are supported.
         bool checkLayers(std::vector<const char*>& layers) const;

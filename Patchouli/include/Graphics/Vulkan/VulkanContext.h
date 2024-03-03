@@ -45,8 +45,8 @@ namespace Patchouli
         Ref<VulkanDebugMessenger> vkDebugMessenger = nullptr;
 #endif
 
-        Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
-
         Ref<VulkanSurface> vkSurface = nullptr; // Vulkan surface to display image
+
+        Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
     };
 }

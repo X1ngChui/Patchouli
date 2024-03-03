@@ -52,6 +52,8 @@ namespace Patchouli
 
 		const ApplicationInfo& getAppInfo() const { return appInfo; }
 
+		Ref<Window> getWindow() const { return window; }
+
 		static const Application& getInstance() { return *instance; }
 
 	protected:
