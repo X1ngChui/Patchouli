@@ -31,9 +31,9 @@ namespace Patchouli
 	struct ApplicationInfo
 	{
 		const char* appName = "Patchouli";			/* Name of the application */
-		uint32_t appVersion = 0;					/* Version of the application */
-		uint32_t subsystems = 0;					/* Subsystems enabled for the application */
-		const WindowInfo* windowInfo = nullptr;
+		const uint32_t appVersion = 0;				/* Version of the application */
+		const uint32_t subsystems = 0;				/* Subsystems enabled for the application */
+		const WindowInfo windowInfo;
 	};
 
 	/* Class representing the application. */
@@ -49,6 +49,10 @@ namespace Patchouli
 		void run();
 
 		void onEvent(Event* event);
+
+		const ApplicationInfo& getAppInfo() const { return appInfo; }
+
+		static const Application& getInstance() { return *instance; }
 
 	protected:
 		Application(const ApplicationInfo& info);
@@ -68,5 +72,7 @@ namespace Patchouli
 		ApplicationInfo appInfo;					/* Information about the application */
 		LayerStack layerStack;						/* Layers container */
 		Ref<Window> window = nullptr;				/* Window pointer */
+
+		inline static Application* instance = nullptr;
 	};
 }

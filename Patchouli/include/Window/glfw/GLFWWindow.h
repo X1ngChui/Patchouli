@@ -16,6 +16,9 @@ namespace Patchouli
 		virtual void setEventCallback(const EventCallback& eventCallback) override { attribute.eventCallback = eventCallback; }
 
 		virtual void onUpdate() override;
+
+		virtual void* getNative() const override { return (void*)(&window); };
+
 	private:
 		struct WindowAttribute
 		{

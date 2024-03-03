@@ -33,6 +33,8 @@ namespace Patchouli
 
 		virtual void onUpdate() = 0;
 
+		virtual void* getNative() const = 0;
+
 		static Ref<Window> create(const WindowInfo& info);
 	};
 }

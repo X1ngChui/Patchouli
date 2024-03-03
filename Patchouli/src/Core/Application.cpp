@@ -10,6 +10,9 @@ namespace Patchouli
 	Application::Application(const ApplicationInfo& info)
 		: running(false), appInfo(info)
 	{
+		assert(instance == nullptr);
+		instance = this;
+
 		init();
 	}
 
@@ -58,7 +61,6 @@ namespace Patchouli
 			switch (subsys)
 			{
 			case Subsystem::Graphics:
-				assert(appInfo.windowInfo != nullptr);
 				graphicsInit(appInfo);
 				break;
 			}
@@ -67,14 +69,8 @@ namespace Patchouli
 
 	void Application::graphicsInit(const ApplicationInfo& appInfo)
 	{
-		assert(appInfo.windowInfo != nullptr);
-		window = Window::create(*appInfo.windowInfo);
+		window = Window::create(appInfo.windowInfo);
 		window->setEventCallback([this](Event* event) {this->onEvent(event); });
-		GraphicsContext::data = {
-			.appName = appInfo.appName,
-			.appVersion = appInfo.appVersion,
-			.windowAPI = appInfo.windowInfo->windowAPI
-		};
 	}
 
 	void Application::pushLayer(Layer* layer)

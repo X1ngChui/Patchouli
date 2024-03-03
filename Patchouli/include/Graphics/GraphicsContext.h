@@ -34,16 +34,5 @@ namespace Patchouli
 
         // Static function to create a graphics context
         static Ref<GraphicsContext> create(const GraphicsInfo& info);
-
-    protected:
-        friend class Application;
-        struct GraphicsContextData
-        {
-            const char* appName;
-            uint32_t appVersion;
-            WindowAPI windowAPI;
-        };
-
-        inline static GraphicsContextData data; // Static status for context initialization
     };
 }

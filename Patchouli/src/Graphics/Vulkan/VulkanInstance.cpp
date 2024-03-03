@@ -1,3 +1,4 @@
+#include "Core/Application.h"
 #include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanContext.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
@@ -12,18 +13,15 @@ namespace Patchouli
         : vkAllocator(allocator)
     {
         // Get required Vulkan extensions and layers
-        std::vector<const char*> extensions = getExtensions(VulkanContext::getWindowAPI());
+        std::vector<const char*> extensions = getExtensions(Application::getInstance().getAppInfo().windowInfo.windowAPI);
         std::vector<const char*> layers = getLayers();
-
-        // Check if all required layers are supported
-        assert(checkLayers(layers));
 
         // Fill VkApplicationInfo structure
         VkApplicationInfo appInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = VulkanContext::getAppName(),
-            .applicationVersion = VulkanContext::getAppVersion(),
+            .pApplicationName = Application::getInstance().getAppInfo().appName,
+            .applicationVersion = Application::getInstance().getAppInfo().appVersion,
             .pEngineName = "Patchouli",
             .engineVersion = VK_MAKE_API_VERSION(0, 0, 0, 0),
             .apiVersion = VK_API_VERSION_1_0
@@ -57,21 +55,21 @@ namespace Patchouli
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.
     std::vector<const char*> VulkanInstance::getExtensions(WindowAPI windowAPI) const
     {
-        uint32_t nExtensions = 0;
-        const char** rawExtensions = nullptr;
+        std::vector<const char*> extensions;
 
         switch (windowAPI)
         {
         case WindowAPI::GLFW:
-            rawExtensions = glfwGetRequiredInstanceExtensions(&nExtensions);
+            uint32_t nExtensions;
+            const char** source = glfwGetRequiredInstanceExtensions(&nExtensions);
+            extensions.resize(nExtensions);
+            std::memcpy(extensions.data(), source, nExtensions * sizeof(const char*));
             break;
         }
 
-        std::vector<const char*> extensions(rawExtensions, rawExtensions + nExtensions);
 #ifdef PATCHOULI_VULKAN_VALIDATION
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
-
         return extensions;
     }
 
@@ -82,6 +80,9 @@ namespace Patchouli
 #ifdef PATCHOULI_VULKAN_VALIDATION
         layers.push_back(PATCHOULI_VULKAN_VALIDATION);
 #endif
+        // Check if all required layers are supported
+        assert(checkLayers(layers));
+
         return layers;
     }
 

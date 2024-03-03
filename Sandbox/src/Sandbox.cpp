@@ -28,10 +28,9 @@ int main()
 		.appName = "Sandbox",
 		.appVersion = Patchouli::version(0, 0, 0, 0),
 		.subsystems = Patchouli::Subsystem::Graphics,
-		.windowInfo = &windowInfo
+		.windowInfo = windowInfo
 	};
 
-	auto* app = new Sandbox::Sandbox(appInfo);
+	Patchouli::Scope<Sandbox::Sandbox> app = Patchouli::makeScope<Sandbox::Sandbox>(appInfo);
 	app->run();
-	delete app;
 }

@@ -5,6 +5,7 @@
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Graphics/Vulkan/VulkanDebugMessenger.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
+#include "Graphics/Vulkan/VulkanSurface.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -28,10 +29,6 @@ namespace Patchouli
         // Function to select a specific Vulkan graphics device.
         virtual void selectDevice(Ref<GraphicsDevice> device) override;
 
-        // Static status getter function.
-        static WindowAPI getWindowAPI() { return GraphicsContext::data.windowAPI; }
-        static const char* getAppName() { return GraphicsContext::data.appName; }
-        static uint32_t getAppVersion() { return GraphicsContext::data.appVersion; }
     private:
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member
@@ -49,5 +46,7 @@ namespace Patchouli
 #endif
 
         Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
+
+        Ref<VulkanSurface> vkSurface = nullptr; // Vulkan surface to display image
     };
 }
