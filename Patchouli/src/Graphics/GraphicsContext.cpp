@@ -8,7 +8,7 @@ namespace Patchouli
 		switch (info.graphicsAPI)
 		{
 		case GraphicsAPI::Vulkan:
-			return makeRef<VulkanContext>();
+			return makeRef<VulkanContext>(info);
 		}
 		
 		return nullptr;

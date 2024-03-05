@@ -16,7 +16,7 @@ namespace Patchouli
     {
     public:
         // Constructor for VulkanContext.
-        VulkanContext();
+        VulkanContext(const GraphicsInfo& info);
 
         // Destructor for VulkanContext.
         // Note: According to the C++ standard (ISO/IEC 14882:2011, ¡ì12.4.10),
@@ -31,6 +31,9 @@ namespace Patchouli
         virtual void selectDevice(Ref<GraphicsDevice> device) override;
 
     private:
+        // Graphics settings info.
+        GraphicsInfo graphicsInfo;
+
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member
         // to ensure correct destruction order specified by the standard.

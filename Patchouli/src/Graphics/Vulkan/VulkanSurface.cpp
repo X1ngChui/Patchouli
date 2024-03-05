@@ -10,6 +10,9 @@ namespace Patchouli
 	{
 		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
 		{
+		case WindowAPI::None:
+			vkSurface = VK_NULL_HANDLE;
+			break;
 		case WindowAPI::GLFW:
 			VkResult status = glfwCreateWindowSurface(*vkInstance, *(GLFWwindow**)window->getNative(), *vkAllocator, &vkSurface);
 			assert(status == VK_SUCCESS);

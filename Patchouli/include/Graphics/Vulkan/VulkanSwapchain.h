@@ -6,36 +6,42 @@
 
 namespace Patchouli
 {
+	// Class representing a Vulkan Swapchain
 	class VulkanSwapchain : public GraphicsObject
 	{
 	public:
-		VulkanSwapchain(Ref<VulkanDevice> device, Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator);
+		// Constructor to create a Vulkan Swapchain
+		VulkanSwapchain(const GraphicsInfo& graphicsInfo, Ref<VulkanDevice> device, Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator);
+
+		// Destructor to destroy a Vulkan Swapchain
 		virtual ~VulkanSwapchain();
+
 	private:
-		struct SwapchainSupports
+		// Friend declaration to allow access to struct VulkanSwapchainSupports
+		template <GraphicsPolicy>
+		friend struct VulkanSwapchainSettingsSelect;
+
+		// Structure to hold information about Vulkan Swapchain supports
+		struct VulkanSwapchainSupports
 		{
-			VkSurfaceCapabilitiesKHR surfaceCapabilities;
-			std::vector<VkSurfaceFormatKHR> surfaceFormats;
-			std::vector<VkPresentModeKHR> presentModes;
+			VkSurfaceCapabilitiesKHR surfaceCapabilities; // Surface capabilities
+			std::vector<VkSurfaceFormatKHR> surfaceFormats; // Surface formats
+			std::vector<VkPresentModeKHR> presentModes; // Present modes
 		};
 
-		SwapchainSupports getSwapchainSupports() const;
+		// Function to retrieve Vulkan Swapchain supports
+		VulkanSwapchainSupports getSwapchainSupports() const;
 
-		VkSurfaceFormatKHR selectSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats) const;
-
-		VkPresentModeKHR selectSurfacePresentMode(const std::vector<VkPresentModeKHR>& presentModes) const;
-
-		VkExtent2D getExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
 	private:
-		VkSwapchainKHR vkSwapchain;
-		Ref<VulkanDevice> vkDevice = nullptr;
-		Ref<VulkanSurface> vkSurface = nullptr;
-		Ref<VulkanAllocator> vkAllocator = nullptr;
+		VkSwapchainKHR vkSwapchain; // Vulkan Swapchain handle
+		Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device
+		Ref<VulkanSurface> vkSurface = nullptr; // Vulkan surface
+		Ref<VulkanAllocator> vkAllocator = nullptr; // Vulkan allocator
 
-		VkFormat vkFormat;
-		VkExtent2D vkExtent;
+		VkFormat vkFormat; // Vulkan image format
+		VkExtent2D vkExtent; // Vulkan image extent
 
-		std::vector<VkImage> vkImages;
-		std::vector<VkImageView> vkImageVies;
+		std::vector<VkImage> vkImages; // Vulkan images
+		std::vector<VkImageView> vkImageViews; // Vulkan image views
 	};
 }

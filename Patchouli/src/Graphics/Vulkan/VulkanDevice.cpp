@@ -87,34 +87,14 @@ namespace Patchouli
         selected = true; // Mark the device as selected
         vkAllocator = allocator; // Store the allocator for resource management
 
-        // Get queue family properties of the selected physical device
-        uint32_t nQueueFamilies = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilyProperties(nQueueFamilies);
-        vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, queueFamilyProperties.data());
-
-        // Iterate through each queue family and check its supported functionalities
-        for (uint32_t i = 0; i < nQueueFamilies; i++)
-        {
-            const auto& property = queueFamilyProperties[i];
-            if (property.queueCount <= 0)
-                continue;
-
-            // Extract each supported functionality from the queue family's flags
-            if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-                queueFamilies.graphics = i;
-
-            // Check if the queue family supports presentation
-            VkBool32 presentSupported = VK_FALSE;
-            vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &presentSupported);
-            if (presentSupported)
-                queueFamilies.present = i;
-        }
+        // Get and determine queue families to be uesd
+        initQueueFamilies(surface);
+        assert(queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE);
 
         // Create queue create info array for device creation
         // Due to the possibility of different queues having the same index for various purposes,
         // duplicate indices are removed
-        assert(queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE);
+        // Note: Now only graphis and present queues are used
         std::set<uint32_t> distinctIndices = { queueFamilies.graphics, queueFamilies.present };
 
         // Create device queue create info for each distinct queue index
@@ -130,7 +110,7 @@ namespace Patchouli
                 .pNext = nullptr,
                 .flags = 0,
                 .queueFamilyIndex = index,
-                .queueCount = 1, // queueFamilyProperties[index].queueCount,
+                .queueCount = 1, // Note: Now only 1 queue is created
                 .pQueuePriorities = &priority
             };
             queueCreateInfos.push_back(deviceQueueCreateInfo);
@@ -160,6 +140,7 @@ namespace Patchouli
         assert(status == VK_SUCCESS);
 
         // Retrieve queues for different queue families
+        // Note: Now only graphis and present queues are used
         if (queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
             vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &graphicsQueue);
         if (queueFamilies.present != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
@@ -182,5 +163,48 @@ namespace Patchouli
             });
 
         return devices;
+    }
+
+    void VulkanDevice::initQueueFamilies(Ref<VulkanSurface> surface)
+    {
+        // Get queue family properties of the selected physical device
+        uint32_t nQueueFamilies = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilyProperties(nQueueFamilies);
+        vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, queueFamilyProperties.data());
+        assert(nQueueFamilies > 0);
+
+        // TODO: Better strategy for queueFamilies select
+        // Iterate through each queue family and check its supported functionalities
+        for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
+        {
+            const auto& property = queueFamilyProperties[i];
+            if (property.queueCount <= 0)
+                continue;
+
+            // Extract each supported functionality from the queue family's flags
+            if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                queueFamilies.graphics = i;
+
+            if (property.queueFlags & VK_QUEUE_COMPUTE_BIT)
+                queueFamilies.compute = i;
+
+            if (property.queueFlags & VK_QUEUE_TRANSFER_BIT)
+                queueFamilies.transfer = i;
+
+            if (property.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT)
+                queueFamilies.sparseBinding = i;
+
+            // Check if the queue family supports presentation
+            if (*surface) // if a window surface is wanted by the application
+            {
+                assert(Application::getInstance().getAppInfo().windowInfo.windowAPI != WindowAPI::None);
+
+                VkBool32 presentSupported = VK_FALSE;
+                vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &presentSupported);
+                if (presentSupported)
+                    queueFamilies.present = i;
+            }
+        }
     }
 }

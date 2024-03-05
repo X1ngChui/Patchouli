@@ -35,8 +35,8 @@ namespace Patchouli
             VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* message);
 
     private:
-        Ref<VulkanInstance> vkInstance = nullptr;  // Weak reference to associated Vulkan instance
-        Ref<VulkanAllocator> vkAllocator = nullptr; // Weak reference to associated Vulkan allocator
-        VkDebugUtilsMessengerEXT debugMessenger;        // Vulkan debug messenger handle
+        Ref<VulkanInstance> vkInstance = nullptr;  // Vulkan instance
+        Ref<VulkanAllocator> vkAllocator = nullptr; // Vulkan allocator
+        VkDebugUtilsMessengerEXT debugMessenger; // Vulkan debug messenger handle
     };
 }

@@ -6,7 +6,8 @@ namespace Patchouli
 {
     // Constructor for VulkanContext.
     // It initializes the Vulkan allocator and instance based on the provided GraphicsInfo object.
-    VulkanContext::VulkanContext()
+    VulkanContext::VulkanContext(const GraphicsInfo& info)
+        : graphicsInfo(info)
     {
         // Initialize Vulkan allocator
         vkAllocator = makeRef<VulkanAllocator>();
@@ -33,6 +34,7 @@ namespace Patchouli
         vkDevice = std::dynamic_pointer_cast<VulkanDevice>(device);
         vkDevice->onSelect(vkAllocator, vkSurface);
 
-        vkSwapchain = makeRef<VulkanSwapchain>(vkDevice, vkSurface, vkAllocator);
+        if (*vkSurface)
+            vkSwapchain = makeRef<VulkanSwapchain>(graphicsInfo, vkDevice, vkSurface, vkAllocator);
     }
 }

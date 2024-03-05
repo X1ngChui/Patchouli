@@ -13,10 +13,17 @@ namespace Patchouli
         Vulkan
     };
 
+    enum class GraphicsPolicy
+    {
+        PerformancePriority = 0,
+        PowerSavingPriority
+    };
+
     // Structure holding graphics-related information
     struct GraphicsInfo
     {
         GraphicsAPI graphicsAPI = GraphicsAPI::Vulkan;
+        GraphicsPolicy graphicsPolicy = GraphicsPolicy::PerformancePriority;
     };
 
     // Abstract base class representing a graphics context

@@ -15,9 +15,10 @@ namespace Patchouli
 
 		virtual ~VulkanSurface();
 
-		inline operator VkSurfaceKHR() const { return vkSurface; }
+		inline operator VkSurfaceKHR() const { assert(vkSurface != VK_NULL_HANDLE); return vkSurface; }
+		inline explicit operator bool() { return vkSurface != VK_NULL_HANDLE; }
 	private:
-		VkSurfaceKHR vkSurface;
+		VkSurfaceKHR vkSurface = VK_NULL_HANDLE;
 		Ref<VulkanInstance> vkInstance;
 		Ref<VulkanAllocator> vkAllocator;
 	};
