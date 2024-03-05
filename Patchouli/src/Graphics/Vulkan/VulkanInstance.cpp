@@ -40,7 +40,7 @@ namespace Patchouli
         };
 
         // Create Vulkan instance
-        VkResult result = vkCreateInstance(&instanceInfo, *vkAllocator.lock(), &(this->vkInstance));
+        VkResult result = vkCreateInstance(&instanceInfo, *vkAllocator, &(this->vkInstance));
         assert(result == VK_SUCCESS);
     }
 
@@ -49,7 +49,7 @@ namespace Patchouli
     VulkanInstance::~VulkanInstance()
     {
         // Destroy Vulkan instance
-        vkDestroyInstance(this->vkInstance, *vkAllocator.lock());
+        vkDestroyInstance(this->vkInstance, *vkAllocator);
     }
 
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.

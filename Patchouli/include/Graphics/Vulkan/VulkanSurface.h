@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Graphics/GraphicsSurface.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Window/Window.h"
@@ -8,7 +7,7 @@
 
 namespace Patchouli
 {
-	class VulkanSurface : public GraphicsSurface
+	class VulkanSurface : public GraphicsObject
 	{
 	public:
 		VulkanSurface(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator,
@@ -19,7 +18,7 @@ namespace Patchouli
 		inline operator VkSurfaceKHR() const { return vkSurface; }
 	private:
 		VkSurfaceKHR vkSurface;
-		WeakRef<VulkanInstance> vkInstance;
-		WeakRef<VulkanAllocator> vkAllocator;
+		Ref<VulkanInstance> vkInstance;
+		Ref<VulkanAllocator> vkAllocator;
 	};
 }

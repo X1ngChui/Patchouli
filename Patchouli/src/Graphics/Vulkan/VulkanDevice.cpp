@@ -1,24 +1,9 @@
 #include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
+#include "Core/Application.h"
 
 namespace Patchouli
 {
-    // Structure to store queue families.
-    struct QueueFamilyIndices
-    {
-        uint32_t graphics = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Graphics queue family index
-        uint32_t compute = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Compute queue family index
-        uint32_t transfer = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Transfer queue family index
-        uint32_t sparseBinding = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Sparse binding queue family index
-        uint32_t present = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Present queue family index
-    };
-
-    struct IndexedQueueFamilyProperties
-    {
-        uint32_t index;
-        VkQueueFamilyProperties properties;
-    };
-
     // Constructor for VulkanDevice class
     VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice)
         : vkPhysicalDevice(physicalDevice)
@@ -32,7 +17,7 @@ namespace Patchouli
         {
             // Wait for the device to become idle before destroying it
             vkDeviceWaitIdle(vkDevice);
-            vkDestroyDevice(vkDevice, *vkAllocator.lock());
+            vkDestroyDevice(vkDevice, *vkAllocator);
         }
     }
 
@@ -73,7 +58,11 @@ namespace Patchouli
 
     std::vector<const char*> VulkanDevice::getEnabledExtensions() const
     {
-        return std::vector<const char*>();
+        std::vector<const char*> extensions;
+
+        if (Application::getInstance().getAppInfo().windowInfo.windowAPI != WindowAPI::None)
+            extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        return extensions;
     }
 
     std::vector<const char*> VulkanDevice::getEnabledLayers() const
@@ -104,72 +93,38 @@ namespace Patchouli
         std::vector<VkQueueFamilyProperties> queueFamilyProperties(nQueueFamilies);
         vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, queueFamilyProperties.data());
 
-        // Make queue family properties indexed
-        std::vector<IndexedQueueFamilyProperties> indexedQueueFamilyProperties;
-        indexedQueueFamilyProperties.reserve(nQueueFamilies);
+        // Iterate through each queue family and check its supported functionalities
         for (uint32_t i = 0; i < nQueueFamilies; i++)
-            indexedQueueFamilyProperties.push_back({ i, queueFamilyProperties[i] });
-
-        // Determine supported functionalities for each queue family
-        QueueFamilyIndices queueFamilyIndices;
-
-        // Sort in descending order by queue count
-        std::ranges::sort(queueFamilyProperties,
-            [](const auto& a, const auto& b) {return a.queueCount > a.queueCount; });
-
-        // Iterate through each queue family and determine its supported functionalities
-        for (const auto& indexedProperty : indexedQueueFamilyProperties)
         {
-            VkQueueFlags flags = indexedProperty.properties.queueFlags;
+            const auto& property = queueFamilyProperties[i];
+            if (property.queueCount <= 0)
+                continue;
 
             // Extract each supported functionality from the queue family's flags
-            while (flags)
-            {
-                VkQueueFlags usage = flags & (-flags);
-                flags &= ~usage;
-
-                switch (usage)
-                {
-                case VK_QUEUE_GRAPHICS_BIT:
-                    if (queueFamilyIndices.graphics == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-                        queueFamilyIndices.graphics = indexedProperty.index;
-                    break;
-                case VK_QUEUE_COMPUTE_BIT:
-                    if (queueFamilyIndices.compute == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-                        queueFamilyIndices.compute = indexedProperty.index;
-                    break;
-                case VK_QUEUE_TRANSFER_BIT:
-                    if (queueFamilyIndices.transfer == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-                        queueFamilyIndices.transfer = indexedProperty.index;
-                    break;
-                case VK_QUEUE_SPARSE_BINDING_BIT:
-                    if (queueFamilyIndices.sparseBinding == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-                        queueFamilyIndices.sparseBinding = indexedProperty.index;
-                    break;
-                }
-            }
+            if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                queueFamilies.graphics = i;
 
             // Check if the queue family supports presentation
             VkBool32 presentSupported = VK_FALSE;
-            vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, indexedProperty.index, *surface, &presentSupported);
-            if (presentSupported && queueFamilyIndices.present == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-                queueFamilyIndices.present = indexedProperty.index;
+            vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &presentSupported);
+            if (presentSupported)
+                queueFamilies.present = i;
         }
 
         // Create queue create info array for device creation
         // Due to the possibility of different queues having the same index for various purposes,
         // duplicate indices are removed
-        std::set<uint32_t> distinctIndex = { queueFamilyIndices.graphics, queueFamilyIndices.compute,
-            queueFamilyIndices.transfer, queueFamilyIndices.sparseBinding, queueFamilyIndices.present
-        };
-        uint32_t nQueueCreateInfo = distinctIndex.size();
+        assert(queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE);
+        std::set<uint32_t> distinctIndices = { queueFamilies.graphics, queueFamilies.present };
 
         // Create device queue create info for each distinct queue index
-        std::vector<VkDeviceQueueCreateInfo> queueCreateInfoArray;
-        queueCreateInfoArray.reserve(nQueueCreateInfo);
+        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         static const float priority = 1.0f;
-        for (uint32_t index : distinctIndex)
+        for (uint32_t index : distinctIndices)
         {
+            if (index == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+                continue;
+
             VkDeviceQueueCreateInfo deviceQueueCreateInfo = {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .pNext = nullptr,
@@ -178,20 +133,21 @@ namespace Patchouli
                 .queueCount = 1, // queueFamilyProperties[index].queueCount,
                 .pQueuePriorities = &priority
             };
-            queueCreateInfoArray.push_back(deviceQueueCreateInfo);
+            queueCreateInfos.push_back(deviceQueueCreateInfo);
         }
 
-        // Create Vulkan logical device
+        // Get required extensions, layers and features
         std::vector<const char*> layers = getEnabledLayers();
         std::vector<const char*> extensions = getEnabledExtensions();
         VkPhysicalDeviceFeatures features = getEnabledFeatures();
 
+        // Create Vulkan logical device
         VkDeviceCreateInfo deviceCreateinfo = {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            .queueCreateInfoCount = nQueueCreateInfo,
-            .pQueueCreateInfos = queueCreateInfoArray.data(),
+            .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
+            .pQueueCreateInfos = queueCreateInfos.data(),
             .enabledLayerCount = static_cast<uint32_t>(layers.size()),
             .ppEnabledLayerNames = layers.data(),
             .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
@@ -200,16 +156,14 @@ namespace Patchouli
         };
 
         // Create the Vulkan device
-        VkResult status = vkCreateDevice(vkPhysicalDevice, &deviceCreateinfo, *vkAllocator.lock(), &vkDevice);
+        VkResult status = vkCreateDevice(vkPhysicalDevice, &deviceCreateinfo, *vkAllocator, &vkDevice);
         assert(status == VK_SUCCESS);
 
         // Retrieve queues for different queue families
-        queues = makeScope<Queues>();
-        vkGetDeviceQueue(vkDevice, queueFamilyIndices.graphics, 0, &queues->graphics);
-        vkGetDeviceQueue(vkDevice, queueFamilyIndices.compute, 0, &queues->compute);
-        vkGetDeviceQueue(vkDevice, queueFamilyIndices.transfer, 0, &queues->transfer);
-        vkGetDeviceQueue(vkDevice, queueFamilyIndices.sparseBinding, 0, &queues->sparseBinding);
-        vkGetDeviceQueue(vkDevice, queueFamilyIndices.present, 0, &queues->present);
+        if (queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+            vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &graphicsQueue);
+        if (queueFamilies.present != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+            vkGetDeviceQueue(vkDevice, queueFamilies.present, 0, &presentQueue);
     }
 
     // Function to retrieve a list of Vulkan devices associated with a Vulkan instance

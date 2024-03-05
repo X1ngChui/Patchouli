@@ -11,7 +11,7 @@ namespace Patchouli
 		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
 		{
 		case WindowAPI::GLFW:
-			VkResult status = glfwCreateWindowSurface(*vkInstance.lock(), *(GLFWwindow**)window->getNative(), *vkAllocator.lock(), &vkSurface);
+			VkResult status = glfwCreateWindowSurface(*vkInstance, *(GLFWwindow**)window->getNative(), *vkAllocator, &vkSurface);
 			assert(status == VK_SUCCESS);
 			break;
 		}
@@ -22,7 +22,7 @@ namespace Patchouli
 		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
 		{
 		case WindowAPI::GLFW:
-			vkDestroySurfaceKHR(*vkInstance.lock(), vkSurface, *vkAllocator.lock());
+			vkDestroySurfaceKHR(*vkInstance, vkSurface, *vkAllocator);
 			break;
 		}
 	}

@@ -32,5 +32,7 @@ namespace Patchouli
     {
         vkDevice = std::dynamic_pointer_cast<VulkanDevice>(device);
         vkDevice->onSelect(vkAllocator, vkSurface);
+
+        vkSwapchain = makeRef<VulkanSwapchain>(vkDevice, vkSurface, vkAllocator);
     }
 }

@@ -36,6 +36,6 @@ namespace Patchouli
 
     private:
         VkInstance vkInstance; // Vulkan instance handle
-        WeakRef<VulkanAllocator> vkAllocator = nullptr; // Weak reference to Vulkan allocator for memory management
+        Ref<VulkanAllocator> vkAllocator = nullptr; // Weak reference to Vulkan allocator for memory management
     };
 }

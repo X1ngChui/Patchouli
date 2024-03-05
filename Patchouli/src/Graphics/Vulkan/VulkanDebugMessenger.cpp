@@ -22,7 +22,7 @@ namespace Patchouli
         VkResult result = VK_SUCCESS;
 
         // Retrieve function pointer for vkCreateDebugUtilsMessengerEXT
-        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance.lock(), "vkCreateDebugUtilsMessengerEXT");
+        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance, "vkCreateDebugUtilsMessengerEXT");
 
         if (createDebugMessenger == nullptr)
         {
@@ -31,7 +31,7 @@ namespace Patchouli
         }
 
         // Create Vulkan debug messenger
-        result = createDebugMessenger(*vkInstance.lock(), &info, *vkAllocator.lock(), &debugMessenger);
+        result = createDebugMessenger(*vkInstance, &info, *vkAllocator, &debugMessenger);
 
     error:
         // Assert if Vulkan debug messenger creation fails
@@ -43,13 +43,13 @@ namespace Patchouli
     VulkanDebugMessenger::~VulkanDebugMessenger()
     {
         // Retrieve function pointer for vkDestroyDebugUtilsMessengerEXT
-        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance.lock(), "vkDestroyDebugUtilsMessengerEXT");
+        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance, "vkDestroyDebugUtilsMessengerEXT");
 
         // Assert if function pointer retrieval fails
         assert(destroyDebugMessenger != nullptr);
 
         // Destroy Vulkan debug messenger
-        destroyDebugMessenger(*vkInstance.lock(), debugMessenger, *vkAllocator.lock());
+        destroyDebugMessenger(*vkInstance, debugMessenger, *vkAllocator);
     }
 
     // Member function for handling Vulkan debug messages.
