@@ -6,8 +6,8 @@
 namespace Patchouli
 {
 	/* Pointer wrappers */
-	template <typename T>
-	using Scope = std::unique_ptr<T>;
+	template <typename T, typename D = std::default_delete<T>>
+	using Scope = std::unique_ptr<T, D>;
 
 	template <typename T, typename... Args>
 	constexpr Scope<T> makeScope(Args&&... args)

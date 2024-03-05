@@ -20,12 +20,11 @@ namespace Patchouli
 	{
 		running = true;
 
+		window->show();
+
 		while (running)
 		{
-			if (window.get() != nullptr)
-			{
-				window->onUpdate();
-			}
+			window->onUpdate();
 		}
 	}
 

@@ -13,6 +13,9 @@ namespace Patchouli
 		virtual uint32_t getWidth() const override { return attribute.width; }
 		virtual uint32_t getHeight() const override { return attribute.height; }
 
+		virtual void show() override;
+		virtual void hide() override;
+
 		virtual void setEventCallback(const EventCallback& eventCallback) override { attribute.eventCallback = eventCallback; }
 
 		virtual void onUpdate() override;

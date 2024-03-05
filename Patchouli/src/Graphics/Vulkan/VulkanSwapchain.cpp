@@ -70,11 +70,11 @@ namespace Patchouli
 		if (formats.size() <= 1 && formats[0].format == VK_FORMAT_UNDEFINED)
 			return defaultFormat;
 
-		for (const auto& format : formats)
-		{
-			if (format.colorSpace == defaultFormat.colorSpace && format.format == defaultFormat.format)
-				return defaultFormat;
-		}
+		auto it = std::ranges::find_if(formats, [&](const auto& format) {
+			return format.colorSpace == defaultFormat.colorSpace && format.format == defaultFormat.format;
+		});
+		if (it != formats.end())
+			return *it;
 
 		return formats[0];
 	}
@@ -84,11 +84,11 @@ namespace Patchouli
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PerformancePriority>::operator()
 		(const std::vector<VkPresentModeKHR>& presentModes)
 	{
-		auto it = std::find(presentModes.begin(), presentModes.end(), VK_PRESENT_MODE_MAILBOX_KHR);
+		auto it = std::ranges::find(presentModes, VK_PRESENT_MODE_MAILBOX_KHR);
 		if (it != presentModes.end())
 			return *it;
 
-		assert(std::find(presentModes.begin(), presentModes.end(), VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
+		assert(std::ranges::find(presentModes, VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
 
@@ -97,7 +97,7 @@ namespace Patchouli
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PowerSavingPriority>::operator()
 		(const std::vector<VkPresentModeKHR>& presentModes)
 	{
-		assert(std::find(presentModes.begin(), presentModes.end(), VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
+		assert(std::ranges::find(presentModes, VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
 

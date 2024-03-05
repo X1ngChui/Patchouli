@@ -17,6 +17,7 @@ namespace Patchouli
 		}
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 		this->window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle, nullptr, nullptr);
 		assert(this->window);
@@ -98,6 +99,16 @@ namespace Patchouli
 	GLFWWindow::~GLFWWindow()
 	{
 		glfwDestroyWindow(this->window);
+	}
+
+	void GLFWWindow::show()
+	{
+		glfwShowWindow(this->window);
+	}
+
+	void GLFWWindow::hide()
+	{
+		glfwHideWindow(this->window);
 	}
 
 	void GLFWWindow::onUpdate()

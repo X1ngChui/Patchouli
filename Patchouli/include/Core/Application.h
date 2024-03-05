@@ -37,10 +37,13 @@ namespace Patchouli
 	};
 
 	/* Class representing the application. */
-	class PATCHOULI_API Application
+	class PATCHOULI_API Application : public RefBase<Application>
 	{
 	public:
 		virtual ~Application() = default;
+
+		Application(const Application& other) = delete;
+		Application& operator=(const Application& other) = delete;
 
 		/* Function to check if the application is running */
 		bool isRunning() const { return this->running; }
@@ -54,7 +57,13 @@ namespace Patchouli
 
 		Ref<Window> getWindow() const { return window; }
 
-		static const Application& getInstance() { return *instance; }
+		static const Application& getInstance() { assert(instance != nullptr); return *instance; }
+
+		template <typename A, typename = std::enable_if_t<std::derived_from<A, Application>>, typename...Args>
+		inline static auto createApplication(Args&&... args)
+		{
+			return makeRef<A>(std::forward<Args>(args)...);
+		}
 
 	protected:
 		Application(const ApplicationInfo& info);

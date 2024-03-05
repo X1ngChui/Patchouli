@@ -28,6 +28,9 @@ namespace Patchouli
 		virtual uint32_t getWidth() const = 0;
 		virtual uint32_t getHeight() const = 0;
 
+		virtual void show() = 0;
+		virtual void hide() = 0;
+
 		using EventCallback = std::function<void(Event*)>;
 		virtual void setEventCallback(const EventCallback& eventCallback) = 0;
 
