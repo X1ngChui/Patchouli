@@ -32,6 +32,10 @@ namespace Patchouli
 		// Function to retrieve Vulkan Swapchain supports
 		VulkanSwapchainSupports getSwapchainSupports() const;
 
+		// Function to create image view
+		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
+			uint32_t mipLevels = 1);
+
 	private:
 		VkSwapchainKHR vkSwapchain; // Vulkan Swapchain handle
 		Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device

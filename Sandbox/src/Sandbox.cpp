@@ -19,7 +19,7 @@ namespace Sandbox
 int main()
 {
 	constexpr Patchouli::WindowInfo windowInfo = {
-		.windowAPI = Patchouli::WindowAPI::None,
+		.windowAPI = Patchouli::WindowAPI::GLFW,
 		.windowTitle = "Sandbox",
 		.windowWidth = 1280,
 		.windowHeight = 720
@@ -33,5 +33,5 @@ int main()
 	};
 
 	auto app = Patchouli::Application::createApplication<Sandbox::Sandbox>(appInfo);
-	//app->run();
+	app->run();
 }

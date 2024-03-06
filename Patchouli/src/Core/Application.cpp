@@ -10,9 +10,6 @@ namespace Patchouli
 	Application::Application(const ApplicationInfo& info)
 		: running(false), appInfo(info)
 	{
-		assert(instance == nullptr);
-		instance = this;
-
 		init();
 	}
 

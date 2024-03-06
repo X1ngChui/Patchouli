@@ -57,12 +57,14 @@ namespace Patchouli
 
 		Ref<Window> getWindow() const { return window; }
 
-		static const Application& getInstance() { assert(instance != nullptr); return *instance; }
+		static Application& getInstance() { assert(instance); return *instance; }
 
 		template <typename A, typename = std::enable_if_t<std::derived_from<A, Application>>, typename...Args>
-		inline static auto createApplication(Args&&... args)
+		inline static auto createApplication(Args... args)
 		{
-			return makeRef<A>(std::forward<Args>(args)...);
+			assert(instance == nullptr);
+			instance = (Application*)::operator new(sizeof(A));
+			return Ref<A>(new((void*)instance) A(std::forward<Args>(args)...));
 		}
 
 	protected:

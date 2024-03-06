@@ -7,9 +7,9 @@ namespace Patchouli
 	// Structure to hold Vulkan Swapchain settings
 	struct VulkanSwapchainSettings
 	{
-		VkSurfaceFormatKHR surfaceFormat;
-		VkPresentModeKHR presentMode;
-		VkExtent2D extent;
+		VkSurfaceFormatKHR surfaceFormat; // Surface format for the swapchain images
+		VkPresentModeKHR presentMode; // Present mode for displaying images
+		VkExtent2D extent; // Extent (size) of the swapchain images
 	};
 
 	// Template struct to select Vulkan Swapchain surface format
@@ -18,7 +18,8 @@ namespace Patchouli
 	{
 		constexpr VulkanSwapchainSurfaceFormatSelect() = default;
 
-		VkSurfaceFormatKHR operator()(const std::vector<VkSurfaceFormatKHR>& formats);
+		// Operator to select the surface format based on given formats
+		VkSurfaceFormatKHR operator()(const std::vector<VkSurfaceFormatKHR>& formats) const;
 	};
 
 	// Template struct to select Vulkan Swapchain present mode
@@ -27,7 +28,8 @@ namespace Patchouli
 	{
 		constexpr VulkanSwapchainPresentModeSelect() = default;
 
-		VkPresentModeKHR operator()(const std::vector<VkPresentModeKHR>& presentModes);
+		// Operator to select the present mode based on given present modes
+		VkPresentModeKHR operator()(const std::vector<VkPresentModeKHR>& presentModes) const;
 	};
 
 	// Template struct to select Vulkan Swapchain extent
@@ -36,7 +38,8 @@ namespace Patchouli
 	{
 		constexpr VulkanSwapchainExtentSelect() = default;
 
-		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities);
+		// Operator to select the extent based on given surface capabilities
+		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities) const;
 	};
 
 	// Template struct to select Vulkan Swapchain settings
@@ -45,11 +48,12 @@ namespace Patchouli
 	{
 		constexpr VulkanSwapchainSettingsSelect() = default;
 
-		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports)
+		// Operator to select the swapchain settings based on the supported formats, present modes, and surface capabilities
+		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports) const
 		{
-			VulkanSwapchainSurfaceFormatSelect<P> surfaceFormatSelect;
-			VulkanSwapchainPresentModeSelect<P> presentModeSelect;
-			VulkanSwapchainExtentSelect<P> extentSelect;
+			constexpr VulkanSwapchainSurfaceFormatSelect<P> surfaceFormatSelect{};
+			constexpr VulkanSwapchainPresentModeSelect<P> presentModeSelect{};
+			constexpr VulkanSwapchainExtentSelect<P> extentSelect{};
 
 			return {
 				.surfaceFormat = surfaceFormatSelect(supports.surfaceFormats),
@@ -62,17 +66,19 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain surface format selection
 	template<GraphicsPolicy P>
 	VkSurfaceFormatKHR VulkanSwapchainSurfaceFormatSelect<P>::operator()
-		(const std::vector<VkSurfaceFormatKHR>& formats)
+		(const std::vector<VkSurfaceFormatKHR>& formats) const
 	{
 		assert(formats.size() > 0);
 		constexpr VkSurfaceFormatKHR defaultFormat = { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
 
+		// If only one format is available and it is undefined, return the default format
 		if (formats.size() <= 1 && formats[0].format == VK_FORMAT_UNDEFINED)
 			return defaultFormat;
 
+		// Try to find the default format, otherwise return the first available format
 		auto it = std::ranges::find_if(formats, [&](const auto& format) {
 			return format.colorSpace == defaultFormat.colorSpace && format.format == defaultFormat.format;
-		});
+			});
 		if (it != formats.end())
 			return *it;
 
@@ -82,8 +88,9 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain present mode selection with performance priority
 	template<>
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PerformancePriority>::operator()
-		(const std::vector<VkPresentModeKHR>& presentModes)
+		(const std::vector<VkPresentModeKHR>& presentModes) const
 	{
+		// Try to find the mailbox present mode, if not available, fallback to FIFO
 		auto it = std::ranges::find(presentModes, VK_PRESENT_MODE_MAILBOX_KHR);
 		if (it != presentModes.end())
 			return *it;
@@ -95,16 +102,18 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain present mode selection with power-saving priority
 	template<>
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PowerSavingPriority>::operator()
-		(const std::vector<VkPresentModeKHR>& presentModes)
+		(const std::vector<VkPresentModeKHR>& presentModes) const
 	{
+		// For power-saving priority, always use FIFO present mode
 		assert(std::ranges::find(presentModes, VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
 
 	// Template method for selecting Vulkan Swapchain extent
 	template<GraphicsPolicy P>
-	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities)
+	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities) const
 	{
+		// If the current extent is defined, use it, otherwise, use the window framebuffer size
 		if (capabilities.currentExtent.width != 0xffffffff)
 			return capabilities.currentExtent;
 
@@ -139,24 +148,27 @@ namespace Patchouli
 		Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator)
 		: vkDevice(device), vkSurface(surface), vkAllocator(allocator)
 	{
+		// Get swapchain supports and select appropriate settings based on the graphics policy
 		VulkanSwapchainSupports supports = getSwapchainSupports();
 		VulkanSwapchainSettings settings;
 		switch (graphicsInfo.graphicsPolicy)
 		{
 		case GraphicsPolicy::PerformancePriority:
-			VulkanSwapchainSettingsSelect<GraphicsPolicy::PerformancePriority> performancePrioritySelect;
+			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PerformancePriority> performancePrioritySelect;
 			settings = performancePrioritySelect(supports);
 			break;
 		case GraphicsPolicy::PowerSavingPriority:
-			VulkanSwapchainSettingsSelect<GraphicsPolicy::PowerSavingPriority> powerSavingPrioritySelect;
+			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PowerSavingPriority> powerSavingPrioritySelect;
 			settings = powerSavingPrioritySelect(supports);
 			break;
 		}
 
+		// Determine the number of swapchain images
 		uint32_t nImages = supports.surfaceCapabilities.minImageCount + 1;
 		if (supports.surfaceCapabilities.maxImageCount > 0 && nImages > supports.surfaceCapabilities.maxImageCount)
 			nImages = supports.surfaceCapabilities.maxImageCount;
 
+		// Determine queue families for sharing or exclusive ownership
 		std::vector<uint32_t> queueFamilies = {
 			vkDevice->getQueueFamilies().graphics,
 			vkDevice->getQueueFamilies().present
@@ -164,6 +176,7 @@ namespace Patchouli
 
 		bool sharedQueue = vkDevice->getQueueFamilies().graphics == vkDevice->getQueueFamilies().present;
 
+		// Create swapchain creation info
 		VkSwapchainCreateInfoKHR info = {
 			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 			.pNext = nullptr,
@@ -184,16 +197,31 @@ namespace Patchouli
 			.clipped = VK_TRUE
 		};
 
+		// Create the Vulkan swapchain
 		VkResult status = vkCreateSwapchainKHR(*vkDevice, &info, *vkAllocator, &vkSwapchain);
 		assert(status == VK_SUCCESS);
 
+		// Store swapchain format and extent
 		vkFormat = settings.surfaceFormat.format;
 		vkExtent = settings.extent;
+
+		vkGetSwapchainImagesKHR(*vkDevice, vkSwapchain, &nImages, nullptr);
+		vkImages.resize(nImages);
+		vkGetSwapchainImagesKHR(*vkDevice, vkSwapchain, &nImages, vkImages.data());
+
+		vkImageViews.reserve(nImages);
+		for (uint32_t i = 0; i < nImages; i++)
+			vkImageViews.push_back(createImageView(vkImages[i], vkFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1));
 	}
 
 	// Destructor for Vulkan Swapchain class
 	VulkanSwapchain::~VulkanSwapchain()
 	{
+		// Destory ecah Vulkan image view
+		for (auto& imageView : vkImageViews)
+			vkDestroyImageView(*vkDevice, imageView, *vkAllocator);
+
+		// Destroy the Vulkan swapchain
 		vkDestroySwapchainKHR(*vkDevice, vkSwapchain, *vkAllocator);
 	}
 
@@ -222,5 +250,30 @@ namespace Patchouli
 		assert(nPresentModes > 0);
 
 		return supports;
+	}
+
+	VkImageView VulkanSwapchain::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
+	{
+		VkImageViewCreateInfo info = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.image = image,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = format,
+			.subresourceRange = {
+				.aspectMask = aspectFlags,
+				.baseMipLevel = 0,
+				.levelCount = mipLevels,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+		};
+
+		VkImageView imageView = VK_NULL_HANDLE;
+		VkResult status = vkCreateImageView(*vkDevice, &info, *vkAllocator, &imageView);
+		assert(status == VK_SUCCESS);
+
+		return imageView;
 	}
 }
