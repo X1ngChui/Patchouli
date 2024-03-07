@@ -20,7 +20,7 @@ namespace Patchouli
         VkApplicationInfo appInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = Application::getInstance().getAppInfo().appName,
+            .pApplicationName = Application::getInstance().getAppInfo().appName.c_str(),
             .applicationVersion = Application::getInstance().getAppInfo().appVersion,
             .pEngineName = "Patchouli",
             .engineVersion = VK_MAKE_API_VERSION(0, 0, 0, 0),

@@ -30,10 +30,10 @@ namespace Patchouli
 	/* Structure representing information about the application */
 	struct ApplicationInfo
 	{
-		const char* appName = "Patchouli";			/* Name of the application */
-		const uint32_t appVersion = 0;				/* Version of the application */
-		const uint32_t subsystems = 0;				/* Subsystems enabled for the application */
-		const WindowInfo windowInfo;
+		std::string appName = "Patchouli"; /* Name of the application */
+		uint32_t appVersion = 0; /* Version of the application */
+		uint32_t subsystems = 0; /* Subsystems enabled for the application */
+		WindowInfo windowInfo;
 	};
 
 	/* Class representing the application. */
@@ -60,7 +60,7 @@ namespace Patchouli
 		static Application& getInstance() { assert(instance); return *instance; }
 
 		template <typename A, typename = std::enable_if_t<std::derived_from<A, Application>>, typename...Args>
-		inline static auto createApplication(Args... args)
+		inline static auto createApplication(Args&&... args)
 		{
 			assert(instance == nullptr);
 			instance = (Application*)::operator new(sizeof(A));

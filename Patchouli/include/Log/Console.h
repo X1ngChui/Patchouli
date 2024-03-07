@@ -31,7 +31,7 @@ namespace Patchouli
 		~Console() = delete;
 		
 		// Initialization function
-		static void init(const char* appName, const LogLevel level = LogLevel::Info);
+		static void init(const std::string& appName, const LogLevel level = LogLevel::Info);
 
 		// --------------------------------------------------
 		// User Logging Functions

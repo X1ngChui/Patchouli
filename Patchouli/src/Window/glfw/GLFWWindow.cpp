@@ -19,7 +19,7 @@ namespace Patchouli
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-		this->window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle, nullptr, nullptr);
+		this->window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle.c_str(), nullptr, nullptr);
 		assert(this->window);
 
 		glfwSetWindowUserPointer(this->window, &(this->attribute));

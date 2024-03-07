@@ -38,7 +38,7 @@ namespace Patchouli
 
 	void Application::init()
 	{
-		// Initialize the console subsystem for debugging'
+		// Initialize the console subsystem for debugging
 #ifdef PATCHOULI_CONSOLE_ENABLE
 		Console::init(appInfo.appName);
 		Console::coreInfo("Hello {}!", appInfo.appName);
