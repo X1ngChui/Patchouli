@@ -1,6 +1,6 @@
 #pragma once
 #include "Event/Event.h"
-#include "Util/Util.h"
+#include "Util/Reference.h"
 
 namespace Patchouli
 {
@@ -31,8 +31,8 @@ namespace Patchouli
 		virtual void show() = 0;
 		virtual void hide() = 0;
 
-		using EventCallback = std::function<void(Event*)>;
 		virtual void setEventCallback(const EventCallback& eventCallback) = 0;
+		virtual void setEventCallback(const EventCallback&& eventCallback) = 0;
 
 		virtual void onUpdate() = 0;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Util/Util.h"
+#include "Util/Reference.h"
 
 namespace Patchouli
 {

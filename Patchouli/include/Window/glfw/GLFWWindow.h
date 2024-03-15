@@ -1,6 +1,8 @@
 #pragma once
+
 #include "Window/Window.h"
 #include <GLFW/glfw3.h>
+#undef APIENTRY
 
 namespace Patchouli
 {
@@ -16,7 +18,15 @@ namespace Patchouli
 		virtual void show() override;
 		virtual void hide() override;
 
-		virtual void setEventCallback(const EventCallback& eventCallback) override { attribute.eventCallback = eventCallback; }
+		virtual void setEventCallback(const EventCallback& eventCallback) override
+		{
+			attribute.eventCallback = eventCallback;
+		}
+
+		virtual void setEventCallback(const EventCallback&& eventCallback) override
+		{
+			attribute.eventCallback = eventCallback;
+		}
 
 		virtual void onUpdate() override;
 
@@ -31,7 +41,6 @@ namespace Patchouli
 
 			EventCallback eventCallback;
 		};
-
 
 		GLFWwindow* window;
 		WindowAttribute attribute;

@@ -32,6 +32,6 @@ int main()
 		.windowInfo = windowInfo
 	};
 
-	auto app = Patchouli::Application::createApplication<Sandbox::Sandbox>(appInfo);
+	auto app = Patchouli::makeRef<Sandbox::Sandbox>(appInfo);
 	app->run();
 }

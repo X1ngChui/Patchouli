@@ -4,17 +4,13 @@
 
 namespace Patchouli
 {
-	class MouseButtonEvent : public Event
+	class MouseButtonEvent : public EventBase<MouseButtonEvent>
 	{
 	public:
 		virtual ~MouseButtonEvent() = default;
 
 		inline int getMouseButton() const { return button; }
 
-		virtual constexpr int getCategoryFlag() const override
-		{
-			return EventCategory::EventCategoryInput | EventCategory::EventCategoryMouse | EventCategory::EventCategoryMouseButton;
-		}
 	protected:
 		int button;
 
@@ -25,7 +21,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public virtual MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -34,9 +30,6 @@ namespace Patchouli
 		}
 		virtual ~MouseButtonPressedEvent() = default;
 
-		static constexpr EventType getStaticType() { return EventType::MouseButtonPressed; }
-		virtual constexpr EventType getEventType() const override { return EventType::MouseButtonPressed; }
-
 		std::string toString() const override
 		{
 			return fmt::format("MouseButtonPressedEvent (Button: {})", button);
@@ -44,7 +37,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent : public virtual MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)
@@ -53,16 +46,13 @@ namespace Patchouli
 		}
 		virtual ~MouseButtonReleasedEvent() = default;
 
-		static constexpr EventType getStaticType() { return EventType::MouseButtonReleased; }
-		virtual constexpr EventType getEventType() const override { return EventType::MouseButtonReleased; }
-
 		std::string toString() const override
 		{
 			return fmt::format("MouseButtonRelease (Button: {})", button);
 		}
 	};
 	
-	class MouseMovedEvent : public Event
+	class MouseMovedEvent : public EventBase<MouseMovedEvent>
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -75,14 +65,6 @@ namespace Patchouli
 		float getPosY() const { return posY; }
 		std::pair<float, float> getPos() const { return { posX, posY }; }
 
-		virtual constexpr int getCategoryFlag() const override
-		{
-			return EventCategory::EventCategoryInput | EventCategory::EventCategoryMouse;
-		}
-
-		static constexpr EventType getStaticType() { return EventType::MouseMoved; }
-		virtual constexpr EventType getEventType() const override { return EventType::MouseMoved; }
-
 		std::string toString() const override 
 		{
 			return fmt::format("MouseMovedEvent (Pos: ({}, {}))", posX, posY);
@@ -91,7 +73,7 @@ namespace Patchouli
 		float posX, posY;
 	};
 
-	class MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public EventBase<MouseScrolledEvent>
 	{
 	public:
 		MouseScrolledEvent(float offsetX, float offsetY)
@@ -103,14 +85,6 @@ namespace Patchouli
 		float getOffsetX() const { return offsetX; }
 		float getOffsetY() const { return offsetY; }
 		std::pair<float, float> getOffset() const { return { offsetX, offsetY }; }
-
-		virtual constexpr int getCategoryFlag() const override 
-		{
-			return EventCategory::EventCategoryInput | EventCategory::EventCategoryMouse;
-		}
-
-		static constexpr EventType getStaticType() { return EventType::MouseScrolled; }
-		virtual constexpr EventType getEventType() const override { return EventType::MouseScrolled; }
 
 		std::string toString() const override
 		{

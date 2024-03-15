@@ -4,28 +4,15 @@
 
 namespace Patchouli
 {
-	class WindowCloseEvent : public Event
+	class WindowCloseEvent : public EventBase<WindowCloseEvent>
 	{
 	public:
 		WindowCloseEvent() = default;
 		virtual ~WindowCloseEvent() = default;
-
-		virtual constexpr int getCategoryFlag() const override
-		{
-			return EventCategory::EventCategoryWindow;
-		}
-
-		static constexpr EventType getStaticType() { return EventType::WindowClosed; }
-		virtual constexpr EventType getEventType() const override { return EventType::WindowClosed; }
-
-		std::string toString() const override 
-		{
-			return "WindowCloseEvent";
-		}
 	};
 
 
-	class WindowResizeEvent : public Event
+	class WindowResizeEvent : public EventBase<WindowResizeEvent>
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -36,14 +23,6 @@ namespace Patchouli
 		
 		unsigned int getWidth() const { return windowWidth; }
 		unsigned int getHeight() const { return windowHeight; }
-
-		virtual constexpr int getCategoryFlag() const override
-		{
-			return EventCategory::EventCategoryWindow;
-		}
-
-		static constexpr EventType getStaticType() { return EventType::WindowResize; }
-		virtual constexpr EventType getEventType() const override { return EventType::WindowResize; }
 
 		std::string toString() const override 
 		{

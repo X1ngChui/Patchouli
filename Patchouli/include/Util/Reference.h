@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ******************************************************************************/
+#pragma once
 
 #ifndef __STD_INTRUSIVE_PTR_HPP
 #define __STD_INTRUSIVE_PTR_HPP
@@ -761,3 +762,31 @@ namespace std {
 }
 
 #endif
+
+namespace Patchouli
+{
+	/* Pointer wrappers */
+	template <typename T, typename D = std::default_delete<T>>
+	using Scope = std::unique_ptr<T, D>;
+
+	template <typename T, typename... Args>
+	constexpr Scope<T> makeScope(Args&&... args)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
+
+	template <typename T, typename D = std::default_delete<T>>
+	using RefBase = std::intrusive_base<T, D>;
+
+	template <typename T>
+	using Ref = std::intrusive_ptr<T>;
+
+	template <typename T, typename... Args>
+	constexpr Ref<T> makeRef(Args&&... args)
+	{
+		return std::make_intrusive<T>(std::forward<Args>(args)...);
+	}
+
+	template <typename T>
+	using WeakRef = std::intrusive_weak_ptr<T>;
+}

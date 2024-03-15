@@ -17,6 +17,7 @@ namespace Patchouli
 		virtual void hide() override {}
 
 		virtual void setEventCallback(const EventCallback& eventCallback) override { (void)eventCallback; }
+		virtual void setEventCallback(const EventCallback&& eventCallback) override { (void)eventCallback; }
 
 		virtual void onUpdate() override {}
 

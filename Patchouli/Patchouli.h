@@ -7,7 +7,7 @@
 #include "Log/Console.h"
 #include "Log/Logger.h"
 
-#include "Util/Util.h"
+#include "Util/Reference.h"
 
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/GraphicsDevice.h"

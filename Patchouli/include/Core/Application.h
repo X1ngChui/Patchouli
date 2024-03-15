@@ -2,6 +2,8 @@
 
 #include "Core/Base.h"
 #include "Core/Layer.h"
+#include "Event/WindowEvent.h"
+#include "Event/MouseEvent.h"
 #include "Window/Window.h"
 #include "Graphics/GraphicsContext.h"
 
@@ -51,21 +53,11 @@ namespace Patchouli
 		/* Function to start running the application */
 		void run();
 
-		void onEvent(Event* event);
-
 		const ApplicationInfo& getAppInfo() const { return appInfo; }
 
 		Ref<Window> getWindow() const { return window; }
 
-		static Application& getInstance() { assert(instance); return *instance; }
-
-		template <typename A, typename = std::enable_if_t<std::derived_from<A, Application>>, typename...Args>
-		inline static auto createApplication(Args&&... args)
-		{
-			assert(instance == nullptr);
-			instance = (Application*)::operator new(sizeof(A));
-			return Ref<A>(new((void*)instance) A(std::forward<Args>(args)...));
-		}
+		static Application& getInstance() { assert(instance != nullptr); return *instance; }
 
 	protected:
 		Application(const ApplicationInfo& info);
@@ -85,6 +77,9 @@ namespace Patchouli
 		ApplicationInfo appInfo;					/* Information about the application */
 		LayerStack layerStack;						/* Layers container */
 		Ref<Window> window = nullptr;				/* Window pointer */
+
+		Ref<EventDispatcher> eventDispatcher = nullptr;
+		Ref<EventListener<WindowCloseEvent>> listener = nullptr;
 
 		inline static Application* instance = nullptr;
 	};

@@ -5,17 +5,12 @@
 
 namespace Patchouli
 {
-	class KeyboardEvent : public Event
+	class KeyboardEvent : public EventBase<KeyboardEvent>
 	{
 	public:
 		virtual ~KeyboardEvent() = default;
 
 		int getKeyCode() const { return keyCode; }
-
-		virtual constexpr int getCategoryFlag() const override
-		{
-			return EventCategory::EventCategoryInput | EventCategory::EventCategoryKeyboard;
-		}
 
 	protected:
 		int keyCode;
@@ -27,7 +22,7 @@ namespace Patchouli
 	};
 
 
-	class KeyPressedEvent : public KeyboardEvent
+	class KeyPressedEvent : public virtual KeyboardEvent
 	{
 	public:
 		KeyPressedEvent(int keyCode, bool repeated)
@@ -38,9 +33,6 @@ namespace Patchouli
 			 
 		constexpr bool isRepeated() const { return repeated; }
 
-		static constexpr EventType getStaticType() { return EventType::KeyPressed; }
-		virtual constexpr EventType getEventType() const override { return EventType::KeyPressed; }
-
 		std::string toString() const override
 		{
 			return fmt::format("KeyPressedEvent (Keycode: {}, Repeated: {})", keyCode, repeated);
@@ -49,7 +41,7 @@ namespace Patchouli
 		bool repeated;
 	};
 
-	class KeyReleasedEvent : public KeyboardEvent
+	class KeyReleasedEvent : public virtual KeyboardEvent
 	{  
 	public:
 		KeyReleasedEvent(int keyCode)
@@ -58,16 +50,13 @@ namespace Patchouli
 		}
 		virtual ~KeyReleasedEvent() = default;
 
-		static constexpr EventType getStaticType() { return EventType::KeyReleased; }
-		virtual constexpr EventType getEventType() const override { return EventType::KeyReleased; }
-
 		std::string toString() const override
 		{
 			return fmt::format("KeyRelaesedEvent (Keycode: {})", keyCode);
 		}
 	};
 
-	class KeyTypedEvent : public KeyboardEvent
+	class KeyTypedEvent : public virtual KeyboardEvent
 	{
 	public:
 		KeyTypedEvent(int keyCode)
@@ -75,9 +64,6 @@ namespace Patchouli
 		{
 		}
 		virtual ~KeyTypedEvent() = default;
-
-		static constexpr EventType getStaticType() { return EventType::KeyTyped; }
-		virtual constexpr EventType getEventType() const override { return EventType::KeyTyped; }
 
 		std::string toString() const override 
 		{

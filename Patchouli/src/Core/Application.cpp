@@ -10,7 +10,13 @@ namespace Patchouli
 	Application::Application(const ApplicationInfo& info)
 		: running(false), appInfo(info)
 	{
+		assert(instance == nullptr);
+		instance = this;
 		init();
+
+		eventDispatcher = makeRef<EventDispatcher>();
+		listener = makeRef<EventListener<WindowCloseEvent>>( [this](Event& event) { running = false; });
+		eventDispatcher->addListener(listener);
 	}
 
 	void Application::run()
@@ -23,17 +29,6 @@ namespace Patchouli
 		{
 			window->onUpdate();
 		}
-	}
-
-	void Application::onEvent(Event* event)
-	{
-		EventDispatcher dispatcher(*event);
-		dispatcher.dispatch<WindowCloseEvent>([this](WindowCloseEvent& event) -> bool {
-			this->running = false;
-			return true;
-		});
-
-		delete event;
 	}
 
 	void Application::init()
@@ -66,7 +61,7 @@ namespace Patchouli
 	void Application::graphicsInit(const ApplicationInfo& appInfo)
 	{
 		window = Window::create(appInfo.windowInfo);
-		window->setEventCallback([this](Event* event) {this->onEvent(event); });
+		window->setEventCallback([this](Event& event) { eventDispatcher->dispatch(event); });
 	}
 
 	void Application::pushLayer(Layer* layer)
