@@ -15,7 +15,7 @@ namespace Patchouli
 		init();
 
 		eventDispatcher = makeRef<EventDispatcher>();
-		listener = makeRef<EventListener<WindowCloseEvent>>( [this](Event& event) { running = false; });
+		listener = makeRef<EventListener<WindowCloseEvent>>( [this](Ref<Event> event) { running = false; });
 		eventDispatcher->addListener(listener);
 	}
 
@@ -27,6 +27,7 @@ namespace Patchouli
 
 		while (running)
 		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(17));
 			window->onUpdate();
 		}
 	}
@@ -61,7 +62,7 @@ namespace Patchouli
 	void Application::graphicsInit(const ApplicationInfo& appInfo)
 	{
 		window = Window::create(appInfo.windowInfo);
-		window->setEventCallback([this](Event& event) { eventDispatcher->dispatch(event); });
+		window->setEventCallback([this](Ref<Event> event) { eventDispatcher->publishEvent(event); });
 	}
 
 	void Application::pushLayer(Layer* layer)

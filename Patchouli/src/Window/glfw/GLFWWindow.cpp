@@ -32,20 +32,16 @@ namespace Patchouli
 
 		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
 			{
-				WindowResizeEvent event(width, height);
-
 				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
 				attrib->width = width;
 				attrib->height = height;
-				attrib->eventCallback(event);
+				attrib->eventCallback(makeRef<WindowResizeEvent>(width, height));
 			});
 
 		glfwSetWindowCloseCallback(window, [](GLFWwindow* window)
 			{
-				WindowCloseEvent event;
-
 				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
-				attrib->eventCallback(event);
+				attrib->eventCallback(makeRef<WindowCloseEvent>());
 			});
 
 		glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -55,32 +51,21 @@ namespace Patchouli
 				switch (action) 
 				{
 				case GLFW_PRESS:
-				{
-					KeyPressedEvent keyPressedEvent(key, false);
-					attrib->eventCallback(keyPressedEvent);
+					attrib->eventCallback(makeRef<KeyPressedEvent>(key, false));
 					break;
-				}
 				case GLFW_REPEAT:
-				{
-					KeyPressedEvent keyRepeatedEvent(key, true);
-					attrib->eventCallback(keyRepeatedEvent);
+					attrib->eventCallback(makeRef<KeyPressedEvent>(key, true));
 					break;
-				}
 				case GLFW_RELEASE:
-				{
-					KeyReleasedEvent keyReleasedEvent(key);
-					attrib->eventCallback(keyReleasedEvent);
+					attrib->eventCallback(makeRef<KeyReleasedEvent>(key));
 					break;
-				}
 				}
 			});
 
 		glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int character)
 			{
-				KeyTypedEvent event(character);
-
 				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
-				attrib->eventCallback(event);
+				attrib->eventCallback(makeRef<KeyTypedEvent>(character));
 			});
 
 		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
@@ -90,34 +75,24 @@ namespace Patchouli
 				switch (action)
 				{
 				case GLFW_PRESS:
-				{
-					MouseButtonPressedEvent mousePressedEvent(button);
-					attrib->eventCallback(mousePressedEvent);
+					attrib->eventCallback(makeRef<MouseButtonPressedEvent>(button));
 					break;
-				}
 				case GLFW_RELEASE:
-				{
-					MouseButtonReleasedEvent mouseReleasedEvent(button);
-					attrib->eventCallback(mouseReleasedEvent);
+					attrib->eventCallback(makeRef<MouseButtonReleasedEvent>(button));
 					break;
-				}
 				}
 			});
 
 		glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)
 			{
-				MouseScrolledEvent event((float)xoffset, (float)yoffset);
-
 				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
-				attrib->eventCallback(event);
+				attrib->eventCallback(makeRef<MouseScrolledEvent>((float)xoffset, (float)yoffset));
 			});
 
 		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
 			{
-				MouseMovedEvent event((float)xpos, (float)ypos);
-
 				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
-				attrib->eventCallback(event);
+				attrib->eventCallback(makeRef<MouseMovedEvent>((float)xpos, (float)ypos));
 			});
 	}
 

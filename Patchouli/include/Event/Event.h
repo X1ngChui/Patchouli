@@ -5,7 +5,7 @@
 #include "Util/TypeTraits.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
-#include <oneapi/tbb.h>
+#include <concurrentqueue.h>
 
 namespace Patchouli
 {
@@ -62,7 +62,7 @@ namespace Patchouli
     };
 
     // Type alias for event callback function
-    using EventCallback = std::function<void(Event&)>;
+    using EventCallback = std::function<void(Ref<Event>)>;
 
     // Forward declaration of EventListenerBase class
     class EventListenerBase;
@@ -75,6 +75,10 @@ namespace Patchouli
     class PATCHOULI_API EventDispatcher : public RefBase<EventDispatcher>
     {
     public:
+        EventDispatcher();
+
+        ~EventDispatcher();
+
         // Add an event listener for a specific event type
         template <EventType E>
         inline void addListener(Ref<EventListener<E>> listener)
@@ -89,8 +93,8 @@ namespace Patchouli
             removeListenerImpl(E::EventType, listener);
         }
 
-        // Dispatch an event to all registered listeners
-        void dispatch(Event& event);
+        // Publish an event to the event queue
+        void publishEvent(Ref<Event> event);
 
     private:
         // Add an event listener implementation
@@ -99,10 +103,22 @@ namespace Patchouli
         // Remove an event listener implementation
         void removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener);
 
-    private:
-        using ListenerMap = oneapi::tbb::concurrent_hash_map<EventTypeID, std::vector<Ref<EventListenerBase>>>;
+        // Dispatch all the events in the event queue
+        void dispatch();
 
-        ListenerMap listeners; // Map of event type to listener vectors
+        // Main loop for event dispatching
+        void dispatchLoop();
+
+    private:
+        std::mutex mapMutex; // Mutex for listener map
+        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap; // Map of event type to listener vectors
+
+        moodycamel::ConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
+
+        bool running = true; // Flag indicating whether the event dispatcher is running
+        std::mutex threadMutex; // Mutex for dispatcher thread synchronization
+        std::condition_variable cv; // Condition variable for dispatcher thread
+        std::thread dispatcherThread; // Dispatcher thread
     };
 
     // Base class for event listeners
@@ -124,7 +140,7 @@ namespace Patchouli
         virtual ~EventListenerBase() = default;
 
         // Operator overload to invoke the event callback
-        void operator()(Event& event) const;
+        void operator()(Ref<Event> event) const;
 
     protected:
         friend class EventDispatcher;

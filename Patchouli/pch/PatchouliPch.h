@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <utility>
 #include <algorithm>
 #include <functional>
