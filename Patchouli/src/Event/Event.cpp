@@ -54,13 +54,21 @@ namespace Patchouli
 
 	void EventDispatcher::addListenerImpl(EventTypeID eventTypeID, Ref<EventListenerBase> listener)
 	{
-		listeners[eventTypeID].push_back(listener);
-		listener->dispatcher = this->weak_from_this();
+		ListenerMap::accessor accessor;
+		if (!listeners.find(accessor, eventTypeID))
+			listeners.insert(accessor, eventTypeID);
+		accessor->second.push_back(listener);
+
+		listener->dispatcher = weak_from_this();
 	}
 
 	void EventDispatcher::removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener)
 	{
-		auto& listenerList = listeners[eventTypeID];
+		ListenerMap::accessor accessor;
+		bool found = listeners.find(accessor, eventTypeID);
+		assert(found);
+
+		auto& listenerList = accessor->second;
 
 		auto it = std::ranges::find_if(listenerList, [listener](Ref<EventListenerBase> l)
 			{ return l.get() == listener; }
@@ -73,10 +81,15 @@ namespace Patchouli
 
 	void EventDispatcher::dispatch(Event& event)
 	{
-		auto type = event.getType();
-		auto& listenerList = listeners[event.getType()];
+		auto eventTypeID = event.getType();
 
-		for (auto it = listenerList.begin(); it != listenerList.end(); it++)
-			(**it)(event);
+		ListenerMap::accessor accessor;
+		if (listeners.find(accessor, eventTypeID))
+		{
+			const auto& listenerList = accessor->second;
+
+			for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
+				(**it)(event);
+		}
 	}
 }

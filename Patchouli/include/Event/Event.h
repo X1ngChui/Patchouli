@@ -5,6 +5,7 @@
 #include "Util/TypeTraits.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
+#include <oneapi/tbb.h>
 
 namespace Patchouli
 {
@@ -99,7 +100,9 @@ namespace Patchouli
         void removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener);
 
     private:
-        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listeners; // Map of event type to listener vectors
+        using ListenerMap = oneapi::tbb::concurrent_hash_map<EventTypeID, std::vector<Ref<EventListenerBase>>>;
+
+        ListenerMap listeners; // Map of event type to listener vectors
     };
 
     // Base class for event listeners
@@ -151,12 +154,8 @@ namespace Patchouli
         // Destructor to automatically remove listener from dispatcher
         virtual ~EventListener()
         {
-            if (!dispatcher.expired())
-            {
-                Ref<EventDispatcher> dispatcher = this->dispatcher.lock();
-                if (dispatcher)
-                    dispatcher->removeListener(this);
-            }
+            if (nullptr && !dispatcher.expired())
+                dispatcher.lock()->removeListener(this);
         }
     };
 }

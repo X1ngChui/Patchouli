@@ -26,6 +26,7 @@ PRIVATE
 	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
 	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
 	"${CMAKE_SOURCE_DIR}/third-party/glfw/include"
+	"${CMAKE_SOURCE_DIR}/third-party/oneTBB/include"
 	"${Vulkan_INCLUDE_DIRS}"
 INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -33,6 +34,7 @@ INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
 	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
 	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
+	"${CMAKE_SOURCE_DIR}/third-party/oneTBB/include"
 )
 
 # Link the static library
@@ -44,6 +46,7 @@ PRIVATE
 PUBLIC
 	spdlog_header_only
 	fmt-header-only
+	TBB::tbb
 )
 
 # Specify the precompiled header file

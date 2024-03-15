@@ -10,3 +10,6 @@
 [submodule "third-party/glfw"]
 	path = third-party/glfw
 	url = https://github.com/X1ngChui/glfw.git
+[submodule "third-party/oneTBB"]
+	path = third-party/oneTBB
+	url = https://github.com/X1ngChui/oneTBB
