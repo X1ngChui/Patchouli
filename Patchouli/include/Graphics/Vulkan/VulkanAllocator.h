@@ -1,11 +1,11 @@
 #pragma once
-#include "Graphics/GraphicsObject.h"
+#include "Core/PObject.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
 {
     // VulkanAllocator class is responsible for managing Vulkan memory allocation.
-    class VulkanAllocator : public GraphicsObject
+    class VulkanAllocator : public PObject
     {
     public:
         // Constructor initializes Vulkan allocation callbacks.

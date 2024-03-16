@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PatchouliPch.h"
-#include "Graphics/GraphicsObject.h"
+#include "Core/PObject.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include <vulkan/vulkan.h>
@@ -9,7 +9,7 @@
 namespace Patchouli
 {
     // VulkanInstance class manages Vulkan instance creation and destruction.
-    class VulkanInstance : public GraphicsObject
+    class VulkanInstance : public PObject
     {
     public:
         // Constructor for VulkanInstance.

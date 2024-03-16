@@ -7,7 +7,7 @@
 
 namespace Patchouli
 {
-	class VulkanShader : public GraphicsObject
+	class VulkanShader : public PObject
 	{
 	public:
 		VulkanShader(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator,

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Graphics/GraphicsObject.h"
+#include "Core/PObject.h"
 
 #define PATCHOULI_MAX_DEVICE_NAME_SIZE (256)
 
@@ -25,7 +25,7 @@ namespace Patchouli
     };
 
     // Class representing a graphics device
-    class PATCHOULI_API GraphicsDevice : public GraphicsObject
+    class PATCHOULI_API GraphicsDevice : public PObject
     {
     public:
         virtual ~GraphicsDevice() = default;

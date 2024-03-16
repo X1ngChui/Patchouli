@@ -7,7 +7,7 @@
 namespace Patchouli
 {
 	// Class representing a Vulkan Swapchain
-	class VulkanSwapchain : public GraphicsObject
+	class VulkanSwapchain : public PObject
 	{
 	public:
 		// Constructor to create a Vulkan Swapchain

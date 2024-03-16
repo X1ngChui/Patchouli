@@ -15,19 +15,28 @@ namespace Patchouli
 		init();
 
 		eventDispatcher = makeRef<EventDispatcher>();
-		listener = makeRef<EventListener<WindowCloseEvent>>( [this](Ref<Event> event) { running = false; });
+		listener = makeRef<EventListener<WindowCloseEvent>>([this](Ref<Event> event) {
+			running = false; eventDispatcher->stop();
+			});
 		eventDispatcher->addListener(listener);
+	}
+
+	Application::~Application()
+	{
+		eventThread.join();
 	}
 
 	void Application::run()
 	{
 		running = true;
 
+		eventThread = std::thread([this] { eventDispatcher->run(); });
+
 		window->show();
 
 		while (running)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(17));
+			// std::this_thread::sleep_for(std::chrono::milliseconds(17));
 			window->onUpdate();
 		}
 	}

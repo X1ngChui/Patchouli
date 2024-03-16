@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Base.h"
+#include "Core/PObject.h"
 #include "Core/Layer.h"
 #include "Event/WindowEvent.h"
 #include "Event/MouseEvent.h"
@@ -39,10 +40,10 @@ namespace Patchouli
 	};
 
 	/* Class representing the application. */
-	class PATCHOULI_API Application : public RefBase<Application>
+	class PATCHOULI_API Application : public PObject
 	{
 	public:
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		Application(const Application& other) = delete;
 		Application& operator=(const Application& other) = delete;
@@ -73,10 +74,11 @@ namespace Patchouli
 		/* Function to initialize the graphics subsystem */
 		void graphicsInit(const ApplicationInfo& appInfo);
 	private:
-		bool running;								/* Flag indicating whether the application is running */
-		ApplicationInfo appInfo;					/* Information about the application */
-		LayerStack layerStack;						/* Layers container */
-		Ref<Window> window = nullptr;				/* Window pointer */
+		bool running; /* Flag indicating whether the application is running */
+		std::thread eventThread; /* Thread to dispatch events */
+		ApplicationInfo appInfo; /* Information about the application */
+		LayerStack layerStack; /* Layers container */
+		Ref<Window> window = nullptr; /* Window pointer */
 
 		Ref<EventDispatcher> eventDispatcher = nullptr;
 		Ref<EventListener<WindowCloseEvent>> listener = nullptr;

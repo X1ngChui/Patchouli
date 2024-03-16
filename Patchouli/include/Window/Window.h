@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/PObject.h"
 #include "Event/Event.h"
 #include "Util/Reference.h"
 
@@ -19,7 +20,7 @@ namespace Patchouli
 		uint32_t windowHeight = 720;
 	};
 
-	class PATCHOULI_API Window : public RefBase<Window>
+	class PATCHOULI_API Window : public PObject
 	{
 	public:
 		Window() = default;

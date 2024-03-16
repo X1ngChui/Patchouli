@@ -2,8 +2,10 @@
 
 #include "PatchouliPch.h"
 #include "Core/Base.h"
+#include "Core/PObject.h"
 #include "Util/TypeTraits.h"
 #include "Util/Reference.h"
+#include "Util/ThreadPool.h"
 #include <fmt/format.h>
 #include <concurrentqueue.h>
 
@@ -13,7 +15,7 @@ namespace Patchouli
     using EventTypeID = uint64_t;
 
     // Abstract base class for events
-    class PATCHOULI_API Event : public RefBase<Event>
+    class PATCHOULI_API Event : public PObject
     {
     public:
         Event() = default;
@@ -25,17 +27,6 @@ namespace Patchouli
         // Convert the event to a string representation
         virtual std::string toString() const = 0;
 
-        // Overloaded new operators for memory management
-        void* operator new(std::size_t size);
-        void* operator new[](std::size_t size);
-        void* operator new(std::size_t size, const std::nothrow_t& tag) noexcept;
-        void* operator new[](std::size_t size, const std::nothrow_t& tag) noexcept;
-
-        // Overloaded delete operators for memory management
-        void operator delete(void* ptr);
-        void operator delete[](void* ptr);
-        void operator delete(void* ptr, const std::nothrow_t& tag) noexcept;
-        void operator delete[](void* ptr, const std::nothrow_t& tag) noexcept;
     private:
         mutable bool dealt = false; // Flag to track if the event is already dealt with
     };
@@ -72,12 +63,12 @@ namespace Patchouli
     class EventListener;
 
     // EventDispatcher class for managing event listeners and dispatching events
-    class PATCHOULI_API EventDispatcher : public RefBase<EventDispatcher>
+    class PATCHOULI_API EventDispatcher : public PObject
     {
     public:
-        EventDispatcher();
+        EventDispatcher(uint32_t nThreads = (uint32_t)std::thread::hardware_concurrency());
 
-        ~EventDispatcher();
+        virtual ~EventDispatcher() = default;
 
         // Add an event listener for a specific event type
         template <EventType E>
@@ -96,6 +87,12 @@ namespace Patchouli
         // Publish an event to the event queue
         void publishEvent(Ref<Event> event);
 
+        // Start the event loop (blocking, not thread safe)
+        void run();
+
+        // Stop the event loop
+        void stop();
+
     private:
         // Add an event listener implementation
         void addListenerImpl(EventTypeID eventTypeID, Ref<EventListenerBase> listener);
@@ -103,26 +100,24 @@ namespace Patchouli
         // Remove an event listener implementation
         void removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener);
 
-        // Dispatch all the events in the event queue
-        void dispatch();
-
-        // Main loop for event dispatching
-        void dispatchLoop();
-
     private:
         std::mutex mapMutex; // Mutex for listener map
         std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap; // Map of event type to listener vectors
 
+        std::mutex threadMutex; // Mutex for thread control
+        std::condition_variable cv; // Condition variable for thread suspension
         moodycamel::ConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
+        moodycamel::ConsumerToken token; // Accelerate the event queue operation:
 
-        bool running = true; // Flag indicating whether the event dispatcher is running
-        std::mutex threadMutex; // Mutex for dispatcher thread synchronization
-        std::condition_variable cv; // Condition variable for dispatcher thread
-        std::thread dispatcherThread; // Dispatcher thread
+        const uint32_t nThreads; // Number of threads for event processing
+        bool running = false; // Flag indicating whether the event loop is running
+
+        Scope<Ref<Event>[]> eventBuffer; // Scoped buffer for event batching
+        ThreadPool threadPool; // Thread pool for event handling
     };
 
     // Base class for event listeners
-    class PATCHOULI_API EventListenerBase : public RefBase<EventListenerBase>
+    class PATCHOULI_API EventListenerBase : public PObject
     {
     public:
         // Constructor with event callback function

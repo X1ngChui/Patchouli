@@ -1,52 +1,8 @@
 #include "Event/Event.h"
-#include <mimalloc.h>
+
 
 namespace Patchouli
 {
-	void* Event::operator new(std::size_t size)
-	{
-		return mi_new(size);
-	}
-
-	void* Event::operator new[](std::size_t size)
-	{
-		return mi_new(size);
-	}
-
-	void* Event::operator new(std::size_t size, const std::nothrow_t& tag) noexcept
-	{
-		(void)(tag);
-		return mi_new_nothrow(size);
-	}
-
-	void* Event::operator new[](std::size_t size, const std::nothrow_t& tag) noexcept
-	{
-		(void)(tag);
-		return mi_new_nothrow(size);
-	}
-
-	void Event::operator delete(void* ptr)
-	{
-		mi_free(ptr);
-	}
-
-	void Event::operator delete[](void* ptr)
-	{
-		mi_free(ptr);
-	}
-
-	void Event::operator delete(void* ptr, const std::nothrow_t& tag) noexcept
-	{
-		(void)(tag);
-		mi_free(ptr);
-	}
-
-	void Event::operator delete[](void* ptr, const std::nothrow_t& tag) noexcept
-	{
-		(void)(tag);
-		mi_free(ptr);
-	}
-
 	void EventListenerBase::operator()(Ref<Event> event) const
 	{
 		callback(event);
@@ -57,7 +13,7 @@ namespace Patchouli
 		std::unique_lock<std::mutex> lock(mapMutex);
 		listenerMap[eventTypeID].push_back(listener);
 
-		listener->dispatcher = weak_from_this();
+		listener->dispatcher = std::static_pointer_cast<EventDispatcher>(this->shared_from_this());
 	}
 
 	void EventDispatcher::removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener)
@@ -75,15 +31,9 @@ namespace Patchouli
 		listener->dispatcher = nullptr;
 	}
 
-	EventDispatcher::EventDispatcher()
-		: running(true), dispatcherThread([this] { dispatchLoop(); })
+	EventDispatcher::EventDispatcher(uint32_t nThreads)
+		: token(eventQueue), nThreads(nThreads), eventBuffer(new Ref<Event>[nThreads]), threadPool(nThreads)
 	{
-	}
-
-	EventDispatcher::~EventDispatcher()
-	{
-		running = false;
-		dispatcherThread.join();
 	}
 
 	void EventDispatcher::publishEvent(Ref<Event> event)
@@ -92,28 +42,41 @@ namespace Patchouli
 		cv.notify_one();
 	}
 
-	void EventDispatcher::dispatch()
+	void EventDispatcher::run()
 	{
-		Ref<Event> event = nullptr;
+		running = true;
 
-		std::unique_lock<std::mutex> lock(mapMutex);
-		while (eventQueue.try_dequeue(event))
-		{ 
-			const auto& listenerList = listenerMap[event->getType()];
+		while (running)
+		{
+			std::size_t nEvents = eventQueue.try_dequeue_bulk(token, eventBuffer.get(), nThreads);
 
-			for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
-				(**it)(event);
+			if (nEvents <= 0)
+			{
+				std::unique_lock<std::mutex> lock(threadMutex);
+				cv.wait(lock);
+				continue;
+			}
+
+			std::unique_lock<std::mutex> mapLock(mapMutex);
+
+			for (uint32_t i = 0; i < nEvents; i++)
+			{
+				Ref<Event> event = eventBuffer[i];
+				const auto& listenerList = listenerMap[event->getType()];
+
+				auto result = threadPool.addWorkFunc(
+					[=] {
+						for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
+							(**it)(event); 
+					}
+				);
+			}
 		}
 	}
 
-	void EventDispatcher::dispatchLoop()
+	void EventDispatcher::stop()
 	{
-		while (running)
-		{
-			std::unique_lock<std::mutex> lock(threadMutex);
-			cv.wait(lock, [] { return true; });
-
-			dispatch();
-		}
+		running = false;
+		cv.notify_one();
 	}
 }

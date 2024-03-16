@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/GraphicsObject.h"
+#include "Core/PObject.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include <vulkan/vulkan.h>
@@ -8,7 +8,7 @@
 namespace Patchouli
 {
     // VulkanDebugMessenger class manages Vulkan debug messaging.
-    class VulkanDebugMessenger : public GraphicsObject
+    class VulkanDebugMessenger : public PObject
     {
     public:
         // Constructor for VulkanDebugMessenger.

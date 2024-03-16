@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Base.h"
+#include "Core/PObject.h"
 #include "Window/Window.h"
-#include "Graphics/GraphicsObject.h"
 #include "Graphics/GraphicsDevice.h"
 
 namespace Patchouli
@@ -27,7 +27,7 @@ namespace Patchouli
     };
 
     // Abstract base class representing a graphics context
-    class PATCHOULI_API GraphicsContext : public GraphicsObject
+    class PATCHOULI_API GraphicsContext : public PObject
     {
     public:
         GraphicsContext() = default;
