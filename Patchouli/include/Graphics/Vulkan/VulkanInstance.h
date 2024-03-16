@@ -14,7 +14,7 @@ namespace Patchouli
     public:
         // Constructor for VulkanInstance.
         // It creates a Vulkan instance using the VulkanAllocator.
-        VulkanInstance(Ref<VulkanAllocator> allocator);
+        VulkanInstance(Ref<VulkanAllocator> allocator, const GraphicsCreateInfo& info);
 
         // Destructor for VulkanInstance.
         // It cleans up Vulkan instance resources.

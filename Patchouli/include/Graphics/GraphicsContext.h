@@ -20,10 +20,12 @@ namespace Patchouli
     };
 
     // Structure holding graphics-related information
-    struct GraphicsInfo
+    struct GraphicsCreateInfo
     {
         GraphicsAPI graphicsAPI = GraphicsAPI::Vulkan;
         GraphicsPolicy graphicsPolicy = GraphicsPolicy::PerformancePriority;
+
+        Ref<Window> window;
     };
 
     // Abstract base class representing a graphics context
@@ -40,6 +42,6 @@ namespace Patchouli
         virtual void selectDevice(Ref<GraphicsDevice> device) = 0;
 
         // Static function to create a graphics context
-        static Ref<GraphicsContext> create(const GraphicsInfo& info);
+        static Ref<GraphicsContext> create(const GraphicsCreateInfo& info);
     };
 }

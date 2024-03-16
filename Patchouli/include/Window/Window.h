@@ -12,12 +12,14 @@ namespace Patchouli
 		GLFW        // GLFW windowing API
 	};
 
-	struct WindowInfo
+	struct WindowCreateInfo
 	{
 		WindowAPI windowAPI = WindowAPI::GLFW;
 		std::string windowTitle = "Patchouli";
 		uint32_t windowWidth = 1280;
 		uint32_t windowHeight = 720;
+
+		EventCallback windowEventCallback;
 	};
 
 	class PATCHOULI_API Window : public PObject
@@ -26,6 +28,7 @@ namespace Patchouli
 		Window() = default;
 		virtual ~Window() = default;
 
+		virtual const std::string& getTitle() const = 0;
 		virtual uint32_t getWidth() const = 0;
 		virtual uint32_t getHeight() const = 0;
 
@@ -38,7 +41,8 @@ namespace Patchouli
 		virtual void onUpdate() = 0;
 
 		virtual void* getNative() const = 0;
+		virtual WindowAPI getAPI() const = 0;
 
-		static Ref<Window> create(const WindowInfo& info);
+		static Ref<Window> create(const WindowCreateInfo& info);
 	};
 }

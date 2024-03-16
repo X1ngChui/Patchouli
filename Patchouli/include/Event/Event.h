@@ -112,7 +112,6 @@ namespace Patchouli
         const uint32_t nThreads; // Number of threads for event processing
         bool running = false; // Flag indicating whether the event loop is running
 
-        Scope<Ref<Event>[]> eventBuffer; // Scoped buffer for event batching
         ThreadPool threadPool; // Thread pool for event handling
     };
 
@@ -120,15 +119,20 @@ namespace Patchouli
     class PATCHOULI_API EventListenerBase : public PObject
     {
     public:
+        enum class ExecutionThread
+        {
+            Main = 0, Background
+        };
+
         // Constructor with event callback function
-        EventListenerBase(const EventCallback& callback)
-            : callback(callback)
+        EventListenerBase(const EventCallback& callback, ExecutionThread executionThread)
+            : callback(callback), executionThread(executionThread)
         {
         }
 
         // Move constructor with event callback function
-        EventListenerBase(const EventCallback&& callback)
-            : callback(callback)
+        EventListenerBase(const EventCallback&& callback, ExecutionThread executionThread)
+            : callback(callback), executionThread(executionThread)
         {
         }
 
@@ -137,11 +141,14 @@ namespace Patchouli
         // Operator overload to invoke the event callback
         void operator()(Ref<Event> event) const;
 
+        ExecutionThread getExecutionThread() const { return executionThread; }
+
     protected:
         friend class EventDispatcher;
         WeakRef<EventDispatcher> dispatcher = nullptr; // Weak reference to the event dispatcher
 
     private:
+        ExecutionThread executionThread;
         EventCallback callback; // Callback function to handle events
     };
 
@@ -151,14 +158,14 @@ namespace Patchouli
     {
     public:
         // Constructor with event callback function
-        EventListener(const EventCallback& callback)
-            : EventListenerBase(callback)
+        EventListener(const EventCallback& callback, ExecutionThread executionThread = ExecutionThread::Background)
+            : EventListenerBase(callback, executionThread)
         {
         }
 
         // Move constructor with event callback function
-        EventListener(const EventCallback&& callback)
-            : EventListenerBase(callback)
+        EventListener(const EventCallback&& callback, ExecutionThread executionThread = ExecutionThread::Background)
+            : EventListenerBase(callback, executionThread)
         {
         }
 

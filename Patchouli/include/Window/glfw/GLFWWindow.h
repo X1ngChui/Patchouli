@@ -9,9 +9,10 @@ namespace Patchouli
 	class GLFWWindow : public Window
 	{
 	public:
-		GLFWWindow(const WindowInfo& info);
+		GLFWWindow(const WindowCreateInfo& info);
 		virtual ~GLFWWindow();
-
+		
+		virtual const std::string& getTitle() const override { return attribute.title; }
 		virtual uint32_t getWidth() const override { return attribute.width; }
 		virtual uint32_t getHeight() const override { return attribute.height; }
 
@@ -32,10 +33,12 @@ namespace Patchouli
 
 		virtual void* getNative() const override { return (void*)(&window); };
 
+		virtual WindowAPI getAPI() const override { return WindowAPI::GLFW; }
+
 	private:
 		struct WindowAttribute
 		{
-			const char* name;
+			std::string title;
 			uint32_t width;
 			uint32_t height;
 

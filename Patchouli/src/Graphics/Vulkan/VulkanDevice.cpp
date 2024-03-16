@@ -1,6 +1,5 @@
 #include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
-#include "Core/Application.h"
 
 namespace Patchouli
 {
@@ -56,11 +55,11 @@ namespace Patchouli
         return features;
     }
 
-    std::vector<const char*> VulkanDevice::getEnabledExtensions() const
+    std::vector<const char*> VulkanDevice::getEnabledExtensions(const GraphicsCreateInfo& info) const
     {
         std::vector<const char*> extensions;
 
-        if (Application::getInstance().getAppInfo().windowInfo.windowAPI != WindowAPI::None)
+        if (info.window->getAPI() != WindowAPI::None)
             extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
         return extensions;
     }
@@ -82,7 +81,7 @@ namespace Patchouli
     }
 
     // Function to select the Vulkan device and initialize its properties
-    void VulkanDevice::onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface)
+    void VulkanDevice::onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface, const GraphicsCreateInfo& info)
     {
         selected = true; // Mark the device as selected
         vkAllocator = allocator; // Store the allocator for resource management
@@ -118,7 +117,7 @@ namespace Patchouli
 
         // Get required extensions, layers and features
         std::vector<const char*> layers = getEnabledLayers();
-        std::vector<const char*> extensions = getEnabledExtensions();
+        std::vector<const char*> extensions = getEnabledExtensions(info);
         VkPhysicalDeviceFeatures features = getEnabledFeatures();
 
         // Create Vulkan logical device
@@ -198,8 +197,6 @@ namespace Patchouli
             // Check if the queue family supports presentation
             if (*surface) // if a window surface is wanted by the application
             {
-                assert(Application::getInstance().getAppInfo().windowInfo.windowAPI != WindowAPI::None);
-
                 VkBool32 presentSupported = VK_FALSE;
                 vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &presentSupported);
                 if (presentSupported)

@@ -1,5 +1,4 @@
 #include "Graphics/Vulkan/VulkanSwapchain.h"
-#include "Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Patchouli
@@ -39,7 +38,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainExtentSelect() = default;
 
 		// Operator to select the extent based on given surface capabilities
-		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities) const;
+		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsCreateInfo& info) const;
 	};
 
 	// Template struct to select Vulkan Swapchain settings
@@ -49,7 +48,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainSettingsSelect() = default;
 
 		// Operator to select the swapchain settings based on the supported formats, present modes, and surface capabilities
-		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports) const
+		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports, const GraphicsCreateInfo& info) const
 		{
 			constexpr VulkanSwapchainSurfaceFormatSelect<P> surfaceFormatSelect{};
 			constexpr VulkanSwapchainPresentModeSelect<P> presentModeSelect{};
@@ -58,7 +57,7 @@ namespace Patchouli
 			return {
 				.surfaceFormat = surfaceFormatSelect(supports.surfaceFormats),
 				.presentMode = presentModeSelect(supports.presentModes),
-				.extent = extentSelect(supports.surfaceCapabilities)
+				.extent = extentSelect(supports.surfaceCapabilities, info)
 			};
 		}
 	};
@@ -111,18 +110,18 @@ namespace Patchouli
 
 	// Template method for selecting Vulkan Swapchain extent
 	template<GraphicsPolicy P>
-	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities) const
+	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsCreateInfo& info) const
 	{
 		// If the current extent is defined, use it, otherwise, use the window framebuffer size
 		if (capabilities.currentExtent.width != 0xffffffff)
 			return capabilities.currentExtent;
 
 		VkExtent2D extent;
-		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
+		switch (info.window->getAPI())
 		{
 		case WindowAPI::GLFW:
 			int width = 0, height = 0;
-			glfwGetFramebufferSize(*(GLFWwindow**)Application::getInstance().getWindow()->getNative(),
+			glfwGetFramebufferSize(*(GLFWwindow**)info.window->getNative(),
 				&width, &height);
 			extent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 		}
@@ -144,7 +143,7 @@ namespace Patchouli
 	}
 
 	// Constructor for Vulkan Swapchain class
-	VulkanSwapchain::VulkanSwapchain(const GraphicsInfo& graphicsInfo, Ref<VulkanDevice> device,
+	VulkanSwapchain::VulkanSwapchain(const GraphicsCreateInfo& graphicsInfo, Ref<VulkanDevice> device,
 		Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator)
 		: vkDevice(device), vkSurface(surface), vkAllocator(allocator)
 	{
@@ -155,11 +154,11 @@ namespace Patchouli
 		{
 		case GraphicsPolicy::PerformancePriority:
 			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PerformancePriority> performancePrioritySelect;
-			settings = performancePrioritySelect(supports);
+			settings = performancePrioritySelect(supports, graphicsInfo);
 			break;
 		case GraphicsPolicy::PowerSavingPriority:
 			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PowerSavingPriority> powerSavingPrioritySelect;
-			settings = powerSavingPrioritySelect(supports);
+			settings = powerSavingPrioritySelect(supports, graphicsInfo);
 			break;
 		}
 

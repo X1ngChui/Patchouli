@@ -21,5 +21,6 @@ namespace Patchouli
 		VkSurfaceKHR vkSurface = VK_NULL_HANDLE;
 		Ref<VulkanInstance> vkInstance;
 		Ref<VulkanAllocator> vkAllocator;
+		Ref<Window> window;
 	};
 }

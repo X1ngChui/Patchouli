@@ -4,7 +4,7 @@
 
 namespace Patchouli
 {
-	Ref<Window> Window::create(const WindowInfo& info)
+	Ref<Window> Window::create(const WindowCreateInfo& info)
 	{
 		switch (info.windowAPI)
 		{

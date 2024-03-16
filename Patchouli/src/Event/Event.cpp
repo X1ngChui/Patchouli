@@ -1,5 +1,6 @@
 #include "Event/Event.h"
 
+#define PATCHOULI_EVENT_BUFFER_SIZE 16
 
 namespace Patchouli
 {
@@ -32,7 +33,7 @@ namespace Patchouli
 	}
 
 	EventDispatcher::EventDispatcher(uint32_t nThreads)
-		: token(eventQueue), nThreads(nThreads), eventBuffer(new Ref<Event>[nThreads]), threadPool(nThreads)
+		: token(eventQueue), nThreads(nThreads), threadPool(nThreads)
 	{
 	}
 
@@ -46,9 +47,11 @@ namespace Patchouli
 	{
 		running = true;
 
+		Ref<Event> eventBuffer[PATCHOULI_EVENT_BUFFER_SIZE];
+
 		while (running)
 		{
-			std::size_t nEvents = eventQueue.try_dequeue_bulk(token, eventBuffer.get(), nThreads);
+			std::size_t nEvents = eventQueue.try_dequeue_bulk(token, eventBuffer, PATCHOULI_EVENT_BUFFER_SIZE);
 
 			if (nEvents <= 0)
 			{
@@ -64,12 +67,18 @@ namespace Patchouli
 				Ref<Event> event = eventBuffer[i];
 				const auto& listenerList = listenerMap[event->getType()];
 
-				auto result = threadPool.addWorkFunc(
-					[=] {
-						for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
-							(**it)(event); 
+				for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
+				{
+					switch ((*it)->getExecutionThread())
+					{
+					case EventListenerBase::ExecutionThread::Main:
+						(**it)(event);
+						break;
+					case EventListenerBase::ExecutionThread::Background:
+						threadPool.addWorkFunc([=] { (**it)(event); });
+						break;
 					}
-				);
+				}
 			}
 		}
 	}

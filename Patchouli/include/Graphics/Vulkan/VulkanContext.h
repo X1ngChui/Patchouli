@@ -16,7 +16,7 @@ namespace Patchouli
     {
     public:
         // Constructor for VulkanContext.
-        VulkanContext(const GraphicsInfo& info);
+        VulkanContext(const GraphicsCreateInfo& info);
 
         // Destructor for VulkanContext.
         // Note: According to the C++ standard (ISO/IEC 14882:2011, ¡ì12.4.10),
@@ -32,7 +32,7 @@ namespace Patchouli
 
     private:
         // Graphics settings info.
-        GraphicsInfo graphicsInfo;
+        GraphicsCreateInfo graphicsInfo;
 
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member

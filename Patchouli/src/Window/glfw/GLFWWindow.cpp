@@ -7,8 +7,15 @@
 
 namespace Patchouli
 {
-	GLFWWindow::GLFWWindow(const WindowInfo& info)
+	GLFWWindow::GLFWWindow(const WindowCreateInfo& info)
 	{
+		attribute = {
+			.title = info.windowTitle,
+			.width = info.windowWidth,
+			.height = info.windowHeight,
+			.eventCallback = info.windowEventCallback
+		};
+
 		if (!glfwInitialized)
 		{
 			auto status = glfwInit();

@@ -1,4 +1,3 @@
-#include "Core/Application.h"
 #include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanContext.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
@@ -9,19 +8,19 @@ namespace Patchouli
 {
     // Constructor for VulkanInstance.
     // It initializes Vulkan instance based on the provided GraphicsInfo and VulkanAllocator.
-    VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator)
+    VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator, const GraphicsCreateInfo& info)
         : vkAllocator(allocator)
     {
         // Get required Vulkan extensions and layers
-        std::vector<const char*> extensions = getEnabledExtensions(Application::getInstance().getAppInfo().windowInfo.windowAPI);
+        std::vector<const char*> extensions = getEnabledExtensions(info.window->getAPI());
         std::vector<const char*> layers = getEnabledLayers();
 
         // Fill VkApplicationInfo structure
         VkApplicationInfo appInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = Application::getInstance().getAppInfo().appName.c_str(),
-            .applicationVersion = Application::getInstance().getAppInfo().appVersion,
+            .pApplicationName = info.window->getTitle().c_str(),
+            .applicationVersion = 0,
             .pEngineName = "Patchouli",
             .engineVersion = VK_MAKE_API_VERSION(0, 0, 0, 0),
             .apiVersion = VK_API_VERSION_1_0

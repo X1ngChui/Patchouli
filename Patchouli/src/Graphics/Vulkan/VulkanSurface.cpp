@@ -1,14 +1,12 @@
 #include "Graphics/Vulkan/VulkanSurface.h"
-#include "Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Patchouli
 {
-	Patchouli::VulkanSurface::VulkanSurface(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator,
-		Ref<Window> window)
-		: vkInstance(instance), vkAllocator(allocator)
+	Patchouli::VulkanSurface::VulkanSurface(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator, Ref<Window> window)
+		: vkInstance(instance), vkAllocator(allocator), window(window)
 	{
-		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
+		switch (window->getAPI())
 		{
 		case WindowAPI::None:
 			vkSurface = VK_NULL_HANDLE;
@@ -22,8 +20,10 @@ namespace Patchouli
 
 	Patchouli::VulkanSurface::~VulkanSurface()
 	{
-		switch (Application::getInstance().getAppInfo().windowInfo.windowAPI)
+		switch (window->getAPI())
 		{
+		case WindowAPI::None:
+			break;
 		case WindowAPI::GLFW:
 			vkDestroySurfaceKHR(*vkInstance, vkSurface, *vkAllocator);
 			break;
