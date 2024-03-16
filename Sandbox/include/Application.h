@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef SANDBOX_DEBUG_MODE
+#if defined(SANDBOX_DEBUG_MODE) || defined(SANDBOX_TESTING_MODE)
 #   define PATCHOULI_CONSOLE_ENABLE
 #   define SANDBOX_CONSOLE_ENABLE
 #endif
@@ -45,5 +45,7 @@ namespace Sandbox
 
         Patchouli::Ref<Patchouli::Window> window = nullptr;                   // Pointer to the application window
         Patchouli::Ref<Patchouli::GraphicsContext> graphicsContext = nullptr; // Pointer to the graphics context
+
+        std::chrono::steady_clock::time_point lastUpdateTime;
     };
 } // namespace Sandbox

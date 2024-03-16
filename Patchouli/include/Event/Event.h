@@ -101,8 +101,18 @@ namespace Patchouli
         void removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener);
 
     private:
-        std::mutex mapMutex; // Mutex for listener map
-        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap; // Map of event type to listener vectors
+        // Mutex for protecting the main thread event listener map
+        std::mutex mainMapMutex;
+
+        // Map of event type to a vector of event listeners for the main thread
+        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> mainListenerMap;
+
+        // Mutex for protecting the background thread event listener map
+        std::mutex backgroundMapMutex;
+
+        // Map of event type to a vector of event listeners for background threads
+        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> backgroundListenerMap;
+
 
         std::mutex threadMutex; // Mutex for thread control
         std::condition_variable cv; // Condition variable for thread suspension
@@ -121,7 +131,8 @@ namespace Patchouli
     public:
         enum class ExecutionThread
         {
-            Main = 0, Background
+            Main = 0, // Execute in the main thread
+            Background // Execute in a background thread
         };
 
         // Constructor with event callback function
@@ -141,6 +152,7 @@ namespace Patchouli
         // Operator overload to invoke the event callback
         void operator()(Ref<Event> event) const;
 
+        // Get the execution thread of the listener
         ExecutionThread getExecutionThread() const { return executionThread; }
 
     protected:
@@ -172,7 +184,7 @@ namespace Patchouli
         // Destructor to automatically remove listener from dispatcher
         virtual ~EventListener()
         {
-            if (nullptr && !dispatcher.expired())
+            if (!dispatcher.expired())
                 dispatcher.lock()->removeListener(this);
         }
     };
@@ -180,8 +192,7 @@ namespace Patchouli
 
 // Specialization of the formatter for Event types in fmt library
 template <typename T>
-struct fmt::formatter<T, std::enable_if_t<std::is_base_of_v<Patchouli::Event, T>, char>>
-    : fmt::formatter<std::string>
+struct fmt::formatter<T, std::enable_if_t<std::is_base_of_v<Patchouli::Event, T>, char>> : fmt::formatter<std::string>
 {
     template <typename FormatCtx>
     auto format(const Patchouli::Event& evt, FormatCtx& ctx) const

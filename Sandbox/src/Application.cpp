@@ -13,10 +13,12 @@ namespace Sandbox
     // Constructor
     Application::Application()
     {
+        // Initialize console logging
 #ifdef SANDBOX_CONSOLE_ENABLE
         Console::init("Sandbox");
         Console::info("Hello Patchouli!");
 #endif
+
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
             .windowAPI = WindowAPI::GLFW,
@@ -54,6 +56,14 @@ namespace Sandbox
     void Application::onUpdate()
     {
         window->onUpdate(); // Update the window
+
+        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+
+        std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
+        double interval = timeElapsed.count();
+        Console::info("Time interval since last update: {} milliseconds", interval);
+
+        lastUpdateTime = currentTime;
     }
 
     // Destructor
@@ -66,6 +76,9 @@ namespace Sandbox
     {
         window->show(); // Show the window
         dispatcher.publishEvent(makeRef<AppUpdateEvent>()); // Publish an application update event
+
+        lastUpdateTime = std::chrono::steady_clock::now();
+
         dispatcher.run(); // Run the event dispatcher
     }
 

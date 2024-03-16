@@ -12,7 +12,7 @@
 	#define trap __builtin_trap;
 #endif
 
-#ifdef PATCHOULI_DEBUG_MODE
+#if defined(PATCHOULI_DEBUG_MODE) || defined(PATCHOULI_TESTING_MODE)
 	#define PATCHOULI_CONSOLE_ENABLE
 #endif
 
