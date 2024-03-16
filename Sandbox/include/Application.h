@@ -1,5 +1,10 @@
 #pragma once
 
+#ifdef SANDBOX_DEBUG_MODE
+#   define PATCHOULI_CONSOLE_ENABLE
+#   define SANDBOX_CONSOLE_ENABLE
+#endif
+
 #include "Patchouli.h"
 
 namespace Sandbox

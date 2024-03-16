@@ -4,11 +4,10 @@
 #include <fmt/format.h>
 
 #ifdef _WIN64
-	#include <Windows.h>
-	#include <rpcdce.h>
-	#pragma comment(lib, "Rpcrt4.lib")
+#	include <rpc.h>
+#	pragma comment(lib, "Rpcrt4.lib")
 #elif defined(__linux)
-	#include <uuid/uuid.h>
+#	include <uuid/uuid.h>
 #endif
 
 namespace Patchouli

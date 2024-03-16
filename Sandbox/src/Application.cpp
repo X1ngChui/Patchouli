@@ -13,6 +13,10 @@ namespace Sandbox
     // Constructor
     Application::Application()
     {
+#ifdef SANDBOX_CONSOLE_ENABLE
+        Console::init("Sandbox");
+        Console::info("Hello Patchouli!");
+#endif
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
             .windowAPI = WindowAPI::GLFW,
