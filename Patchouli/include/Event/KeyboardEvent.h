@@ -5,7 +5,7 @@
 
 namespace Patchouli
 {
-	class KeyboardEvent : public EventBase<KeyboardEvent>
+	class KeyboardEvent
 	{
 	public:
 		virtual ~KeyboardEvent() = default;
@@ -22,7 +22,7 @@ namespace Patchouli
 	};
 
 
-	class KeyPressedEvent : public virtual KeyboardEvent
+	class KeyPressedEvent final : public KeyboardEvent, public EventBase<KeyPressedEvent>
 	{
 	public:
 		KeyPressedEvent(int keyCode, bool repeated)
@@ -41,7 +41,7 @@ namespace Patchouli
 		bool repeated;
 	};
 
-	class KeyReleasedEvent : public virtual KeyboardEvent
+	class KeyReleasedEvent final : public KeyboardEvent, public EventBase<KeyReleasedEvent>
 	{  
 	public:
 		KeyReleasedEvent(int keyCode)
@@ -56,7 +56,7 @@ namespace Patchouli
 		}
 	};
 
-	class KeyTypedEvent : public virtual KeyboardEvent
+	class KeyTypedEvent final : public KeyboardEvent, public EventBase<KeyTypedEvent>
 	{
 	public:
 		KeyTypedEvent(int keyCode)

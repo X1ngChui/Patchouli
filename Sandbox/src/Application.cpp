@@ -38,16 +38,20 @@ namespace Sandbox
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
 
         // Set up event listeners
+        listeners.onWindowUpdate = makeRef<EventListener<WindowUpdateEvent>>(
+            [this](Ref<Event> event) { window->onUpdate(); Console::info("Window Update"); }
+        );
+
         listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(
             [this](Ref<Event> event) { dispatcher.stop(); } // Event listener for window close event
         );
 
         listeners.onAppUpdate = makeRef<EventListener<AppUpdateEvent>>(
-            [this](Ref<Event> event) { this->onUpdate(); dispatcher.publishEvent(makeRef<AppUpdateEvent>()); }, // Event listener for application update event
-            EventListenerBase::ExecutionThread::Main // Execute event listener in the main thread
+            [this](Ref<Event> event) { this->onUpdate(); Console::info("App Update"); } // Event listener for application update event
         );
 
         // Add event listeners to the dispatcher
+        dispatcher.addListener(listeners.onWindowUpdate);
         dispatcher.addListener(listeners.onWindowClose);
         dispatcher.addListener(listeners.onAppUpdate);
     }
@@ -55,15 +59,16 @@ namespace Sandbox
     // Method called when the application is updated
     void Application::onUpdate()
     {
-        window->onUpdate(); // Update the window
-
         std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
 
         std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
         double interval = timeElapsed.count();
-        Console::info("Time interval since last update: {} milliseconds", interval);
+        // Console::info("Time interval since last update: {} milliseconds", interval);
 
         lastUpdateTime = currentTime;
+        dispatcher.publishEvent(makeRef<WindowUpdateEvent>());
+        dispatcher.publishEvent(makeRef<FenceEvent>());
+        dispatcher.publishEvent(makeRef<AppUpdateEvent>());
     }
 
     // Destructor

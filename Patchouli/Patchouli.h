@@ -11,6 +11,7 @@
 #include "Event/KeyboardEvent.h"
 #include "Event/MouseEvent.h"
 #include "Event/WindowEvent.h"
+#include "Event/FenceEvent.h"
 
 #include "Util/Reference.h"
 #include "Util/TypeTraits.h"

@@ -37,6 +37,7 @@ namespace Sandbox
         // Structure holding event listeners for the application
         struct EventListenerGroup
         {
+            Patchouli::Ref<Patchouli::EventListener<Patchouli::WindowUpdateEvent>> onWindowUpdate = nullptr; // Event listener for window update event
             Patchouli::Ref<Patchouli::EventListener<Patchouli::WindowCloseEvent>> onWindowClose = nullptr; // Event listener for window close event
             Patchouli::Ref<Patchouli::EventListener<Patchouli::AppUpdateEvent>> onAppUpdate = nullptr;   // Event listener for application update event
         };

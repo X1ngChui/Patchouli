@@ -1,4 +1,5 @@
 #include "Event/Event.h"
+#include "Event/FenceEvent.h"
 
 // Maximum number of events to process in a single iteration
 #define PATCHOULI_EVENT_BUFFER_SIZE 16
@@ -12,59 +13,25 @@ namespace Patchouli
 	}
 
 	// Implementation of adding an event listener
-	void EventDispatcher::addListenerImpl(EventTypeID eventTypeID, Ref<EventListenerBase> listener)
+	void EventDispatcher::addListener(Ref<EventListenerBase> listener)
 	{
-		switch (listener->getExecutionThread())
-		{
-		case EventListenerBase::ExecutionThread::Main:
-		{
-			std::unique_lock<std::mutex> mainLock(mainMapMutex);
-			mainListenerMap[eventTypeID].push_back(listener);
-			break;
-		}
-		case EventListenerBase::ExecutionThread::Background:
-		{
-			std::unique_lock<std::mutex> backgroundLock(backgroundMapMutex);
-			backgroundListenerMap[eventTypeID].push_back(listener);
-			break;
-		}
-		}
+		std::unique_lock<std::mutex> lock(mapMutex);
+		listenerMap[listener->getType()].push_back(listener);
 
 		listener->dispatcher = std::static_pointer_cast<EventDispatcher>(this->shared_from_this());
 	}
 
 	// Implementation of removing an event listener
-	void EventDispatcher::removeListenerImpl(EventTypeID eventTypeID, EventListenerBase* listener)
+	void EventDispatcher::removeListener(Ref<EventListenerBase> listener)
 	{
-		switch (listener->getExecutionThread())
-		{
-		case EventListenerBase::ExecutionThread::Main:
-		{
-			std::unique_lock<std::mutex> mainLock(mainMapMutex);
+		
+		std::unique_lock<std::mutex> lock(mapMutex);
 
-			auto& listenerList = mainListenerMap[eventTypeID];
+		auto& listenerList = listenerMap[listener->getType()];
 
-			auto it = std::ranges::find_if(listenerList, [listener](Ref<EventListenerBase> l)
-				{ return l.get() == listener; }
-			);
-			if (it != listenerList.end())
-				listenerList.erase(it);
-			break;
-		}
-		case EventListenerBase::ExecutionThread::Background:
-		{
-			std::unique_lock<std::mutex> backgroundLock(backgroundMapMutex);
-
-			auto& listenerList = backgroundListenerMap[eventTypeID];
-
-			auto it = std::ranges::find_if(listenerList, [listener](Ref<EventListenerBase> l)
-				{ return l.get() == listener; }
-			);
-			if (it != listenerList.end())
-				listenerList.erase(it);
-			break;
-		}
-		}
+		auto it = std::ranges::find(listenerList, listener);
+		if (it != listenerList.end())
+			listenerList.erase(it);
 
 		listener->dispatcher = nullptr;
 	}
@@ -108,21 +75,33 @@ namespace Patchouli
 			{
 				Ref<Event> event = eventBuffer[i];
 
+				if (event->getType() == FenceEvent::EventType)
 				{
-					// Process main thread event listeners
-					std::unique_lock<std::mutex> mainLock(mainMapMutex);
-					const auto& listenerList = mainListenerMap[event->getType()];
-
-					for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
-						(**it)(event);
+					std::unique_lock<std::mutex> lock(threadMutex);
+					if (nRunningEvents != 0)
+						cv.wait(lock);
+					continue;
 				}
 
+				// Process background thread event listeners
+				std::unique_lock<std::mutex> lock(mapMutex);
+				const auto& listenerList = listenerMap[event->getType()];
+				for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
 				{
-					// Process background thread event listeners
-					std::unique_lock<std::mutex> backgroundLock(backgroundMapMutex);
-					const auto& listenerList = backgroundListenerMap[event->getType()];
-					for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
-						threadPool.addWorkFunc([=] { (**it)(event); });
+					switch (event->getExecutionThread())
+					{
+					case Event::ExecutionThread::Main:
+						beignEvent();
+						(**it)(event);
+						endEvent();
+						break;
+					case Event::ExecutionThread::Background:
+						Ref<EventListenerBase> listener = *it;
+						threadPool.addWorkFunc([this, listener, event] {
+							this->beignEvent(); (*listener)(event); this->endEvent();
+							});
+						break;
+					}
 				}
 			}
 		}
@@ -133,5 +112,19 @@ namespace Patchouli
 	{
 		running = false;
 		cv.notify_one();
+	}
+
+	void EventDispatcher::beignEvent()
+	{
+		std::lock_guard<std::mutex> lock(countMutex);
+		nRunningEvents++;
+	}
+
+	void EventDispatcher::endEvent()
+	{
+		std::lock_guard<std::mutex> lock(countMutex);
+		nRunningEvents--;
+		if (nRunningEvents == 0)
+			cv.notify_one();
 	}
 }

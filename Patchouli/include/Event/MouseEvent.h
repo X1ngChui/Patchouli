@@ -4,7 +4,7 @@
 
 namespace Patchouli
 {
-	class MouseButtonEvent : public EventBase<MouseButtonEvent>
+	class MouseButtonEvent
 	{
 	public:
 		virtual ~MouseButtonEvent() = default;
@@ -21,7 +21,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonPressedEvent : public virtual MouseButtonEvent
+	class MouseButtonPressedEvent final : public MouseButtonEvent, public EventBase<MouseButtonPressedEvent>
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -37,7 +37,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonReleasedEvent : public virtual MouseButtonEvent
+	class MouseButtonReleasedEvent final : public MouseButtonEvent, public EventBase<MouseButtonReleasedEvent>
 	{
 	public:
 		MouseButtonReleasedEvent(int button)
@@ -52,7 +52,7 @@ namespace Patchouli
 		}
 	};
 	
-	class MouseMovedEvent : public EventBase<MouseMovedEvent>
+	class MouseMovedEvent final : public EventBase<MouseMovedEvent>
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -73,7 +73,7 @@ namespace Patchouli
 		float posX, posY;
 	};
 
-	class MouseScrolledEvent : public EventBase<MouseScrolledEvent>
+	class MouseScrolledEvent final : public EventBase<MouseScrolledEvent>
 	{
 	public:
 		MouseScrolledEvent(float offsetX, float offsetY)

@@ -4,15 +4,7 @@
 
 namespace Patchouli
 {
-	class AppTickEvent : public EventBase<AppTickEvent>
-	{
-	public:
-		AppTickEvent() = default;
-		virtual ~AppTickEvent() = default;
-	};
-
-
-	class AppUpdateEvent : public EventBase<AppUpdateEvent>
+	class AppUpdateEvent final : public EventBase<AppUpdateEvent>
 	{
 	public:
 		AppUpdateEvent() = default;
@@ -20,7 +12,7 @@ namespace Patchouli
 	};
 
 
-	class AppRenderEvent : public EventBase<AppRenderEvent>
+	class AppRenderEvent final : public EventBase<AppRenderEvent>
 	{
 	public:
 		AppRenderEvent() = default;

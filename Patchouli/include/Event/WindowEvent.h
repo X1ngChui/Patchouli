@@ -4,7 +4,15 @@
 
 namespace Patchouli
 {
-	class WindowCloseEvent : public EventBase<WindowCloseEvent>
+	class WindowUpdateEvent final : public EventBase<WindowUpdateEvent, Event::ExecutionThread::Main>
+	{
+	public:
+		WindowUpdateEvent() = default;
+
+		virtual ~WindowUpdateEvent() = default;
+	};
+
+	class WindowCloseEvent final : public EventBase<WindowCloseEvent>
 	{
 	public:
 		WindowCloseEvent() = default;
@@ -12,7 +20,7 @@ namespace Patchouli
 	};
 
 
-	class WindowResizeEvent : public EventBase<WindowResizeEvent>
+	class WindowResizeEvent final : public EventBase<WindowResizeEvent>
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
