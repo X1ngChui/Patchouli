@@ -39,7 +39,7 @@ namespace Sandbox
 
         // Set up event listeners
         listeners.onWindowUpdate = makeRef<EventListener<WindowUpdateEvent>>(
-            [this](Ref<Event> event) { window->onUpdate(); Console::info("Window Update"); }
+            [this](Ref<Event> event) { /* Console::info("Window Update"); */ }
         );
 
         listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(
@@ -47,7 +47,7 @@ namespace Sandbox
         );
 
         listeners.onAppUpdate = makeRef<EventListener<AppUpdateEvent>>(
-            [this](Ref<Event> event) { this->onUpdate(); Console::info("App Update"); } // Event listener for application update event
+            [this](Ref<Event> event) { this->onUpdate(); /* Console::info("App Update"); */} // Event listener for application update event
         );
 
         // Add event listeners to the dispatcher
@@ -63,12 +63,16 @@ namespace Sandbox
 
         std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
         double interval = timeElapsed.count();
-        // Console::info("Time interval since last update: {} milliseconds", interval);
+        Console::info("Time interval since last update: {} milliseconds", interval);
 
         lastUpdateTime = currentTime;
-        dispatcher.publishEvent(makeRef<WindowUpdateEvent>());
-        dispatcher.publishEvent(makeRef<FenceEvent>());
-        dispatcher.publishEvent(makeRef<AppUpdateEvent>());
+        dispatcher.publishEvents(
+            { 
+                makeRef<WindowUpdateEvent>(),
+                makeRef<FenceEvent>(),
+                makeRef<AppUpdateEvent>()
+            }
+        );
     }
 
     // Destructor

@@ -4,7 +4,7 @@
 
 namespace Patchouli
 {
-	class FenceEvent final : public EventBase<FenceEvent>
+	class FenceEvent final : public EventBase<FenceEvent, Event::ExecutionThread::Main>
 	{
 	public:
 		FenceEvent() = default;

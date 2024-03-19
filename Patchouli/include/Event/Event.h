@@ -90,7 +90,18 @@ namespace Patchouli
         void removeListener(Ref<EventListenerBase> listener);
 
         // Publish an event to the event queue
+        // This function publishes a single event to the event queue.
+        // It takes a reference to the event object as a parameter.
+        // The order in which events are inserted into the event queue is not guaranteed,
+        // even if this function is called consequently.
         void publishEvent(Ref<Event> event);
+
+        // Publish the events to the event queue
+        // This function publishes multiple events to the event queue. 
+        // It takes a vector of event references as a parameter.
+        // Unlike the publishEvent function, events inserted by this function maintain
+        // the order in which they appear in the vector
+        void publishEvents(const std::vector<Ref<Event>>& events);
 
         // Start the event loop (blocking, not thread safe)
         void run();
@@ -103,6 +114,10 @@ namespace Patchouli
 
         void endEvent();
 
+        moodycamel::ProducerToken& getProducerToken();
+
+        moodycamel::ConsumerToken& getConsumerToken();
+
     private:
         // Mutex for protecting the event listener map
         std::mutex mapMutex;
@@ -110,13 +125,11 @@ namespace Patchouli
         // Map of event type to a vector of event listeners
         std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap;
 
-        std::mutex threadMutex; // Mutex for thread control
-        std::condition_variable cv; // Condition variable for thread suspension
+        std::mutex loopMutex; // Mutex for event loop control
+        std::condition_variable loopCv; // Condition variable for event loop suspension
         moodycamel::ConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
-        moodycamel::ConsumerToken token; // Accelerate the event queue operation
-
-        std::mutex countMutex;
-        uint32_t nRunningEvents = 0;
+       
+        std::atomic<std::size_t> nRunningEvents = 0; // Counter for events in process
 
         const uint32_t nThreads; // Number of threads for event processing
         bool running = false; // Flag indicating whether the event loop is running

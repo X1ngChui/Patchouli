@@ -38,15 +38,20 @@ namespace Patchouli
 
 	// Constructor for the event dispatcher
 	EventDispatcher::EventDispatcher(uint32_t nThreads)
-		: token(eventQueue), nThreads(nThreads), threadPool(nThreads)
+		: nThreads(nThreads), threadPool(nThreads)
 	{
 	}
 
 	// Method to publish an event to the event queue
 	void EventDispatcher::publishEvent(Ref<Event> event)
 	{
-		eventQueue.enqueue(event);
-		cv.notify_one();
+		eventQueue.enqueue(getProducerToken(), event);
+		loopCv.notify_one();
+	}
+
+	void EventDispatcher::publishEvents(const std::vector<Ref<Event>>& events)
+	{
+		eventQueue.enqueue_bulk(getProducerToken(), events.data(), events.size());
 	}
 
 	// Method to start the event loop
@@ -60,13 +65,13 @@ namespace Patchouli
 		while (running)
 		{
 			// Attempt to dequeue events from the event queue
-			std::size_t nEvents = eventQueue.try_dequeue_bulk(token, eventBuffer, PATCHOULI_EVENT_BUFFER_SIZE);
+			std::size_t nEvents = eventQueue.try_dequeue_bulk(getConsumerToken(), eventBuffer, PATCHOULI_EVENT_BUFFER_SIZE);
 
 			if (nEvents <= 0)
 			{
 				// Wait if no events are available
-				std::unique_lock<std::mutex> lock(threadMutex);
-				cv.wait(lock);
+				std::unique_lock<std::mutex> lock(loopMutex);
+				loopCv.wait(lock);
 				continue;
 			}
 
@@ -77,15 +82,15 @@ namespace Patchouli
 
 				if (event->getType() == FenceEvent::EventType)
 				{
-					std::unique_lock<std::mutex> lock(threadMutex);
-					if (nRunningEvents != 0)
-						cv.wait(lock);
+					std::unique_lock<std::mutex> lock(loopMutex);
+					loopCv.wait(lock, [this] { return nRunningEvents.load(std::memory_order_acquire) <= 0; });
 					continue;
 				}
 
 				// Process background thread event listeners
 				std::unique_lock<std::mutex> lock(mapMutex);
 				const auto& listenerList = listenerMap[event->getType()];
+
 				for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
 				{
 					switch (event->getExecutionThread())
@@ -97,7 +102,7 @@ namespace Patchouli
 						break;
 					case Event::ExecutionThread::Background:
 						Ref<EventListenerBase> listener = *it;
-						threadPool.addWorkFunc([this, listener, event] {
+						threadPool.addWorkFunc([=] {
 							this->beignEvent(); (*listener)(event); this->endEvent();
 							});
 						break;
@@ -111,20 +116,29 @@ namespace Patchouli
 	void EventDispatcher::stop()
 	{
 		running = false;
-		cv.notify_one();
+		loopCv.notify_one();
 	}
 
 	void EventDispatcher::beignEvent()
 	{
-		std::lock_guard<std::mutex> lock(countMutex);
-		nRunningEvents++;
+		nRunningEvents.fetch_add(1, std::memory_order_release);
 	}
 
 	void EventDispatcher::endEvent()
 	{
-		std::lock_guard<std::mutex> lock(countMutex);
-		nRunningEvents--;
-		if (nRunningEvents == 0)
-			cv.notify_one();
+		if (nRunningEvents.fetch_sub(1, std::memory_order_release) == 1)
+			loopCv.notify_one();
+	}
+
+	moodycamel::ProducerToken& EventDispatcher::getProducerToken()
+	{
+		static thread_local moodycamel::ProducerToken pToken(eventQueue);
+		return pToken;
+	}
+
+	moodycamel::ConsumerToken& EventDispatcher::getConsumerToken()
+	{
+		static thread_local moodycamel::ConsumerToken cToken(eventQueue);
+		return cToken;
 	}
 }
