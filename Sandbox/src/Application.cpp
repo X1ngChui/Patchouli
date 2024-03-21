@@ -39,7 +39,7 @@ namespace Sandbox
 
         // Set up event listeners
         listeners.onWindowUpdate = makeRef<EventListener<WindowUpdateEvent>>(
-            [this](Ref<Event> event) { }
+            [this](Ref<Event> event) { window->onUpdate(); }
         );
 
         listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(

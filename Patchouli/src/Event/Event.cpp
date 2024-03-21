@@ -39,7 +39,7 @@ namespace Patchouli
 
 	// Constructor for the event dispatcher
 	EventDispatcher::EventDispatcher(uint32_t nThreads)
-		: threadPool(nThreads), nTasks(0)
+		: threadPool(nThreads), nTasks(0), loopSemaphore(0)
 	{
 	}
 
@@ -75,7 +75,7 @@ namespace Patchouli
 				EventTypeID type = event->getType();
 
 				if (type == FenceEvent::EventType)
-					while (nTasks.load(std::memory_order_acquire) > 0);
+					loopSemaphore.wait();
 
 				// Process background thread event listeners
 				std::unique_lock<std::mutex> lock(mapMutex);
@@ -109,17 +109,19 @@ namespace Patchouli
 	void EventDispatcher::stop()
 	{
 		running.store(false, std::memory_order_relaxed);
-		loopCv.notify_all();
+		loopSemaphore.signal();
 	}
 
 	void EventDispatcher::beginEvent()
 	{
+		flushed.store(false, std::memory_order_relaxed);
 		nTasks.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	void EventDispatcher::endEvent()
 	{
-		nTasks.fetch_sub(1, std::memory_order_relaxed);
+		if (nTasks.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			loopSemaphore.signal();
 	}
 
 	moodycamel::ProducerToken& EventDispatcher::getProducerToken()

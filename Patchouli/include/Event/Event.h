@@ -6,6 +6,7 @@
 #include "Util/TypeTraits.h"
 #include "Util/Reference.h"
 #include "Util/ThreadPool.h"
+#include "Util/Semaphore.h"
 #include <fmt/format.h>
 #include <concurrentqueue.h>
 
@@ -114,11 +115,12 @@ namespace Patchouli
 
     private:
         std::atomic<bool> running = false; // Flag indicating whether the event loop is running
+        std::atomic<bool> flushed;
         std::atomic<long long> nTasks; // Counter for events in process
 
         std::mutex mapMutex; // Mutex for protecting the event listener map
-        std::mutex loopMutex; // Mutex for event loop control
-        std::condition_variable loopCv; // Condition variable for event loop suspension
+
+        Semaphore loopSemaphore;
 
         // Map of event type to a vector of event listeners
         std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap;
