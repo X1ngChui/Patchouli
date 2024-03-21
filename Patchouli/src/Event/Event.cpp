@@ -1,5 +1,6 @@
 #include "Event/Event.h"
 #include "Event/FenceEvent.h"
+#include "Log/Console.h"
 
 // Maximum number of events to process in a single iteration
 #define PATCHOULI_EVENT_BUFFER_SIZE 16
@@ -38,7 +39,7 @@ namespace Patchouli
 
 	// Constructor for the event dispatcher
 	EventDispatcher::EventDispatcher(uint32_t nThreads)
-		: threadPool(nThreads)
+		: threadPool(nThreads), nTasks(0)
 	{
 	}
 
@@ -56,7 +57,7 @@ namespace Patchouli
 	// Method to start the event loop
 	void EventDispatcher::run()
 	{
-		running.store(true, std::memory_order_relaxed);
+		running.store(true, std::memory_order_release);
 
 		// Buffer to hold events to process
 		Ref<Event> eventBuffer[PATCHOULI_EVENT_BUFFER_SIZE];
@@ -65,35 +66,37 @@ namespace Patchouli
 		{
 			// Attempt to dequeue events from the event queue
 			std::size_t nEvents = eventQueue.try_dequeue_bulk(getConsumerToken(), eventBuffer, PATCHOULI_EVENT_BUFFER_SIZE);
-
+			assert(nEvents <= PATCHOULI_EVENT_BUFFER_SIZE);
+			
 			// Process each event
 			for (std::size_t i = 0; i < nEvents; i++)
 			{
 				Ref<Event> event = eventBuffer[i];
+				EventTypeID type = event->getType();
 
-				if (event->getType() == FenceEvent::EventType)
-				{
-					std::unique_lock<std::mutex> lock(loopMutex);
-					loopCv.wait(lock, [this] { return nRunningEvents.load(std::memory_order_acquire) <= 0; });
-				}
+				if (type == FenceEvent::EventType)
+					while (nTasks.load(std::memory_order_acquire) > 0);
 
 				// Process background thread event listeners
 				std::unique_lock<std::mutex> lock(mapMutex);
-				const auto& listenerList = listenerMap[event->getType()];
+				const auto& listenerList = listenerMap[type];
 
 				for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
 				{
+					Ref<EventListenerBase> listener = *it;
+
 					switch (event->getExecutionThread())
 					{
 					case Event::ExecutionThread::Main:
-						beignEvent();
-						(**it)(event);
+						beginEvent();
+						(*listener)(event);
 						endEvent();
 						break;
 					case Event::ExecutionThread::Background:
-						Ref<EventListenerBase> listener = *it;
+						beginEvent();
 						threadPool.enqueue([=] {
-							this->beignEvent(); (*listener)(event); this->endEvent();
+								(*listener)(event);
+								endEvent();
 							});
 						break;
 					}
@@ -105,19 +108,18 @@ namespace Patchouli
 	// Method to stop the event loop
 	void EventDispatcher::stop()
 	{
-		running.store(false, std::memory_order_release);
-		loopCv.notify_one();
+		running.store(false, std::memory_order_relaxed);
+		loopCv.notify_all();
 	}
 
-	void EventDispatcher::beignEvent()
+	void EventDispatcher::beginEvent()
 	{
-		nRunningEvents.fetch_add(1, std::memory_order_release);
+		nTasks.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	void EventDispatcher::endEvent()
 	{
-		if (nRunningEvents.fetch_sub(1, std::memory_order_acq_rel) == 1)
-			loopCv.notify_one();
+		nTasks.fetch_sub(1, std::memory_order_relaxed);
 	}
 
 	moodycamel::ProducerToken& EventDispatcher::getProducerToken()

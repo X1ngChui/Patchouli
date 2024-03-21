@@ -39,7 +39,7 @@ namespace Sandbox
 
         // Set up event listeners
         listeners.onWindowUpdate = makeRef<EventListener<WindowUpdateEvent>>(
-            [this](Ref<Event> event) { window->onUpdate(); }
+            [this](Ref<Event> event) { }
         );
 
         listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(
@@ -69,6 +69,7 @@ namespace Sandbox
         dispatcher.publishEvents(
             { 
                 makeRef<WindowUpdateEvent>(),
+                makeRef<FenceEvent>(),
                 makeRef<AppUpdateEvent>()
             }
         );

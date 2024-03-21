@@ -103,7 +103,7 @@ namespace Patchouli
     
     private:
         // Function called when a event begin
-        void beignEvent();
+        void beginEvent();
 
         // Function called when a event end
         void endEvent();
@@ -114,7 +114,7 @@ namespace Patchouli
 
     private:
         std::atomic<bool> running = false; // Flag indicating whether the event loop is running
-        std::atomic<std::size_t> nRunningEvents = 0; // Counter for events in process
+        std::atomic<long long> nTasks; // Counter for events in process
 
         std::mutex mapMutex; // Mutex for protecting the event listener map
         std::mutex loopMutex; // Mutex for event loop control
