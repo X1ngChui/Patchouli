@@ -43,7 +43,9 @@ namespace Sandbox
         );
 
         listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(
-            [this](Ref<Event> event) { dispatcher.stop(); } // Event listener for window close event
+            [this](Ref<Event> event) {
+                dispatcher.publishEvents({ makeRef<FenceEvent>(), makeRef<TerminationEvent>() });
+            } // Event listener for window close event
         );
 
         listeners.onAppUpdate = makeRef<EventListener<AppUpdateEvent>>(

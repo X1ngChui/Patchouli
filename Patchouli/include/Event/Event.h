@@ -8,7 +8,7 @@
 #include "Util/ThreadPool.h"
 #include "Util/Semaphore.h"
 #include <fmt/format.h>
-#include <concurrentqueue.h>
+#include <blockingconcurrentqueue.h>
 
 namespace Patchouli
 {
@@ -99,9 +99,6 @@ namespace Patchouli
         // Start the event loop (blocking, not thread safe)
         void run();
 
-        // Stop the event loop
-        void stop();
-    
     private:
         // Function called when a event begin
         void beginEvent();
@@ -114,18 +111,17 @@ namespace Patchouli
         moodycamel::ConsumerToken& getConsumerToken();
 
     private:
-        std::atomic<bool> running = false; // Flag indicating whether the event loop is running
-        std::atomic<bool> flushed;
+        bool running = false; // Flag indicating whether the event loop is running
         std::atomic<long long> nTasks; // Counter for events in process
 
         std::mutex mapMutex; // Mutex for protecting the event listener map
-
-        Semaphore loopSemaphore;
+        std::mutex loopMutex; // Mutex for event loop control
+        std::condition_variable loopCv; // Condition variable for event loop suspension
 
         // Map of event type to a vector of event listeners
         std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap;
 
-        moodycamel::ConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
+        moodycamel::BlockingConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
         ThreadPool threadPool; // Thread pool for event handling
     };
 

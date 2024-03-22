@@ -12,6 +12,7 @@
 #include "Event/MouseEvent.h"
 #include "Event/WindowEvent.h"
 #include "Event/FenceEvent.h"
+#include "Event/TerminationEvent.h"
 
 #include "Util/Reference.h"
 #include "Util/TypeTraits.h"
