@@ -17,7 +17,7 @@ namespace Patchouli
 	void EventDispatcher::addListener(Ref<EventListenerBase> listener)
 	{
 		std::unique_lock<std::mutex> lock(mapMutex);
-		listenerMap[listener->getType()].push_back(listener);
+		listenerMap.insert({ listener->getType(), listener });
 
 		listener->dispatcher = std::static_pointer_cast<EventDispatcher>(this->shared_from_this());
 	}
@@ -27,12 +27,14 @@ namespace Patchouli
 	{
 		
 		std::unique_lock<std::mutex> lock(mapMutex);
+		auto range = listenerMap.equal_range(listener->getType());
+		auto it = std::find_if(range.first, range.second, [&listener](const auto& pair) {
+			return pair.second == listener;
+			});
 
-		auto& listenerList = listenerMap[listener->getType()];
+		assert(it != range.second);
 
-		auto it = std::ranges::find(listenerList, listener);
-		if (it != listenerList.end())
-			listenerList.erase(it);
+		listenerMap.erase(it);
 
 		listener->dispatcher = nullptr;
 	}
@@ -64,14 +66,12 @@ namespace Patchouli
 		running = true;
 
 		// Buffer to hold events to process
-		Ref<Event> eventBuffer[PATCHOULI_EVENT_BUFFER_SIZE];
+		std::array<Ref<Event>, PATCHOULI_EVENT_BUFFER_SIZE> eventBuffer;
 
 		while (running)
 		{
 			// Attempt to dequeue events from the event queue
-			std::size_t nEvents = eventQueue.wait_dequeue_bulk(getConsumerToken(), eventBuffer, PATCHOULI_EVENT_BUFFER_SIZE);
-
-			assert(nEvents > 0);
+			std::size_t nEvents = eventQueue.wait_dequeue_bulk(getConsumerToken(), eventBuffer.data(),  eventBuffer.size());
 	
 			// Process each event
 			for (std::size_t i = 0; i < nEvents; i++)
@@ -79,6 +79,7 @@ namespace Patchouli
 				Ref<Event> event = eventBuffer[i];
 				EventTypeID type = event->getType();
 
+				// Special Event for event loop control
 				switch (type) {
 					case TerminationEvent::EventType:
 						running = false;
@@ -94,19 +95,18 @@ namespace Patchouli
 
 				// Process background thread event listeners
 				std::unique_lock<std::mutex> lock(mapMutex);
-				const auto& listenerList = listenerMap[type];
+				auto range = listenerMap.equal_range(type);
 
-				for (auto it = listenerList.cbegin(); it != listenerList.cend(); it++)
+				for (auto it = range.first; it != range.second; it++)
 				{
-					Ref<EventListenerBase> listener = *it;
+					Ref<EventListenerBase> listener = it->second;
 
 					switch (event->getExecutionThread())
 					{
 					case Event::ExecutionThread::Main:
-						beginEvent();
 						(*listener)(event);
-						endEvent();
 						break;
+
 					case Event::ExecutionThread::Background:
 						beginEvent();
 						threadPool.enqueue([=] {

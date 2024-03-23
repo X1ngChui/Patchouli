@@ -112,16 +112,17 @@ namespace Patchouli
 
     private:
         bool running = false; // Flag indicating whether the event loop is running
-        std::atomic<long long> nTasks; // Counter for events in process
+        std::atomic<uint32_t> nTasks; // Counter for events in process
 
-        std::mutex mapMutex; // Mutex for protecting the event listener map
         std::mutex loopMutex; // Mutex for event loop control
         std::condition_variable loopCv; // Condition variable for event loop suspension
 
+        std::mutex mapMutex; // Mutex for protecting the event listener map
         // Map of event type to a vector of event listeners
-        std::unordered_map<EventTypeID, std::vector<Ref<EventListenerBase>>> listenerMap;
+        std::multimap<EventTypeID, Ref<EventListenerBase>> listenerMap;
 
         moodycamel::BlockingConcurrentQueue<Ref<Event>> eventQueue; // Concurrent event queue
+
         ThreadPool threadPool; // Thread pool for event handling
     };
 
