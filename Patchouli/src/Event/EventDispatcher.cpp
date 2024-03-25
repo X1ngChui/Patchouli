@@ -1,18 +1,11 @@
-#include "Event/Event.h"
-#include "Event/FenceEvent.h"
-#include "Event/TerminationEvent.h"
+#include "Event/EventDispatecher.h"
+#include "Event/ControlEvent.h"
+#include "Event/EventListener.h"
 
-// Maximum number of events to process in a single iteration
 #define PATCHOULI_EVENT_BUFFER_SIZE 16
 
 namespace Patchouli
 {
-	// Operator overload to invoke the event callback
-	void EventListenerBase::operator()(Ref<Event> event) const
-	{
-		callback(event);
-	}
-
 	// Implementation of adding an event listener
 	void EventDispatcher::addListener(Ref<EventListenerBase> listener)
 	{
@@ -25,7 +18,6 @@ namespace Patchouli
 	// Implementation of removing an event listener
 	void EventDispatcher::removeListener(Ref<EventListenerBase> listener)
 	{
-		
 		std::unique_lock<std::mutex> lock(mapMutex);
 		auto range = listenerMap.equal_range(listener->getType());
 		auto it = std::find_if(range.first, range.second, [&listener](const auto& pair) {
@@ -41,21 +33,22 @@ namespace Patchouli
 
 	// Constructor for the event dispatcher
 	EventDispatcher::EventDispatcher(uint32_t nThreads)
-		: threadPool(nThreads), nTasks(0)
+		: threadPool(nThreads), cToken(eventQueue)
 	{
 	}
 
 	// Method to publish an event to the event queue
 	void EventDispatcher::publishEvent(Ref<Event> event)
 	{
-		eventQueue.enqueue(getProducerToken(), event);
+		eventQueue.enqueue(event);
 		std::unique_lock<std::mutex> lock(loopMutex);
 		loopCv.notify_one();
 	}
 
+	// Method to publish events to the event queue
 	void EventDispatcher::publishEvents(const std::vector<Ref<Event>>& events)
 	{
-		eventQueue.enqueue_bulk(getProducerToken(), events.data(), events.size());
+		eventQueue.enqueue_bulk(events.data(), events.size());
 		std::unique_lock<std::mutex> lock(loopMutex);
 		loopCv.notify_one();
 	}
@@ -70,27 +63,24 @@ namespace Patchouli
 
 		while (running)
 		{
-			// Attempt to dequeue events from the event queue
-			std::size_t nEvents = eventQueue.wait_dequeue_bulk(getConsumerToken(), eventBuffer.data(),  eventBuffer.size());
-	
+			// Dequeue several events from the event queue
+			std::size_t nEvents = eventQueue.wait_dequeue_bulk(cToken, eventBuffer.data(), eventBuffer.size());
+
 			// Process each event
 			for (std::size_t i = 0; i < nEvents; i++)
 			{
-				Ref<Event> event = eventBuffer[i];
-				EventTypeID type = event->getType();
+				Ref<Event>& event = eventBuffer[i];
+				EventType type = event->getType();
 
 				// Special Event for event loop control
-				switch (type) {
-					case TerminationEvent::EventType:
-						running = false;
-						break;
-
-					case FenceEvent::EventType:
-					{
-						std::unique_lock<std::mutex> lock(loopMutex);
-						loopCv.wait(lock, [this] { return nTasks.load(std::memory_order_acquire) <= 0; });
-					}
-						break;
+				switch (type)
+				{
+				case TerminationEvent::getStaticType():
+					onTerminationEvent();
+					break;
+				case FenceEvent::getStaticType():
+					onFenceEvent();
+					break;
 				}
 
 				// Process background thread event listeners
@@ -99,20 +89,17 @@ namespace Patchouli
 
 				for (auto it = range.first; it != range.second; it++)
 				{
-					Ref<EventListenerBase> listener = it->second;
+					Ref<EventListenerBase>& listener = it->second;
 
 					switch (event->getExecutionThread())
 					{
-					case Event::ExecutionThread::Main:
+					case Event::ExecutionPolicy::Inline:
 						(*listener)(event);
 						break;
 
-					case Event::ExecutionThread::Background:
+					case Event::ExecutionPolicy::Background:
 						beginEvent();
-						threadPool.enqueue([=] {
-								(*listener)(event);
-								endEvent();
-							});
+						threadPool.enqueue([=] { (*listener)(event); endEvent(); });
 						break;
 					}
 				}
@@ -120,12 +107,12 @@ namespace Patchouli
 		}
 	}
 
-	void EventDispatcher::beginEvent()
+	inline void EventDispatcher::beginEvent()
 	{
 		nTasks.fetch_add(1, std::memory_order_relaxed);
 	}
 
-	void EventDispatcher::endEvent()
+	inline void EventDispatcher::endEvent()
 	{
 		if (nTasks.fetch_sub(1, std::memory_order_acq_rel) == 1)
 		{
@@ -134,15 +121,14 @@ namespace Patchouli
 		}
 	}
 
-	moodycamel::ProducerToken& EventDispatcher::getProducerToken()
+	inline void EventDispatcher::onTerminationEvent()
 	{
-		static thread_local moodycamel::ProducerToken pToken(eventQueue);
-		return pToken;
+		running = false;
 	}
 
-	moodycamel::ConsumerToken& EventDispatcher::getConsumerToken()
+	inline void EventDispatcher::onFenceEvent()
 	{
-		static thread_local moodycamel::ConsumerToken cToken(eventQueue);
-		return cToken;
+		std::unique_lock<std::mutex> lock(loopMutex);
+		loopCv.wait(lock, [this] { return nTasks.load(std::memory_order_acquire) <= 0; });
 	}
 }

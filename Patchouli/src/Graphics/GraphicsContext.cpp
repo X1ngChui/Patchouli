@@ -3,7 +3,7 @@
 
 namespace Patchouli
 {
-	Ref<GraphicsContext> Patchouli::GraphicsContext::create(const GraphicsCreateInfo& info)
+	Ref<GraphicsContext> Patchouli::GraphicsContext::create(const GraphicsContextCreateInfo& info)
 	{
 		switch (info.graphicsAPI)
 		{

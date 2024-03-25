@@ -5,7 +5,7 @@ namespace Patchouli
 {
     // Constructor for VulkanContext.
     // It initializes the Vulkan allocator and instance based on the provided GraphicsInfo object.
-    VulkanContext::VulkanContext(const GraphicsCreateInfo& info)
+    VulkanContext::VulkanContext(const GraphicsContextCreateInfo& info)
         : graphicsInfo(info)
     {
         // Initialize Vulkan allocator

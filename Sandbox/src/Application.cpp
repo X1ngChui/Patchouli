@@ -30,7 +30,7 @@ namespace Sandbox
         window = Window::create(windowCreateInfo);
 
         // Create graphics context with specified parameters
-        GraphicsCreateInfo graphicsCreateInfo = {
+        GraphicsContextCreateInfo graphicsCreateInfo = {
             .graphicsAPI = GraphicsAPI::Vulkan,
             .graphicsPolicy = GraphicsPolicy::PerformancePriority,
             .window = window
@@ -61,13 +61,12 @@ namespace Sandbox
     // Method called when the application is updated
     void Application::onUpdate()
     {
-        /*std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-
+        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
         double interval = timeElapsed.count();
         Console::info("Time interval since last update: {} milliseconds", interval);
+        lastUpdateTime = currentTime;
 
-        lastUpdateTime = currentTime;*/
         dispatcher.publishEvents(
             { 
                 makeRef<WindowUpdateEvent>(),

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.20)
 project("Patchouli")
 
 # Build options
-option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" OFF)
+option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
 
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)

@@ -55,7 +55,7 @@ namespace Patchouli
         return features;
     }
 
-    std::vector<const char*> VulkanDevice::getEnabledExtensions(const GraphicsCreateInfo& info) const
+    std::vector<const char*> VulkanDevice::getEnabledExtensions(const GraphicsContextCreateInfo& info) const
     {
         std::vector<const char*> extensions;
 
@@ -81,7 +81,7 @@ namespace Patchouli
     }
 
     // Function to select the Vulkan device and initialize its properties
-    void VulkanDevice::onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface, const GraphicsCreateInfo& info)
+    void VulkanDevice::onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface, const GraphicsContextCreateInfo& info)
     {
         selected = true; // Mark the device as selected
         vkAllocator = allocator; // Store the allocator for resource management

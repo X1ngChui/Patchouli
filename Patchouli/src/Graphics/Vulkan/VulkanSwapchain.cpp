@@ -38,7 +38,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainExtentSelect() = default;
 
 		// Operator to select the extent based on given surface capabilities
-		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsCreateInfo& info) const;
+		VkExtent2D operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsContextCreateInfo& info) const;
 	};
 
 	// Template struct to select Vulkan Swapchain settings
@@ -48,7 +48,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainSettingsSelect() = default;
 
 		// Operator to select the swapchain settings based on the supported formats, present modes, and surface capabilities
-		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports, const GraphicsCreateInfo& info) const
+		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports, const GraphicsContextCreateInfo& info) const
 		{
 			constexpr VulkanSwapchainSurfaceFormatSelect<P> surfaceFormatSelect{};
 			constexpr VulkanSwapchainPresentModeSelect<P> presentModeSelect{};
@@ -110,7 +110,7 @@ namespace Patchouli
 
 	// Template method for selecting Vulkan Swapchain extent
 	template<GraphicsPolicy P>
-	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsCreateInfo& info) const
+	VkExtent2D VulkanSwapchainExtentSelect<P>::operator()(const VkSurfaceCapabilitiesKHR& capabilities, const GraphicsContextCreateInfo& info) const
 	{
 		// If the current extent is defined, use it, otherwise, use the window framebuffer size
 		if (capabilities.currentExtent.width != 0xffffffff)
@@ -143,7 +143,7 @@ namespace Patchouli
 	}
 
 	// Constructor for Vulkan Swapchain class
-	VulkanSwapchain::VulkanSwapchain(const GraphicsCreateInfo& graphicsInfo, Ref<VulkanDevice> device,
+	VulkanSwapchain::VulkanSwapchain(const GraphicsContextCreateInfo& graphicsInfo, Ref<VulkanDevice> device,
 		Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator)
 		: vkDevice(device), vkSurface(surface), vkAllocator(allocator)
 	{

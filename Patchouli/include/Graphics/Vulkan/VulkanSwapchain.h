@@ -11,7 +11,7 @@ namespace Patchouli
 	{
 	public:
 		// Constructor to create a Vulkan Swapchain
-		VulkanSwapchain(const GraphicsCreateInfo& graphicsInfo, Ref<VulkanDevice> device, Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator);
+		VulkanSwapchain(const GraphicsContextCreateInfo& graphicsInfo, Ref<VulkanDevice> device, Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator);
 
 		// Destructor to destroy a Vulkan Swapchain
 		virtual ~VulkanSwapchain();

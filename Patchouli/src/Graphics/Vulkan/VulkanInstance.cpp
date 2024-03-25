@@ -8,7 +8,7 @@ namespace Patchouli
 {
     // Constructor for VulkanInstance.
     // It initializes Vulkan instance based on the provided GraphicsInfo and VulkanAllocator.
-    VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator, const GraphicsCreateInfo& info)
+    VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator, const GraphicsContextCreateInfo& info)
         : vkAllocator(allocator)
     {
         // Get required Vulkan extensions and layers
