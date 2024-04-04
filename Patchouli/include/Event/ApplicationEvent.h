@@ -4,7 +4,7 @@
 
 namespace Patchouli
 {
-	class AppUpdateEvent : public Event
+	class PATCHOULI_API AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() = default;
@@ -15,18 +15,12 @@ namespace Patchouli
 
 		static EventType getStaticType() { return EventType::AppUpdate; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override 
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		virtual std::string toString() const override { return "AppUpdateEvent"; }
 	};
 
 
-	class AppRenderEvent : public Event
+	class PATCHOULI_API AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() = default;
@@ -37,15 +31,7 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::AppRender; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		};
-
 		// Convert the event to a string representation
 		virtual std::string toString() const { return "AppRenderEvent"; }
-
-		
 	};
 }

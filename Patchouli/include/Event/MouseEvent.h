@@ -4,7 +4,7 @@
 
 namespace Patchouli
 {
-	class MouseButtonEvent : public Event
+	class PATCHOULI_API MouseButtonEvent : public Event
 	{
 	public:
 		virtual ~MouseButtonEvent() = default;
@@ -21,7 +21,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonPressedEvent : public MouseButtonEvent
+	class PATCHOULI_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -35,12 +35,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::MouseButtonPressed; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -49,7 +43,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonReleasedEvent : public MouseButtonEvent
+	class PATCHOULI_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)
@@ -63,12 +57,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::MouseButtonReleased; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -76,7 +64,7 @@ namespace Patchouli
 		}
 	};
 	
-	class MouseMovedEvent : public Event
+	class PATCHOULI_API MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -94,12 +82,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::MouseMoved; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -110,7 +92,7 @@ namespace Patchouli
 		float posX, posY;
 	};
 
-	class MouseScrolledEvent : public Event
+	class PATCHOULI_API MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(float offsetX, float offsetY)
@@ -127,12 +109,6 @@ namespace Patchouli
 		virtual EventType getType() const override { return EventType::MouseScrolled; }
 
 		static constexpr EventType getStaticType() { return EventType::MouseScrolled; }
-
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
 
 		// Convert the event to a string representation
 		std::string toString() const override

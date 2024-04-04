@@ -34,19 +34,23 @@ namespace Sandbox
         void onUpdate();
 
     private:
-        // Structure holding event listeners for the application
-        struct EventListenerGroup
+        // Structure holding event handlers for the application
+        struct EventHandlerGroup
         {
-            Patchouli::Ref<Patchouli::EventListener<Patchouli::WindowUpdateEvent>> onWindowUpdate = nullptr; // Event listener for window update event
-            Patchouli::Ref<Patchouli::EventListener<Patchouli::WindowCloseEvent>> onWindowClose = nullptr; // Event listener for window close event
-            Patchouli::Ref<Patchouli::EventListener<Patchouli::AppUpdateEvent>> onAppUpdate = nullptr;   // Event listener for application update event
+            // Event handler for window close event
+            Patchouli::Ref<Patchouli::EventHandler> onWindowClose = nullptr; 
+
+            // Event handler for application update event
+            Patchouli::Ref<Patchouli::EventHandler> onAppUpdate = nullptr;
+
+            // Evnet handler for input event
+            Patchouli::Ref<Patchouli::EventHandler> onInput = nullptr;
         };
-        EventListenerGroup listeners; // Group of event listeners
-        Patchouli::EventDispatcher dispatcher; // Event dispatcher for managing events
+
+        EventHandlerGroup handlers; // Group of event handler
+        Patchouli::EventManager dispatcher; // Event dispatcher for managing events
 
         Patchouli::Ref<Patchouli::Window> window = nullptr;                   // Pointer to the application window
         Patchouli::Ref<Patchouli::GraphicsContext> graphicsContext = nullptr; // Pointer to the graphics context
-
-        std::chrono::steady_clock::time_point lastUpdateTime;
     };
 } // namespace Sandbox

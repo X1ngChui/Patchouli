@@ -4,31 +4,7 @@
 
 namespace Patchouli
 {
-	class WindowUpdateEvent final : public Event
-	{
-	public:
-		WindowUpdateEvent() = default;
-		virtual ~WindowUpdateEvent() = default;
-
-		// Get the type identifier of the event
-		virtual EventType getType() const override { return EventType::WindowUpdate; }
-
-		static constexpr EventType getStaticType() { return EventType::WindowUpdate; }
-
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Inline;
-		}
-
-		// Convert the event to a string representation
-		std::string toString() const override
-		{
-			return "WindowUpdateEvent";
-		}
-	};
-
-	class WindowCloseEvent final : public Event
+	class PATCHOULI_API WindowCloseEvent final : public Event
 	{
 	public:
 		WindowCloseEvent() = default;
@@ -39,12 +15,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::WindowClose; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -52,7 +22,7 @@ namespace Patchouli
 		}
 	};
 
-	class WindowResizeEvent final : public Event
+	class PATCHOULI_API WindowResizeEvent final : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -68,12 +38,6 @@ namespace Patchouli
 		virtual EventType getType() const override { return EventType::WindowResize; }
 
 		static constexpr EventType getStaticType() { return EventType::WindowResize; }
-
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
 
 		// Convert the event to a string representation
 		std::string toString() const override

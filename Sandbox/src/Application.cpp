@@ -38,42 +38,31 @@ namespace Sandbox
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
 
         // Set up event listeners
-        listeners.onWindowUpdate = makeRef<EventListener<WindowUpdateEvent>>(
-            [this](Ref<Event> event) { window->onUpdate(); }
-        );
-
-        listeners.onWindowClose = makeRef<EventListener<WindowCloseEvent>>(
+        handlers.onWindowClose = makeRef<EventHandler>(
             [this](Ref<Event> event) {
-                dispatcher.publishEvents({ makeRef<FenceEvent>(), makeRef<TerminationEvent>() });
+                dispatcher.publishEvent(makeRef<TerminationEvent>());
             } // Event listener for window close event
         );
 
-        listeners.onAppUpdate = makeRef<EventListener<AppUpdateEvent>>(
-            [this](Ref<Event> event) { this->onUpdate(); } // Event listener for application update event
+        handlers.onAppUpdate = makeRef<EventHandler>(
+            [this](Ref<Event> event) { this->onUpdate(); } 
+        ); // Event listener for application update event
+
+        handlers.onInput = makeRef<EventHandler>(
+            [](Ref<Event> event) { Console::info(*event); }
         );
 
         // Add event listeners to the dispatcher
-        dispatcher.addListener(listeners.onWindowUpdate);
-        dispatcher.addListener(listeners.onWindowClose);
-        dispatcher.addListener(listeners.onAppUpdate);
+        dispatcher.addHandler(handlers.onWindowClose, EventType::WindowClose);
+        dispatcher.addHandler(handlers.onAppUpdate, EventType::AppUpdate);
+        dispatcher.addHandler(handlers.onInput, EventType::Input);
     }
 
     // Method called when the application is updated
     void Application::onUpdate()
     {
-        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-        std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
-        double interval = timeElapsed.count();
-        Console::info("Time interval since last update: {} milliseconds", interval);
-        lastUpdateTime = currentTime;
-
-        dispatcher.publishEvents(
-            { 
-                makeRef<WindowUpdateEvent>(),
-                makeRef<FenceEvent>(),
-                makeRef<AppUpdateEvent>()
-            }
-        );
+        window->onUpdate();
+        dispatcher.publishEvent(makeRef<AppUpdateEvent>());
     }
 
     // Destructor
@@ -86,9 +75,6 @@ namespace Sandbox
     {
         window->show(); // Show the window
         dispatcher.publishEvent(makeRef<AppUpdateEvent>()); // Publish an application update event
-
-        lastUpdateTime = std::chrono::steady_clock::now();
-
         dispatcher.run(); // Run the event dispatcher
     }
 

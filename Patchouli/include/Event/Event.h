@@ -7,39 +7,53 @@
 #include "Util/Reference.h"
 #include "Util/ThreadPool.h"
 #include <fmt/format.h>
-#include <blockingconcurrentqueue.h>
+
+#define PATCHOULI_EVENT_BIT(x) (1 << x)
 
 namespace Patchouli
 {
     // Type alias for event type identifier
-    enum class EventType: uint32_t
+    using event_type = uint32_t;
+
+    enum class EventType : event_type
     {
         None = 0,
+
         // Control Events
-        Termination, Fence,
+        Termination = PATCHOULI_EVENT_BIT(1),
+        Control = Termination,
 
         // Application Events
-        AppUpdate, AppRender,
+        AppUpdate = PATCHOULI_EVENT_BIT(2),
+        AppRender = PATCHOULI_EVENT_BIT(3),
+        Application = AppUpdate | AppRender,
 
         // Keyboard Events
-        KeyPressed, KeyReleased, KeyTyped,
+        KeyPressed = PATCHOULI_EVENT_BIT(4),
+        KeyReleased = PATCHOULI_EVENT_BIT(5),
+        KeyTyped = PATCHOULI_EVENT_BIT(6),
+        Keyboard = KeyPressed | KeyReleased | KeyTyped,
 
         // Mouse Events
-        MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+        MouseButtonPressed = PATCHOULI_EVENT_BIT(7),
+        MouseButtonReleased = PATCHOULI_EVENT_BIT(8),
+        MouseMoved = PATCHOULI_EVENT_BIT(9),
+        MouseScrolled = PATCHOULI_EVENT_BIT(10),
+        Mouse = MouseButtonPressed | MouseButtonReleased | MouseMoved | MouseScrolled,
+
+        // Input Events
+        Input = Keyboard | Mouse,
 
         // Window Events
-        WindowUpdate, WindowClose, WindowResize
+        WindowClose = PATCHOULI_EVENT_BIT(12),
+        WindowResize = PATCHOULI_EVENT_BIT(13),
+        Window = WindowClose | WindowResize
     };
 
     // Abstract base class for events
     class PATCHOULI_API Event : public PObject
     {
     public:
-        enum class ExecutionPolicy
-        {
-            Inline = 0, Background
-        };
-
         Event() = default;
         virtual ~Event() = default;
 
@@ -48,9 +62,6 @@ namespace Patchouli
 
         // To be implemented...
         // static constexpr EventTypeID getStaticType();
-
-        // Get the event execution thread
-        virtual ExecutionPolicy getExecutionThread() const = 0;
 
         // Convert the event to a string representation
         virtual std::string toString() const = 0;

@@ -7,8 +7,8 @@
 #include "Log/Logger.h"
 
 #include "Event/Event.h"
-#include "Event/EventListener.h"
-#include "Event/EventDispatecher.h"
+#include "Event/EventHandler.h"
+#include "Event/EventManager.h"
 #include "Event/ControlEvent.h"
 #include "Event/ApplicationEvent.h"
 #include "Event/KeyboardEvent.h"

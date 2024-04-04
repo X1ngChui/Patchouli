@@ -5,7 +5,7 @@
 
 namespace Patchouli
 {
-	class KeyboardEvent : public Event
+	class PATCHOULI_API KeyboardEvent : public Event
 	{
 	public:
 		virtual ~KeyboardEvent() = default;
@@ -21,7 +21,7 @@ namespace Patchouli
 		}
 	};
 
-	class KeyPressedEvent : public KeyboardEvent
+	class PATCHOULI_API KeyPressedEvent : public KeyboardEvent
 	{
 	public:
 		KeyPressedEvent(int keyCode, bool repeated)
@@ -37,12 +37,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::KeyPressed; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -53,7 +47,7 @@ namespace Patchouli
 		bool repeated;
 	};
 
-	class KeyReleasedEvent : public KeyboardEvent
+	class PATCHOULI_API KeyReleasedEvent : public KeyboardEvent
 	{  
 	public:
 		KeyReleasedEvent(int keyCode)
@@ -67,12 +61,6 @@ namespace Patchouli
 
 		static constexpr EventType getStaticType() { return EventType::KeyReleased; }
 
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
-
 		// Convert the event to a string representation
 		std::string toString() const override
 		{
@@ -80,7 +68,7 @@ namespace Patchouli
 		}
 	};
 
-	class KeyTypedEvent : public KeyboardEvent
+	class PATCHOULI_API KeyTypedEvent : public KeyboardEvent
 	{
 	public:
 		KeyTypedEvent(int keyCode)
@@ -93,12 +81,6 @@ namespace Patchouli
 		virtual EventType getType() const override { return EventType::KeyTyped; }
 
 		static constexpr EventType getStaticType() { return EventType::KeyTyped; }
-
-		// Get the event execution thread
-		virtual ExecutionPolicy getExecutionThread() const override
-		{
-			return Event::ExecutionPolicy::Background;
-		}
 
 		// Convert the event to a string representation
 		std::string toString() const override 
