@@ -2,6 +2,8 @@
 
 #include "Event/Event.h"
 
+#define PATCHOULI_EVENT_TOPIC_CONTROL Patchouli::TerminationEvent
+
 namespace Patchouli
 {
 	class PATCHOULI_API TerminationEvent : public Event

@@ -13,11 +13,31 @@ namespace Sandbox
     // Constructor
     Application::Application()
     {
-        // Initialize console logging
 #ifdef SANDBOX_CONSOLE_ENABLE
+        // Initialize console logging
         Console::init("Sandbox");
         Console::info("Hello Patchouli!");
 #endif
+
+        // Set up event listeners
+        handlers.onWindowClose = makeRef<EventHandler<WindowCloseEvent>>(
+            [this](Ref<Event> event) {
+                manager.publish<TerminationEvent>();
+            } // Event listener for window close event
+        );
+
+        handlers.onAppUpdate = makeRef<EventHandler<AppUpdateEvent>>(
+            [this](Ref<Event> event) { this->onUpdate(); }
+        ); // Event listener for application update event
+
+        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_KEYBOARD, PATCHOULI_EVENT_TOPIC_MOUSE>>(
+            [](Ref<Event> event) { Console::info(*event); }
+        );
+
+        // Add event handlers to the manager
+        manager.addHandler(handlers.onWindowClose);
+        manager.addHandler(handlers.onAppUpdate);
+        manager.addHandler(handlers.onInput);
 
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
@@ -25,7 +45,7 @@ namespace Sandbox
             .windowTitle = "Patchouli",
             .windowWidth = 1280,
             .windowHeight = 720,
-            .windowEventCallback = [this](Ref<Event> event) { dispatcher.publishEvent(event); }
+            .windowEventCallback = [this](Ref<Event> event) { manager.publish(event); }
         };
         window = Window::create(windowCreateInfo);
 
@@ -37,45 +57,45 @@ namespace Sandbox
         };
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
 
-        // Set up event listeners
-        handlers.onWindowClose = makeRef<EventHandler>(
-            [this](Ref<Event> event) {
-                dispatcher.publishEvent(makeRef<TerminationEvent>());
-            } // Event listener for window close event
-        );
-
-        handlers.onAppUpdate = makeRef<EventHandler>(
-            [this](Ref<Event> event) { this->onUpdate(); } 
-        ); // Event listener for application update event
-
-        handlers.onInput = makeRef<EventHandler>(
-            [](Ref<Event> event) { Console::info(*event); }
-        );
-
-        // Add event listeners to the dispatcher
-        dispatcher.addHandler(handlers.onWindowClose, EventType::WindowClose);
-        dispatcher.addHandler(handlers.onAppUpdate, EventType::AppUpdate);
-        dispatcher.addHandler(handlers.onInput, EventType::Input);
-    }
-
-    // Method called when the application is updated
-    void Application::onUpdate()
-    {
-        window->onUpdate();
-        dispatcher.publishEvent(makeRef<AppUpdateEvent>());
+        std::vector<Ref<GraphicsDevice>> devices = graphicsContext->getDevices();
+        for (auto device : devices)
+        {
+            if (device->getProperties().discreteGPU)
+            {
+                graphicsContext->selectDevice(device);
+                break;
+            }
+        }
     }
 
     // Destructor
     Application::~Application()
     {
+        // Remove event handlers from the manager
+        manager.removeHandler(handlers.onWindowClose);
+        manager.removeHandler(handlers.onAppUpdate);
+        manager.removeHandler(handlers.onInput);
+    }
+
+    // Method called when the application is updated
+    void Application::onUpdate()
+    {
+        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+        std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
+        double interval = timeElapsed.count();
+        Console::info("Time interval since last update: {} milliseconds", interval);
+        lastUpdateTime = currentTime;
+
+        window->onUpdate();
+        manager.publish<AppUpdateEvent>();
     }
 
     // Method to start the application
     void Application::run()
     {
         window->show(); // Show the window
-        dispatcher.publishEvent(makeRef<AppUpdateEvent>()); // Publish an application update event
-        dispatcher.run(); // Run the event dispatcher
+        manager.publish<AppUpdateEvent>(); // Publish an application update event
+        manager.run(); // Run the event manager
     }
 
     // Method to get the instance of the application (singleton pattern)

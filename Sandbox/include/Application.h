@@ -38,19 +38,21 @@ namespace Sandbox
         struct EventHandlerGroup
         {
             // Event handler for window close event
-            Patchouli::Ref<Patchouli::EventHandler> onWindowClose = nullptr; 
+            Patchouli::Ref<Patchouli::EventHandler<Patchouli::WindowCloseEvent>> onWindowClose = nullptr;
 
             // Event handler for application update event
-            Patchouli::Ref<Patchouli::EventHandler> onAppUpdate = nullptr;
+            Patchouli::Ref<Patchouli::EventHandler<Patchouli::AppUpdateEvent>> onAppUpdate = nullptr;
 
             // Evnet handler for input event
-            Patchouli::Ref<Patchouli::EventHandler> onInput = nullptr;
+            Patchouli::Ref<Patchouli::EventHandler<PATCHOULI_EVENT_TOPIC_KEYBOARD, PATCHOULI_EVENT_TOPIC_MOUSE>> onInput = nullptr;
         };
 
         EventHandlerGroup handlers; // Group of event handler
-        Patchouli::EventManager dispatcher; // Event dispatcher for managing events
+        Patchouli::EventManager manager; // Event manager for managing events
 
-        Patchouli::Ref<Patchouli::Window> window = nullptr;                   // Pointer to the application window
+        Patchouli::Ref<Patchouli::Window> window = nullptr; // Pointer to the application window
         Patchouli::Ref<Patchouli::GraphicsContext> graphicsContext = nullptr; // Pointer to the graphics context
+
+        std::chrono::steady_clock::time_point lastUpdateTime;
     };
 } // namespace Sandbox

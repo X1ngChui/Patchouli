@@ -2,6 +2,8 @@
 
 #include "Event/Event.h"
 
+#define PATCHOULI_EVENT_TOPIC_WINDOW Patchouli::WindowCloseEvent, Patchouli::WindowResizeEvent
+
 namespace Patchouli
 {
 	class PATCHOULI_API WindowCloseEvent final : public Event

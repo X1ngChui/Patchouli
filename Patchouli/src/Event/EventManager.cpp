@@ -2,44 +2,36 @@
 #include "Event/ControlEvent.h"
 #include "Event/EventHandler.h"
 
-#define PATCHOULI_EVENT_BUFFER_SIZE 8
-
 namespace Patchouli
 {
 	// Implementation of adding an event listener
-	void EventManager::addHandler(Ref<EventHandler> handler, EventType type)
+	void EventManager::addHandlerImpl(Ref<EventHandlerBase> handler, EventType type)
 	{
 		std::unique_lock<std::mutex> lock(mapMutex);
-
-		event_type types = (event_type)type;
-		while (types)
-		{
-			event_type tp = types & (-types);
-			types &= ~tp;
-
-			handlerMap.insert({ (EventType)tp, handler });
-		}
-		
+		handlerMap.insert({ type, handler });
 	}
 
 	// Implementation of removing an event listener
-	void EventManager::removeHandler(Ref<EventHandler> handler)
+	void EventManager::removeHandlerImpl(Ref<EventHandlerBase> handler, EventType type)
 	{
 		std::unique_lock<std::mutex> lock(mapMutex);
-		auto it = handlerMap.begin();
-		while (it != handlerMap.end())
-		{
-			if (it->second == handler)
-				it = handlerMap.erase(it);
-			else
-				++it;
+		auto range = handlerMap.equal_range(type);
+
+		for (auto& it = range.first; it != range.second; ++it) {
+			if (it->second == handler) 
+			{
+				handlerMap.erase(it);
+				break;
+			}
 		}
 	}
 
 	// Method to publish an event to the event queue
-	void EventManager::publishEvent(Ref<Event> event)
+	EventManager& EventManager::publish(Ref<Event> event)
 	{
-		eventQueue.enqueue(event);
+		std::lock_guard<std::mutex> lock(queueMutex);
+		eventQueue.push(event);
+		return *this;
 	}
 
 	// Method to start the event loop
@@ -47,21 +39,21 @@ namespace Patchouli
 	{
 		running = true;
 
-		// Buffer to hold events to process
-		std::array<Ref<Event>, PATCHOULI_EVENT_BUFFER_SIZE> eventBuffer;
-
 		while (running)
 		{
-			// Dequeue several events from the event queue
-			std::size_t nEvents = eventQueue.wait_dequeue_bulk(eventBuffer.data(), eventBuffer.size());
+			Ref<Event> event;
+			{
+				std::unique_lock<std::mutex> lock(queueMutex);
+				loopCv.wait(lock, [this] { return !eventQueue.empty(); });
+				event = eventQueue.front();
+				eventQueue.pop();
+			}
 
-			// Process each event
-			for (std::size_t i = 0; i < nEvents; i++)
-				onEvent(eventBuffer[i]);
+			onEvent(event);
 		}
 	}
 
-	void EventManager::onEvent(Ref<Event>& event)
+	void EventManager::onEvent(Ref<Event> event)
 	{
 		EventType type = event->getType();
 
@@ -77,9 +69,9 @@ namespace Patchouli
 		std::unique_lock<std::mutex> lock(mapMutex);
 		auto range = handlerMap.equal_range(type);
 
-		for (auto it = range.first; it != range.second; it++)
+		for (auto& it = range.first; it != range.second; it++)
 		{
-			Ref<EventHandler>& handler = it->second;
+			Ref<EventHandlerBase>& handler = it->second;
 			(*handler)(event);
 		}
 	}

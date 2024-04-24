@@ -2,6 +2,7 @@
 
 #include "Event/Event.h"
 
+#define PATCHOULI_EVENT_TOPIC_KEYBOARD Patchouli::KeyPressedEvent, Patchouli::KeyReleasedEvent, Patchouli::KeyTypedEvent 
 
 namespace Patchouli
 {

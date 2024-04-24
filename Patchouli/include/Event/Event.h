@@ -5,49 +5,39 @@
 #include "Core/PObject.h"
 #include "Util/TypeTraits.h"
 #include "Util/Reference.h"
-#include "Util/ThreadPool.h"
 #include <fmt/format.h>
-
-#define PATCHOULI_EVENT_BIT(x) (1 << x)
 
 namespace Patchouli
 {
     // Type alias for event type identifier
-    using event_type = uint32_t;
+    using EventID = uint64_t;
 
-    enum class EventType : event_type
+    enum class EventType : EventID
     {
         None = 0,
 
         // Control Events
-        Termination = PATCHOULI_EVENT_BIT(1),
-        Control = Termination,
+        Termination,
 
         // Application Events
-        AppUpdate = PATCHOULI_EVENT_BIT(2),
-        AppRender = PATCHOULI_EVENT_BIT(3),
-        Application = AppUpdate | AppRender,
+        AppUpdate,
+        AppRender,
 
         // Keyboard Events
-        KeyPressed = PATCHOULI_EVENT_BIT(4),
-        KeyReleased = PATCHOULI_EVENT_BIT(5),
-        KeyTyped = PATCHOULI_EVENT_BIT(6),
-        Keyboard = KeyPressed | KeyReleased | KeyTyped,
+        KeyPressed,
+        KeyReleased,
+        KeyTyped,
+        Keyboard,
 
         // Mouse Events
-        MouseButtonPressed = PATCHOULI_EVENT_BIT(7),
-        MouseButtonReleased = PATCHOULI_EVENT_BIT(8),
-        MouseMoved = PATCHOULI_EVENT_BIT(9),
-        MouseScrolled = PATCHOULI_EVENT_BIT(10),
-        Mouse = MouseButtonPressed | MouseButtonReleased | MouseMoved | MouseScrolled,
-
-        // Input Events
-        Input = Keyboard | Mouse,
+        MouseButtonPressed,
+        MouseButtonReleased,
+        MouseMoved,
+        MouseScrolled,
 
         // Window Events
-        WindowClose = PATCHOULI_EVENT_BIT(12),
-        WindowResize = PATCHOULI_EVENT_BIT(13),
-        Window = WindowClose | WindowResize
+        WindowClose,
+        WindowResize
     };
 
     // Abstract base class for events
@@ -57,7 +47,6 @@ namespace Patchouli
         Event() = default;
         virtual ~Event() = default;
 
-        // Get the type identifier of the event
         virtual EventType getType() const = 0;
 
         // To be implemented...

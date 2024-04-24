@@ -5,15 +5,15 @@
 
 namespace Patchouli
 {
-    class PATCHOULI_API EventHandler : public PObject
+    class EventHandlerBase : public PObject
     {
     public:
-        EventHandler(EventCallback&& callback)
+        EventHandlerBase(EventCallback&& callback)
             : callback(std::move(callback))
         {
         }
 
-        ~EventHandler() = default;
+        virtual ~EventHandlerBase() = default;
 
         // Operator overload to invoke the event callback
         void operator()(Ref<Event> event) const
@@ -21,7 +21,30 @@ namespace Patchouli
             callback(event);
         }
 
-    private:
+    protected:
         EventCallback callback; // Callback function to handle events
+    };
+
+    template <TypeEvent... Args>
+    class EventHandler;
+
+    template <TypeEvent E>
+    class EventHandler<E> : public EventHandlerBase
+    {
+    public:
+        EventHandler(EventCallback&& callback)
+            : EventHandlerBase(std::move(callback))
+        {
+        }
+    };
+
+    template <TypeEvent E, TypeEvent... Rest>
+    class EventHandler<E, Rest...> : public EventHandler<Rest...>
+    {
+    public:
+        EventHandler(EventCallback&& callback)
+            : EventHandler<Rest...>(std::move(callback))
+        {
+        }
     };
 }

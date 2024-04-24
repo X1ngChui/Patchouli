@@ -2,6 +2,8 @@
 
 #include "Event/Event.h"
 
+#define PATCHOULI_EVENT_TOPIC_MOUSE Patchouli::MouseButtonPressedEvent, Patchouli::MouseButtonReleasedEvent, Patchouli::MouseMovedEvent, Patchouli::MouseScrolledEvent
+
 namespace Patchouli
 {
 	class PATCHOULI_API MouseButtonEvent : public Event
