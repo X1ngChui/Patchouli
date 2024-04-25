@@ -19,25 +19,25 @@ namespace Sandbox
         Console::info("Hello Patchouli!");
 #endif
 
-        // Set up event listeners
+        // Set up event handlers
         handlers.onWindowClose = makeRef<EventHandler<WindowCloseEvent>>(
             [this](Ref<Event> event) {
                 manager.publish<TerminationEvent>();
-            } // Event listener for window close event
+            } // Event handler for window close event
         );
 
         handlers.onAppUpdate = makeRef<EventHandler<AppUpdateEvent>>(
             [this](Ref<Event> event) { this->onUpdate(); }
-        ); // Event listener for application update event
+        ); // Event handler for application update event
 
         handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_KEYBOARD, PATCHOULI_EVENT_TOPIC_MOUSE>>(
             [](Ref<Event> event) { Console::info(*event); }
         );
 
         // Add event handlers to the manager
-        manager.addHandler(handlers.onWindowClose);
-        manager.addHandler(handlers.onAppUpdate);
-        manager.addHandler(handlers.onInput);
+        manager.addHandler(handlers.onWindowClose)
+            .addHandler(handlers.onAppUpdate)
+            .addHandler(handlers.onInput);
 
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
@@ -57,7 +57,7 @@ namespace Sandbox
         };
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
 
-        std::vector<Ref<GraphicsDevice>> devices = graphicsContext->getDevices();
+        auto devices = graphicsContext->getDevices();
         for (auto device : devices)
         {
             if (device->getProperties().discreteGPU)
@@ -72,9 +72,9 @@ namespace Sandbox
     Application::~Application()
     {
         // Remove event handlers from the manager
-        manager.removeHandler(handlers.onWindowClose);
-        manager.removeHandler(handlers.onAppUpdate);
-        manager.removeHandler(handlers.onInput);
+        manager.removeHandler(handlers.onWindowClose)
+            .removeHandler(handlers.onAppUpdate)
+            .removeHandler(handlers.onInput);
     }
 
     // Method called when the application is updated

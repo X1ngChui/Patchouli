@@ -29,8 +29,14 @@ namespace Patchouli
 	// Method to publish an event to the event queue
 	EventManager& EventManager::publish(Ref<Event> event)
 	{
-		std::lock_guard<std::mutex> lock(queueMutex);
-		eventQueue.push(event);
+		eventBus.push(event);
+		return *this;
+	}
+
+	// Method to publish events to the event queue
+	EventManager& EventManager::publish(std::initializer_list<Ref<Event>> events)
+	{
+		eventBus.push(events);
 		return *this;
 	}
 
@@ -41,14 +47,7 @@ namespace Patchouli
 
 		while (running)
 		{
-			Ref<Event> event;
-			{
-				std::unique_lock<std::mutex> lock(queueMutex);
-				loopCv.wait(lock, [this] { return !eventQueue.empty(); });
-				event = eventQueue.front();
-				eventQueue.pop();
-			}
-
+			auto event = eventBus.pop();
 			onEvent(event);
 		}
 	}

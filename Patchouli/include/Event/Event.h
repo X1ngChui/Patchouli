@@ -50,14 +50,25 @@ namespace Patchouli
         virtual EventType getType() const = 0;
 
         // To be implemented...
-        // static constexpr EventTypeID getStaticType();
+        // static constexpr EventType getStaticType();
 
         // Convert the event to a string representation
         virtual std::string toString() const = 0;
     };
 
+    /**
+     * Concept TypeEvent checks if a type meets the requirements to be considered as an Event type.
+     * A type T satisfies TypeEvent if it:
+     * - Is derived from the base class Event.
+     * - Is not an abstract class (i.e., can be instantiated).
+     * - Provides a static member function getStaticType() that returns a value of EventType,
+     *   and its return type is computable at compile-time using std::integral_constant.
+     */
     template <typename T>
-    concept TypeEvent = std::is_base_of_v<Event, T>;
+    concept TypeEvent = std::is_base_of_v<Event, T> && !std::is_abstract_v<T> && requires {
+        { T::getStaticType() } -> std::same_as<EventType>;
+        { std::integral_constant<EventType, T::getStaticType()>{} };
+    };
 
     // Type alias for event callback function
     using EventCallback = std::function<void(Ref<Event>)>;

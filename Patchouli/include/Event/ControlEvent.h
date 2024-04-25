@@ -15,7 +15,7 @@ namespace Patchouli
 		// Get the type identifier of the event
 		virtual EventType getType() const override { return EventType::Termination; }
 
-		constexpr static EventType getStaticType() { return EventType::Termination; }
+		static constexpr EventType getStaticType() { return EventType::Termination; }
 
 		// Convert the event to a string representation
 		virtual std::string toString() const override 
