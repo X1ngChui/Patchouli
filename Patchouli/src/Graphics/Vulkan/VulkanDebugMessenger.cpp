@@ -13,27 +13,20 @@ namespace Patchouli
             .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
             .pNext = nullptr,
             .flags = 0,
-            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-            .pfnUserCallback = &console, // Specify the static callback function for handling debug messages
-            .pUserData = nullptr,
+            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+            .pfnUserCallback = &VulkanDebugMessenger::console, // Specify the static callback function for handling debug messages
+            .pUserData = this,
         };
-
-        VkResult result = VK_SUCCESS;
 
         // Retrieve function pointer for vkCreateDebugUtilsMessengerEXT
         auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance, "vkCreateDebugUtilsMessengerEXT");
 
-        if (createDebugMessenger == nullptr)
-        {
-            result = VK_ERROR_EXTENSION_NOT_PRESENT;
-            goto error;
-        }
+        assert(createDebugMessenger != nullptr);
 
         // Create Vulkan debug messenger
-        result = createDebugMessenger(*vkInstance, &info, *vkAllocator, &debugMessenger);
+        VkResult result = createDebugMessenger(*vkInstance, &info, *vkAllocator, &debugMessenger);
 
-    error:
         // Assert if Vulkan debug messenger creation fails
         assert(result == VK_SUCCESS);
     }

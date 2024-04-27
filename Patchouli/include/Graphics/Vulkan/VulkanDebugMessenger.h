@@ -22,8 +22,7 @@ namespace Patchouli
         // Static callback function for handling Vulkan debug messages.
         // It redirects the message to the consoleImpl member function of the associated VulkanDebugMessenger object.
         static VKAPI_ATTR VkBool32 VKAPI_CALL console(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-            VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* message,
-            void* pUserData)
+            VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* message, void* pUserData)
         {
             static_cast<VulkanDebugMessenger*>(pUserData)->consoleImpl(severity, messageType, message);
             return VK_FALSE;

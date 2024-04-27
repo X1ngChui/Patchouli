@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/PObject.h"
+#include <mimalloc.h>
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -11,7 +12,8 @@ namespace Patchouli
         // Constructor initializes Vulkan allocation callbacks.
         VulkanAllocator();
 
-        ~VulkanAllocator() = default;
+        // Destructor destroys the whole heap.
+        ~VulkanAllocator();
 
         // Conversion operator to const VkAllocationCallbacks*.
         // This allows VulkanAllocator objects to be used directly as Vulkan allocation callbacks.
@@ -47,5 +49,8 @@ namespace Patchouli
     private:
         // Vulkan allocation callbacks structure.
         VkAllocationCallbacks vkCallbacks;
+
+        // Heap for allocation.
+        mi_heap_t* heap;
     };
 }

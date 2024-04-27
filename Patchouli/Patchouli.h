@@ -9,11 +9,12 @@
 #include "Event/Event.h"
 #include "Event/EventHandler.h"
 #include "Event/EventManager.h"
-#include "Event/ControlEvent.h"
+#include "Event/TerminationEvent.h"
 #include "Event/ApplicationEvent.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/MouseEvent.h"
 #include "Event/WindowEvent.h"
+#include "Event/EventTopic.h"
 
 #include "Util/Reference.h"
 #include "Util/TypeTraits.h"

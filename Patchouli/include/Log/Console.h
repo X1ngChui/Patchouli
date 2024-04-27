@@ -40,7 +40,7 @@ namespace Patchouli
 		// These functions should not be used until initialized, and internal usage is discouraged.
 		// --------------------------------------------------
 
-		void setLevel(const LogLevel level);
+		static void setLevel(const LogLevel level);
 
 		template <typename... Args>
 		static void trace(spdlog::format_string_t<Args...> fmt, Args&&... args)
@@ -129,7 +129,7 @@ namespace Patchouli
 		// These functions are always available and should only be used internally.
 		// --------------------------------------------------
 
-		void setCoreLevel(const LogLevel level);
+		static void setCoreLevel(const LogLevel level);
 
 		template <typename... Args>
 		static void coreTrace(spdlog::format_string_t<Args...> fmt, Args&&... args)

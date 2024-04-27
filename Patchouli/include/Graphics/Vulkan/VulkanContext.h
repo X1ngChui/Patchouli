@@ -1,6 +1,7 @@
 #pragma once
 #include "PatchouliPch.h"
 #include "Graphics/GraphicsContext.h"
+#include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Graphics/Vulkan/VulkanDebugMessenger.h"

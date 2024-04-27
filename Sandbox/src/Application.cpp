@@ -15,7 +15,7 @@ namespace Sandbox
     {
 #ifdef SANDBOX_CONSOLE_ENABLE
         // Initialize console logging
-        Console::init("Sandbox");
+        Console::init("Sandbox", LogLevel::Trace);
         Console::info("Hello Patchouli!");
 #endif
 
@@ -83,7 +83,7 @@ namespace Sandbox
         std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
         double interval = timeElapsed.count();
-        Console::info("Time interval since last update: {} milliseconds", interval);
+        // Console::info("Time interval since last update: {} milliseconds", interval);
         lastUpdateTime = currentTime;
 
         window->onUpdate();

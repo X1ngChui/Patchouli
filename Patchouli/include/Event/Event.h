@@ -27,7 +27,6 @@ namespace Patchouli
         KeyPressed,
         KeyReleased,
         KeyTyped,
-        Keyboard,
 
         // Mouse Events
         MouseButtonPressed,
@@ -56,13 +55,12 @@ namespace Patchouli
         virtual std::string toString() const = 0;
     };
 
-    /**
+    /*
      * Concept TypeEvent checks if a type meets the requirements to be considered as an Event type.
      * A type T satisfies TypeEvent if it:
      * - Is derived from the base class Event.
-     * - Is not an abstract class (i.e., can be instantiated).
-     * - Provides a static member function getStaticType() that returns a value of EventType,
-     *   and its return type is computable at compile-time using std::integral_constant.
+     * - Is not an abstract class.
+     * - Provides a static member function getStaticType() that returns a constexpr EventType.
      */
     template <typename T>
     concept TypeEvent = std::is_base_of_v<Event, T> && !std::is_abstract_v<T> && requires {

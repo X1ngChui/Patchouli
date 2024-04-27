@@ -8,6 +8,7 @@ namespace Patchouli
     // Forward declaration of EventHandlerBase class
     class EventHandlerBase;
 
+    // Forward declaration of EventHandler template class
     template <TypeEvent... Args>
     class EventHandler;
 
@@ -22,32 +23,42 @@ namespace Patchouli
         EventManager(const EventManager&) = delete;
         EventManager& operator=(const EventManager&) = delete;
 
+        // Add an event handler for a specific event type
+        // Returns a reference to the EventManager for chaining
         template <TypeEvent E>
-        EventManager& addHandler(Ref<EventHandler<E>> handler)
+        inline EventManager& addHandler(Ref<EventHandler<E>> handler)
         {
             addHandlerImpl(handler, E::getStaticType());
             return *this;
         }
 
+        // Add an event handler for specific event types
+        // Returns a reference to the EventManager for chaining
         template <TypeEvent E, TypeEvent... Rest>
-        EventManager& addHandler(Ref<EventHandler<E, Rest...>> handler)
+        inline EventManager& addHandler(Ref<EventHandler<E, Rest...>> handler)
         {
             addHandlerImpl(handler, E::getStaticType());
-            return addHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            (void)addHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            return *this;
         }
 
+        // Remove an event handler for a specific event type
+        // Returns a reference to the EventManager for chaining
         template <TypeEvent E>
-        EventManager& removeHandler(Ref<EventHandler<E>> handler)
+        inline EventManager& removeHandler(Ref<EventHandler<E>> handler)
         {
             removeHandlerImpl(handler, E::getStaticType());
             return *this;
         }
 
+        // Remove an event handler for specific event types
+        // Returns a reference to the EventManager for chaining
         template <TypeEvent E, TypeEvent... Rest>
-        EventManager& removeHandler(Ref<EventHandler<E, Rest...>> handler)
+        inline EventManager& removeHandler(Ref<EventHandler<E, Rest...>> handler)
         {
             removeHandlerImpl(handler, E::getStaticType());
-            return removeHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            (void)removeHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            return *this;
         }
 
         // Publish an event to the event queue (thread-safety)
@@ -61,7 +72,7 @@ namespace Patchouli
         // Publish an event to the event queue (thread-safety)
         EventManager& publish(Ref<Event> event);
 
-        // Publish an event to the event queue (thread-safety)
+        // Publish events to the event queue (thread-safety)
         EventManager& publish(std::initializer_list<Ref<Event>> event);
 
         // Start the event loop (blocking, no thread-safety)
@@ -75,8 +86,6 @@ namespace Patchouli
         void removeHandlerImpl(Ref<EventHandlerBase> handler, EventType type);
 
         void onEvent(Ref<Event> event);
-        
-        void onTerminationEvent();
 
     private:
         bool running = false; // Flag indicating whether the event loop is running

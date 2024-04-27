@@ -1,5 +1,5 @@
 #include "Event/EventManager.h"
-#include "Event/ControlEvent.h"
+#include "Event/TerminationEvent.h"
 #include "Event/EventHandler.h"
 
 namespace Patchouli
@@ -57,12 +57,8 @@ namespace Patchouli
 		EventType type = event->getType();
 
 		// Special Event for event loop control
-		switch (type)
-		{
-		case TerminationEvent::getStaticType():
-			onTerminationEvent();
-			break;
-		}
+		if (type == TerminationEvent::getStaticType())
+			running = false;
 
 		// Process each event handlers
 		std::unique_lock<std::mutex> lock(mapMutex);
@@ -70,13 +66,8 @@ namespace Patchouli
 
 		for (auto& it = range.first; it != range.second; it++)
 		{
-			Ref<EventHandlerBase>& handler = it->second;
+			Ref<EventHandlerBase> handler = it->second;
 			(*handler)(event);
 		}
-	}
-
-	void EventManager::onTerminationEvent()
-	{
-		running = false;
 	}
 }

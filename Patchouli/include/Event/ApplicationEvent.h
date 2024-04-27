@@ -2,8 +2,6 @@
 
 #include "Event/Event.h"
 
-#define PATCHOULI_EVENT_TOPIC_APP Patchouli::AppUpdateEvent, Patchouli::AppRenderEvent
-
 namespace Patchouli
 {
 	class PATCHOULI_API AppUpdateEvent : public Event
