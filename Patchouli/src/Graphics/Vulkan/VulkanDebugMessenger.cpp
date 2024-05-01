@@ -60,7 +60,7 @@ namespace Patchouli
             Console::coreInfo("Vulkan Info: {}", message->pMessage);
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-            Console::coreWarn("Vulkan Warn: {}", message->pMessage);
+            Console::coreWarn("Vulkan Warning: {}", message->pMessage);
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
             Console::coreError("Vulkan Error: {}", message->pMessage);

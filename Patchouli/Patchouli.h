@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Base.h"
+#include "Core/PObject.h"
 #include "Core/Layer.h"
 
 #include "Log/Console.h"

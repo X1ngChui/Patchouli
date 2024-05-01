@@ -18,8 +18,6 @@ namespace Patchouli
 		void setViewports(const std::vector<VkViewport>& viewports) { this->viewports = viewports; }
 		void setScissors(const std::vector<VkRect2D>& scissors) { this->scissors = scissors; }
 
-		void build();
-
 	public:
 		VkPipelineVertexInputStateCreateInfo vkVertexInputStateCreateInfo;
 		VkPipelineInputAssemblyStateCreateInfo vkInputAssemblyStateCreateInfo;

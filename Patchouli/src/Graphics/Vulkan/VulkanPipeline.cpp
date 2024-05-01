@@ -165,8 +165,4 @@ namespace Patchouli
 		if (vkPipeline != VK_NULL_HANDLE)
 			vkDestroyPipeline(*vkDevice, vkPipeline, *vkAllocator);
 	}
-
-	void VulkanPipeline::build()
-	{
-	}
 }

@@ -5,15 +5,13 @@ cmake_minimum_required(VERSION 3.20)
 project("Patchouli")
 
 # Build options
-option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" ON)
+option(PATCHOULI_LIBRARY_TYPE "Build shared library instead of static library" OFF)
 
 # Set language standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
 
 # Set output directories for executable, library, and symbol files
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/dist/${CMAKE_BUILD_TYPE})
@@ -74,3 +72,4 @@ add_third_party(mimalloc)
 add_third_party(fmt)
 add_third_party(spdlog)
 add_third_party(glfw)
+add_third_party(concurrentqueue)
