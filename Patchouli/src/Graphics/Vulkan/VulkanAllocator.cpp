@@ -5,8 +5,6 @@ namespace Patchouli
 {
 	VulkanAllocator::VulkanAllocator()
 	{
-		heap = mi_heap_new();
-
 		vkCallbacks = {
 			.pUserData = this,
 			.pfnAllocation = &VulkanAllocator::allocation,
@@ -17,21 +15,16 @@ namespace Patchouli
 		};
 	}
 
-	VulkanAllocator::~VulkanAllocator()
-	{
-		mi_heap_destroy(heap);
-	}
-
 	void* VulkanAllocator::allocationImpl(std::size_t size, std::size_t alignment, VkSystemAllocationScope allocationScope)
 	{
 		(void)allocationScope;
-		return mi_heap_malloc_aligned(heap, size, alignment);
+		return mi_malloc_aligned(size, alignment);
 	}
 
 	void* VulkanAllocator::reallocationImpl(void* pOriginal, std::size_t size, std::size_t alignment, VkSystemAllocationScope allocationScope)
 	{
 		(void)allocationScope;
-		return mi_heap_realloc_aligned(heap, pOriginal, size, alignment);
+		return mi_realloc_aligned(pOriginal, size, alignment);
 	}
 
 	void VulkanAllocator::freeImpl(void* pMemory)

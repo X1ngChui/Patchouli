@@ -14,6 +14,10 @@ namespace Patchouli
 			const std::filesystem::path& path, VkShaderStageFlagBits shaderStage, const std::string& entryPoint);
 		~VulkanShader();
 
+		auto getShaderStage() const { return vkShaderStage; }
+		auto getShaderModule() const { return vkShaderModule; }
+		const std::string& getEntryPoint() const { return entryPoint; }
+
 	private:
 		VkShaderModule vkShaderModule;
 		VkShaderStageFlagBits vkShaderStage;

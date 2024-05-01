@@ -34,5 +34,7 @@ namespace Patchouli
 
         if (*vkSurface)
             vkSwapchain = makeRef<VulkanSwapchain>(graphicsInfo, vkDevice, vkSurface, vkAllocator);
+
+        vkPipeline = makeRef<VulkanPipeline>(vkDevice, vkAllocator);
     }
 }

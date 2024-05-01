@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(SANDBOX_DEBUG_MODE) || defined(SANDBOX_TESTING_MODE)
+#ifdef SANDBOX_DEBUG_MODE
 #   define PATCHOULI_CONSOLE_ENABLE
 #   define SANDBOX_CONSOLE_ENABLE
 #endif

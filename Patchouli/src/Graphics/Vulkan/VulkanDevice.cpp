@@ -28,15 +28,13 @@ namespace Patchouli
 
         // Construct GraphicsDeviceProperties struct from Vulkan device properties
         GraphicsDeviceProperties properties = {
+            .name = std::string(vkProperties.deviceName),
             .apiVersion = vkProperties.apiVersion,
             .driverVersion = vkProperties.driverVersion,
             .vendorID = vkProperties.vendorID,
             .deviceID = vkProperties.deviceID,
             .discreteGPU = (bool)(vkProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         };
-
-        // Copy device name to GraphicsDeviceProperties struct
-        std::strncpy(properties.deviceName, vkProperties.deviceName, PATCHOULI_MAX_DEVICE_NAME_SIZE);
 
         return properties;
     }

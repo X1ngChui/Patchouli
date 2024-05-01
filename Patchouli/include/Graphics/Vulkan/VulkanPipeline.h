@@ -14,20 +14,22 @@ namespace Patchouli
 		VulkanPipeline(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);
 		virtual ~VulkanPipeline();
 
-		void setShaderGroup(const std::vector<Ref<VulkanShader>>& shaderGroup);
+		void setShaders(const std::vector<Ref<VulkanShader>>& shaders) { this->shaders = shaders; }
+		void setViewports(const std::vector<VkViewport>& viewports) { this->viewports = viewports; }
+		void setScissors(const std::vector<VkRect2D>& scissors) { this->scissors = scissors; }
 
 		void build();
 
 	public:
-		VkPipelineVertexInputStateCreateInfo vkVertexInputState;
-		VkPipelineInputAssemblyStateCreateInfo vkInputAssemblyState;
-		VkPipelineViewportStateCreateInfo vkViewportState;
-		VkPipelineRasterizationStateCreateInfo vkRasterizationState;
-		VkPipelineMultisampleStateCreateInfo vkMultisampleState;
-		VkPipelineColorBlendAttachmentState vkBlendAttachmentState;
-		VkPipelineColorBlendStateCreateInfo vkBlendState;
-		VkPipelineDepthStencilStateCreateInfo vkDepthStencilState;
-		VkPipelineLayoutCreateInfo vkPipelineLayoutState;
+		VkPipelineVertexInputStateCreateInfo vkVertexInputStateCreateInfo;
+		VkPipelineInputAssemblyStateCreateInfo vkInputAssemblyStateCreateInfo;
+		VkPipelineViewportStateCreateInfo vkViewportStateCreateInfo;
+		VkPipelineRasterizationStateCreateInfo vkRasterizationStateCreateInfo;
+		VkPipelineMultisampleStateCreateInfo vkMultisampleStateCreateInfo;
+		std::vector<VkPipelineColorBlendAttachmentState> vkColorBlendAttachmentStates;
+		VkPipelineColorBlendStateCreateInfo vkColorBlendStateCreateInfo;
+		VkPipelineDepthStencilStateCreateInfo vkDepthStencilStateCreateInfo;
+		VkPipelineLayoutCreateInfo vkLayoutCreateInfo;
 
 	private:
 		VkPipeline vkPipeline = VK_NULL_HANDLE;
@@ -36,5 +38,8 @@ namespace Patchouli
 		Ref<VulkanDevice> vkDevice = nullptr;
 		Ref<VulkanAllocator> vkAllocator = nullptr;
 		std::vector<Ref<VulkanShader>> shaders;
+
+		std::vector<VkViewport> viewports;
+		std::vector<VkRect2D> scissors;
 	};
 }

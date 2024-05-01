@@ -4,6 +4,17 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_
 # Create executable target
 add_executable(Sandbox ${SOURCE_FILES})
 
+# Custom target for resources
+add_custom_target(UpdateResources
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:Sandbox>/assets
+    COMMENT "Updating resources..."
+)
+
+# Make Sandbox depend on UpdateResources
+add_dependencies(Sandbox UpdateResources)
+
 # Add include directory
 target_include_directories(Sandbox
 PRIVATE

@@ -12,12 +12,11 @@ namespace Patchouli
         // Constructor initializes Vulkan allocation callbacks.
         VulkanAllocator();
 
-        // Destructor destroys the whole heap.
-        ~VulkanAllocator();
+        ~VulkanAllocator() = default;
 
         // Conversion operator to const VkAllocationCallbacks*.
         // This allows VulkanAllocator objects to be used directly as Vulkan allocation callbacks.
-        inline operator const VkAllocationCallbacks* () const
+        inline operator const VkAllocationCallbacks*() const
         {
             return &vkCallbacks;
         }
@@ -49,8 +48,5 @@ namespace Patchouli
     private:
         // Vulkan allocation callbacks structure.
         VkAllocationCallbacks vkCallbacks;
-
-        // Heap for allocation.
-        mi_heap_t* heap;
     };
 }

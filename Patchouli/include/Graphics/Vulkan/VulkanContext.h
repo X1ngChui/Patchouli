@@ -8,6 +8,7 @@
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanSurface.h"
 #include "Graphics/Vulkan/VulkanSwapchain.h"
+#include "Graphics/Vulkan/VulkanPipeline.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -54,6 +55,8 @@ namespace Patchouli
 
         Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
 
-        Ref<VulkanSwapchain> vkSwapchain = nullptr;
+        Ref<VulkanSwapchain> vkSwapchain = nullptr; // Vulkan sawpchain to display image
+
+        Ref<VulkanPipeline> vkPipeline = nullptr; // Vulkan pipeline for rendering
     };
 }

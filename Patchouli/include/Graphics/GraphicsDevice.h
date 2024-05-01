@@ -3,14 +3,12 @@
 #include "Core/Base.h"
 #include "Core/PObject.h"
 
-#define PATCHOULI_MAX_DEVICE_NAME_SIZE (256)
-
 namespace Patchouli
 {
     // Structure to hold properties of a graphics device
     struct GraphicsDeviceProperties
     {
-        char deviceName[PATCHOULI_MAX_DEVICE_NAME_SIZE]; // Name of the graphics device
+        std::string name; // Name of the graphics device
         uint32_t apiVersion;        // API version supported by the device
         uint32_t driverVersion;     // Driver version of the device
         uint32_t vendorID;          // Vendor ID of the device
