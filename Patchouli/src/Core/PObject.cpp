@@ -24,59 +24,63 @@ namespace Patchouli
 		return mi_new_aligned(size, static_cast<std::size_t>(alignment));
 	}
 
+	void* PObject::operator new(std::size_t size, const std::nothrow_t&) noexcept
+	{
+		return mi_new_nothrow(size);
+	}
+
+	void* PObject::operator new[](std::size_t size, const std::nothrow_t&) noexcept
+	{
+		return mi_new_nothrow(size);
+	}
+
+	void* PObject::operator new(std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
+	{
+		return mi_new_aligned_nothrow(size, static_cast<std::size_t>(alignment));
+	}
+
+	void* PObject::operator new[](std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
+	{
+		return mi_new_aligned_nothrow(size, static_cast<std::size_t>(alignment));
+	}
+
 	void PObject::operator delete(void* ptr)
 	{
-		manager.push(ptr);
+		mi_free(ptr);
 	}
 
 	void PObject::operator delete[](void* ptr)
 	{
-		manager.push(ptr);
+		mi_free(ptr);
 	}
 
-	PObject::ObjectManager::ObjectManager()
+	void PObject::operator delete(void* ptr, std::align_val_t alignment)
 	{
-		mi_register_deferred_free([](bool force, unsigned long long heartbeat, void* arg) {
-			std::size_t n = ((ObjectManager*)arg)->collect();
-			Console::coreInfo("Collection {}: {} Objects collected", heartbeat, n);
-			}, this);
+		mi_free_aligned(ptr, static_cast<std::size_t>(alignment));
 	}
 
-	PObject::ObjectManager::~ObjectManager()
+	void PObject::operator delete[](void* ptr, std::align_val_t alignment)
 	{
-		mi_register_deferred_free(nullptr, nullptr);
-		collect();
+		mi_free_aligned(ptr, static_cast<std::size_t>(alignment));
 	}
 
-	void PObject::ObjectManager::push(void* obj)
+	void PObject::operator delete(void* ptr, std::size_t size)
 	{
-		static_assert(sizeof(PObject) > sizeof(Node));
-		Node* node = (Node*)obj;
-		node->next = deferredList.load(std::memory_order_relaxed);
-		while (!deferredList.compare_exchange_weak(node->next, node));
+		mi_free_size(ptr, size);
 	}
 
-	void* PObject::ObjectManager::pop()
+	void PObject::operator delete[](void* ptr, std::size_t size)
 	{
-		Node* head = deferredList.load(std::memory_order_relaxed);
-		do {
-			if (head == nullptr) return nullptr;
-		} while (!deferredList.compare_exchange_weak(head, head->next));
-
-		return head;
+		mi_free_size(ptr, size);
 	}
 
-	std::size_t PObject::ObjectManager::collect()
+	void PObject::operator delete(void* ptr, std::size_t size, std::align_val_t alignment)
 	{
-		std::lock_guard<std::mutex> lock(collectMutex);
+		mi_free_size_aligned(ptr, size, static_cast<std::size_t>(alignment));
+	}
 
-		std::size_t n = 0;
-		for (void* obj = pop(); obj != nullptr; obj = pop())
-		{
-			n++;
-			mi_free(obj);
-		}
-
-		return n;
+	void PObject::operator delete[](void* ptr, std::size_t size, std::align_val_t alignment)
+	{
+		mi_free_size_aligned(ptr, size, static_cast<std::size_t>(alignment));
 	}
 }

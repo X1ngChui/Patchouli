@@ -6,8 +6,8 @@
 
 namespace Patchouli
 {
-	class PATCHOULI_API PObject : public RefBase<PObject>
-	{
+    class PATCHOULI_API PObject : public RefBase<PObject>
+    {
     public:
         PObject() noexcept = default;
         virtual ~PObject() noexcept = default;
@@ -17,33 +17,19 @@ namespace Patchouli
         void* operator new[](std::size_t size);
         void* operator new(std::size_t size, std::align_val_t alignment);
         void* operator new[](std::size_t size, std::align_val_t alignment);
+        void* operator new(std::size_t size, const std::nothrow_t&) noexcept;
+        void* operator new[](std::size_t size, const std::nothrow_t&) noexcept;
+        void* operator new(std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept;
+        void* operator new[](std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept;
 
         // Overloaded delete operators for fast memory management
-        void operator delete(void* ptr);
-        void operator delete[](void* ptr);
-
-    private:
-        struct Node
-        {
-            Node* next = nullptr;
-        };
-
-        class ObjectManager
-        {
-        public:
-            ObjectManager();
-            ~ObjectManager();
-
-            void push(void* obj);
-            std::size_t collect();
-
-        private:
-            void* pop();
-
-            std::mutex collectMutex;
-            std::atomic<Node*> deferredList = nullptr;
-        };
-
-        inline static ObjectManager manager;
-	};
+        void operator delete(void* ptr) noexcept;
+        void operator delete[](void* ptr) noexcept;
+        void operator delete(void* ptr, std::align_val_t alignment) noexcept;
+        void operator delete[](void* ptr, std::align_val_t alignment) noexcept;
+        void operator delete(void* ptr, std::size_t size) noexcept;
+        void operator delete[](void* ptr, std::size_t size) noexcept;
+        void operator delete(void* ptr, std::size_t size, std::align_val_t alignment) noexcept;
+        void operator delete[](void* ptr, std::size_t size, std::align_val_t alignment) noexcept;
+    };
 }
