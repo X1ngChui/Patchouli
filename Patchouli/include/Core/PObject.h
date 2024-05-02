@@ -4,9 +4,6 @@
 #include "Util/Reference.h"
 #include <concurrentqueue.h>
 
-#define PATCHOULI_MAX_OBJECTS_FREE 1024
-#define PATCHOULI_MAX_OBJECTS_REMAINING_FACTOR 0.25f
-
 namespace Patchouli
 {
 	class PATCHOULI_API PObject : public RefBase<PObject>
@@ -26,19 +23,27 @@ namespace Patchouli
         void operator delete[](void* ptr);
 
     private:
-        class PObjectManger
+        struct Node
         {
-        public:
-            PObjectManger();
-            ~PObjectManger();
-
-            void free(void* obj);
-            std::size_t collect(bool force);
-
-        private:
-            moodycamel::ConcurrentQueue<void*> deferredList;
+            Node* next = nullptr;
         };
 
-        inline static PObjectManger objectManger;
+        class ObjectManager
+        {
+        public:
+            ObjectManager();
+            ~ObjectManager();
+
+            void push(void* obj);
+            std::size_t collect();
+
+        private:
+            void* pop();
+
+            std::mutex collectMutex;
+            std::atomic<Node*> deferredList = nullptr;
+        };
+
+        inline static ObjectManager manager;
 	};
 }

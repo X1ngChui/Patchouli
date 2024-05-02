@@ -26,52 +26,57 @@ namespace Patchouli
 
 	void PObject::operator delete(void* ptr)
 	{
-		objectManger.free(ptr);
+		manager.push(ptr);
 	}
 
 	void PObject::operator delete[](void* ptr)
 	{
-		objectManger.free(ptr);
+		manager.push(ptr);
 	}
 
-	PObject::PObjectManger::PObjectManger()
-		: deferredList(PATCHOULI_MAX_OBJECTS_FREE)
+	PObject::ObjectManager::ObjectManager()
 	{
 		mi_register_deferred_free([](bool force, unsigned long long heartbeat, void* arg) {
-			std::size_t n = ((PObjectManger*)arg)->collect(force);
+			std::size_t n = ((ObjectManager*)arg)->collect();
 			Console::coreInfo("Collection {}: {} Objects collected", heartbeat, n);
-			},
-			this
-		);
+			}, this);
 	}
 
-	PObject::PObjectManger::~PObjectManger()
+	PObject::ObjectManager::~ObjectManager()
 	{
 		mi_register_deferred_free(nullptr, nullptr);
-		collect(true);
+		collect();
 	}
 
-	void PObject::PObjectManger::free(void* obj)
+	void PObject::ObjectManager::push(void* obj)
 	{
-		thread_local moodycamel::ProducerToken ptoken(deferredList);
-		deferredList.enqueue(ptoken, obj);
+		static_assert(sizeof(PObject) > sizeof(Node));
+		Node* node = (Node*)obj;
+		node->next = deferredList.load(std::memory_order_relaxed);
+		while (!deferredList.compare_exchange_weak(node->next, node));
 	}
 
-	std::size_t PObject::PObjectManger::collect(bool force)
+	void* PObject::ObjectManager::pop()
 	{
-		thread_local moodycamel::ConsumerToken ctoken(deferredList);
-		std::array<void*, PATCHOULI_MAX_OBJECTS_FREE> objBuffer;
-
-		std::size_t total = 0, nObjects = 0, maxRemain = force ? 0 : PATCHOULI_MAX_OBJECTS_REMAINING_FACTOR * PATCHOULI_MAX_OBJECTS_FREE;
-
+		Node* head = deferredList.load(std::memory_order_relaxed);
 		do {
-			nObjects = deferredList.try_dequeue_bulk(ctoken, objBuffer.data(), objBuffer.size());
-			total += nObjects;
+			if (head == nullptr) return nullptr;
+		} while (!deferredList.compare_exchange_weak(head, head->next));
 
-			for (std::size_t i = 0; i < nObjects; i++)
-				mi_free(objBuffer[i]);
-		} while (deferredList.size_approx() > maxRemain);
+		return head;
+	}
 
-		return total;
+	std::size_t PObject::ObjectManager::collect()
+	{
+		std::lock_guard<std::mutex> lock(collectMutex);
+
+		std::size_t n = 0;
+		for (void* obj = pop(); obj != nullptr; obj = pop())
+		{
+			n++;
+			mi_free(obj);
+		}
+
+		return n;
 	}
 }
