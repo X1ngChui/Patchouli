@@ -1,11 +1,9 @@
 #include "Core/PObject.h"
+#include "Log/Console.h"
 #include <mimalloc.h>
-
-#define PATCHOULI_MAXN_FREE_OBJECTS 256
 
 namespace Patchouli
 {
-
 	void* PObject::operator new(std::size_t size)
 	{
 		return mi_new(size);
@@ -28,40 +26,52 @@ namespace Patchouli
 
 	void PObject::operator delete(void* ptr)
 	{
-		objectManger.free((PObject*)ptr);
+		objectManger.free(ptr);
 	}
 
 	void PObject::operator delete[](void* ptr)
 	{
-		objectManger.free((PObject*)ptr);
+		objectManger.free(ptr);
 	}
 
 	PObject::PObjectManger::PObjectManger()
+		: deferredList(PATCHOULI_MAX_OBJECTS_FREE)
 	{
 		mi_register_deferred_free([](bool force, unsigned long long heartbeat, void* arg) {
-			((PObjectManger*)arg)->collect();
-			}, this);
+			std::size_t n = ((PObjectManger*)arg)->collect(force);
+			Console::coreInfo("Collection {}: {} Objects collected", heartbeat, n);
+			},
+			this
+		);
 	}
 
 	PObject::PObjectManger::~PObjectManger()
 	{
 		mi_register_deferred_free(nullptr, nullptr);
-		PObject* obj;
-		while (deferedList.try_dequeue_non_interleaved(obj))
-			mi_free(obj);
+		collect(true);
 	}
 
-	void PObject::PObjectManger::free(PObject* obj)
+	void PObject::PObjectManger::free(void* obj)
 	{
-		deferedList.enqueue(obj);
+		thread_local moodycamel::ProducerToken ptoken(deferredList);
+		deferredList.enqueue(ptoken, obj);
 	}
 
-	void PObject::PObjectManger::collect()
+	std::size_t PObject::PObjectManger::collect(bool force)
 	{
-		std::array<PObject*, PATCHOULI_MAXN_FREE_OBJECTS> objBuffer;
-		std::size_t n = deferedList.try_dequeue_bulk(objBuffer.data(), objBuffer.size());
+		thread_local moodycamel::ConsumerToken ctoken(deferredList);
+		std::array<void*, PATCHOULI_MAX_OBJECTS_FREE> objBuffer;
 
-		for (std::size_t i = 0; i < n; i++)
-			mi_free(objBuffer[i]);
+		std::size_t total = 0, nObjects = 0, maxRemain = force ? 0 : PATCHOULI_MAX_OBJECTS_REMAINING_FACTOR * PATCHOULI_MAX_OBJECTS_FREE;
+
+		do {
+			nObjects = deferredList.try_dequeue_bulk(ctoken, objBuffer.data(), objBuffer.size());
+			total += nObjects;
+
+			for (std::size_t i = 0; i < nObjects; i++)
+				mi_free(objBuffer[i]);
+		} while (deferredList.size_approx() > maxRemain);
+
+		return total;
 	}
 }
