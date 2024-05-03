@@ -53,18 +53,18 @@ namespace Patchouli
         return features;
     }
 
-    std::vector<const char*> VulkanDevice::getEnabledExtensions(const GraphicsContextCreateInfo& info) const
+    VulkanVector<const char*> VulkanDevice::getEnabledExtensions(const GraphicsContextCreateInfo& info) const
     {
-        std::vector<const char*> extensions;
+        VulkanVector<const char*> extensions;
 
         if (info.window->getAPI() != WindowAPI::None)
             extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
         return extensions;
     }
 
-    std::vector<const char*> VulkanDevice::getEnabledLayers() const
+    VulkanVector<const char*> VulkanDevice::getEnabledLayers() const
     {
-        std::vector<const char*> layers;
+        VulkanVector<const char*> layers;
 
 #ifdef PATCHOULI_VULKAN_VALIDATION
         layers.push_back(PATCHOULI_VULKAN_VALIDATION);
@@ -95,7 +95,7 @@ namespace Patchouli
         std::set<uint32_t> distinctIndices = { queueFamilies.graphics, queueFamilies.present };
 
         // Create device queue create info for each distinct queue index
-        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+        VulkanVector<VkDeviceQueueCreateInfo> queueCreateInfos;
         static const float priority = 1.0f;
         for (uint32_t index : distinctIndices)
         {
@@ -114,8 +114,8 @@ namespace Patchouli
         }
 
         // Get required extensions, layers and features
-        std::vector<const char*> layers = getEnabledLayers();
-        std::vector<const char*> extensions = getEnabledExtensions(info);
+        VulkanVector<const char*> layers = getEnabledLayers();
+        VulkanVector<const char*> extensions = getEnabledExtensions(info);
         VkPhysicalDeviceFeatures features = getEnabledFeatures();
 
         // Create Vulkan logical device
@@ -145,14 +145,14 @@ namespace Patchouli
     }
 
     // Function to retrieve a list of Vulkan devices associated with a Vulkan instance
-    std::vector<Ref<GraphicsDevice>> VulkanDevice::getDevices(Ref<VulkanInstance> instance)
+    VulkanVector<Ref<GraphicsDevice>> VulkanDevice::getDevices(Ref<VulkanInstance> instance)
     {
         uint32_t nDevices = 0;
         vkEnumeratePhysicalDevices(*instance, &nDevices, nullptr);
-        std::vector<VkPhysicalDevice> physicalDevices(nDevices);
+        VulkanVector<VkPhysicalDevice> physicalDevices(nDevices);
         vkEnumeratePhysicalDevices(*instance, &nDevices, physicalDevices.data());
 
-        std::vector<Ref<GraphicsDevice>> devices;
+        VulkanVector<Ref<GraphicsDevice>> devices;
 
         // Transform Vulkan physical devices into GraphicsDevice objects
         std::ranges::transform(physicalDevices, std::back_inserter(devices), [](auto physicalDevice) {
@@ -167,7 +167,7 @@ namespace Patchouli
         // Get queue family properties of the selected physical device
         uint32_t nQueueFamilies = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilyProperties(nQueueFamilies);
+        VulkanVector<VkQueueFamilyProperties> queueFamilyProperties(nQueueFamilies);
         vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &nQueueFamilies, queueFamilyProperties.data());
         assert(nQueueFamilies > 0);
 

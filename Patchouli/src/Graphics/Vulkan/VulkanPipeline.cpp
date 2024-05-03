@@ -28,7 +28,7 @@ namespace Patchouli
 
 		this->setShaders({ shaderVertex, shaderFragment });
 
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
+		VulkanVector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
 		for (auto shader : shaders)
 		{
 			VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {

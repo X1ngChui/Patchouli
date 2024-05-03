@@ -9,7 +9,6 @@ namespace Patchouli
     // Enum representing different graphics APIs
     enum class GraphicsAPI
     {
-        None = 0,
         Vulkan
     };
 
@@ -26,6 +25,9 @@ namespace Patchouli
         GraphicsPolicy graphicsPolicy = GraphicsPolicy::PerformancePriority;
 
         Ref<Window> window;
+
+        using DeviceSelector = std::function<Ref<GraphicsDevice>(const std::vector<Ref<GraphicsDevice>>&)>;
+        DeviceSelector deviceSelector;
     };
 
     // Abstract base class representing a graphics context
@@ -34,12 +36,6 @@ namespace Patchouli
     public:
         GraphicsContext() = default;
         virtual ~GraphicsContext() = default;
-
-        // Function to retrieve graphics devices
-        virtual std::vector<Ref<GraphicsDevice>> getDevices() const = 0;
-
-        // Function to select a graphics device
-        virtual void selectDevice(Ref<GraphicsDevice> device) = 0;
 
         // Static function to create a graphics context
         static Ref<GraphicsContext> create(const GraphicsContextCreateInfo& info);

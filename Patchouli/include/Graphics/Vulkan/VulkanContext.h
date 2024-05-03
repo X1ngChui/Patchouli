@@ -21,20 +21,11 @@ namespace Patchouli
         VulkanContext(const GraphicsContextCreateInfo& info);
 
         // Destructor for VulkanContext.
-        // Note: According to the C++ standard (ISO/IEC 14882:2011, ¡ì12.4.10),
-        // member variables are destructed in the reverse order of their declaration.
-        // Therefore, vkAllocator, being the last member declared, is destructed last.
         virtual ~VulkanContext() = default;
-
-        // Function to retrieve a list of Vulkan graphics devices.
-        virtual std::vector<Ref<GraphicsDevice>> getDevices() const override;
-
-        // Function to select a specific Vulkan graphics device.
-        virtual void selectDevice(Ref<GraphicsDevice> device) override;
 
     private:
         // Graphics settings info.
-        GraphicsContextCreateInfo graphicsInfo;
+        GraphicsContextCreateInfo graphicsContextInfo;
 
         // Vulkan memory allocator.
         // Note: vkAllocator must be placed as the first member

@@ -2,7 +2,6 @@
 
 #include "Core/Base.h"
 #include "Util/Reference.h"
-#include <concurrentqueue.h>
 
 namespace Patchouli
 {
@@ -16,7 +15,7 @@ namespace Patchouli
         void* operator new(std::size_t size);
         void* operator new[](std::size_t size);
         void* operator new(std::size_t size, std::align_val_t al);
-        void* operator new[](std::size_t size, std::align_val_t a);
+        void* operator new[](std::size_t size, std::align_val_t al);
         void* operator new(std::size_t size, const std::nothrow_t&) noexcept;
         void* operator new[](std::size_t size, const std::nothrow_t&) noexcept;
         void* operator new(std::size_t size, std::align_val_t al, const std::nothrow_t&) noexcept;

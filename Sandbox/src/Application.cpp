@@ -53,19 +53,14 @@ namespace Sandbox
         GraphicsContextCreateInfo graphicsCreateInfo = {
             .graphicsAPI = GraphicsAPI::Vulkan,
             .graphicsPolicy = GraphicsPolicy::PerformancePriority,
-            .window = window
+            .window = window,
+            .deviceSelector = [](const std::vector<Ref<GraphicsDevice>>& devices) {
+            for (Ref<GraphicsDevice> device : devices)
+                if (device->getProperties().discreteGPU)
+                    return device;
+            }
         };
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
-
-        auto devices = graphicsContext->getDevices();
-        for (auto device : devices)
-        {
-            if (device->getProperties().discreteGPU)
-            {
-                graphicsContext->selectDevice(device);
-                break;
-            }
-        }
     }
 
     // Destructor

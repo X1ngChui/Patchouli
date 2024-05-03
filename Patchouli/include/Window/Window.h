@@ -8,7 +8,7 @@ namespace Patchouli
 	// Enum representing different windowing APIs
 	enum class WindowAPI
 	{
-		None = 0,   // No window
+		None = 0,   // None
 		GLFW        // GLFW windowing API
 	};
 
