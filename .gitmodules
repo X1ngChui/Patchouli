@@ -10,6 +10,3 @@
 [submodule "third-party/glfw"]
 	path = third-party/glfw
 	url = https://github.com/X1ngChui/glfw.git
-[submodule "third-party/concurrentqueue"]
-	path = third-party/concurrentqueue
-	url = https://github.com/cameron314/concurrentqueue.git
