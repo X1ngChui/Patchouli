@@ -9,7 +9,7 @@ namespace Patchouli
     // Enum representing different graphics APIs
     enum class GraphicsAPI
     {
-        Vulkan
+        Vulkan = 0
     };
 
     enum class GraphicsPolicy

@@ -74,9 +74,9 @@ namespace Patchouli
         // Valid when selected
         // --------------------
         VkDevice vkDevice = VK_NULL_HANDLE; // Vulkan logical device
-        Ref<VulkanAllocator> vkAllocator = nullptr; // Vulkan allocator
-        VkQueue graphicsQueue = VK_NULL_HANDLE; // Vulkan graphics queue
-        VkQueue presentQueue = VK_NULL_HANDLE; // Vulkan present queue
+        Ref<VulkanAllocator> allocator = nullptr; // Vulkan allocator
+        VkQueue vkGraphicsQueue = VK_NULL_HANDLE; // Vulkan graphics queue
+        VkQueue vkPresentQueue = VK_NULL_HANDLE; // Vulkan present queue
         VulkanQueueFamilies queueFamilies; // Selected queue families
     };
 }

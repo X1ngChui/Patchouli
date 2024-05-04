@@ -16,7 +16,7 @@ namespace Patchouli
         {
             // Wait for the device to become idle before destroying it
             vkDeviceWaitIdle(vkDevice);
-            vkDestroyDevice(vkDevice, *vkAllocator);
+            vkDestroyDevice(vkDevice, *allocator);
         }
     }
 
@@ -82,7 +82,7 @@ namespace Patchouli
     void VulkanDevice::onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface, const GraphicsContextCreateInfo& info)
     {
         selected = true; // Mark the device as selected
-        vkAllocator = allocator; // Store the allocator for resource management
+        this->allocator = allocator; // Store the allocator for resource management
 
         // Get and determine queue families to be uesd
         initQueueFamilies(surface);
@@ -133,15 +133,15 @@ namespace Patchouli
         };
 
         // Create the Vulkan device
-        VkResult status = vkCreateDevice(vkPhysicalDevice, &deviceCreateinfo, *vkAllocator, &vkDevice);
+        VkResult status = vkCreateDevice(vkPhysicalDevice, &deviceCreateinfo, *allocator, &vkDevice);
         assert(status == VK_SUCCESS);
 
         // Retrieve queues for different queue families
         // Note: Now only graphis and present queues are used
         if (queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-            vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &graphicsQueue);
+            vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &vkGraphicsQueue);
         if (queueFamilies.present != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
-            vkGetDeviceQueue(vkDevice, queueFamilies.present, 0, &presentQueue);
+            vkGetDeviceQueue(vkDevice, queueFamilies.present, 0, &vkPresentQueue);
     }
 
     // Function to retrieve a list of Vulkan devices associated with a Vulkan instance

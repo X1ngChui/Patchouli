@@ -3,7 +3,7 @@
 namespace Patchouli
 {
 	 VulkanShader::VulkanShader(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator, const std::filesystem::path& path, VkShaderStageFlagBits shaderStage, const std::string& entryPoint)
-		: vkDevice(device), vkAllocator(allocator), vkShaderStage(shaderStage), entryPoint(entryPoint)
+		: device(device), allocator(allocator), vkShaderStage(shaderStage), entryPoint(entryPoint)
 	{
 		std::ifstream file(path, std::ios::binary | std::ios::in);
 		assert(file.is_open());
@@ -18,12 +18,12 @@ namespace Patchouli
 			.pCode = (uint32_t*)spirv.data()
 		};
 
-		VkResult status = vkCreateShaderModule(*vkDevice, &shaderModuleInfo, *vkAllocator, &vkShaderModule);
+		VkResult status = vkCreateShaderModule(*device, &shaderModuleInfo, *allocator, &vkShaderModule);
 		assert(status == VK_SUCCESS);
 	}
 
 	VulkanShader::~VulkanShader()
 	{
-		vkDestroyShaderModule(*vkDevice, vkShaderModule, *vkAllocator);
+		vkDestroyShaderModule(*device, vkShaderModule, *allocator);
 	}
 }

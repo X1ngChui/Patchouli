@@ -26,15 +26,15 @@ namespace Patchouli
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-		this->window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle.c_str(), nullptr, nullptr);
-		assert(this->window);
+		window = glfwCreateWindow(attribute.width, attribute.height, attribute.title.c_str(), nullptr, nullptr);
+		assert(window != NULL);
 
-		glfwSetWindowUserPointer(this->window, &(this->attribute));
+		glfwSetWindowUserPointer(window, &attribute);
 
 		// Set glfw callbacks
 		glfwSetErrorCallback([](int error_code, const char* description)
 			{
-				Console::coreError("glfwError({0}): {1}", error_code, description);
+				Console::coreError("glfwError({}): {}", error_code, description);
 			});
 
 		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)

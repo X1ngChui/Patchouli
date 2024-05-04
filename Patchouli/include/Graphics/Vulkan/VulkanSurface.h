@@ -19,8 +19,8 @@ namespace Patchouli
 		inline explicit operator bool() { return vkSurface != VK_NULL_HANDLE; }
 	private:
 		VkSurfaceKHR vkSurface = VK_NULL_HANDLE;
-		Ref<VulkanInstance> vkInstance;
-		Ref<VulkanAllocator> vkAllocator;
+		Ref<VulkanInstance> instance;
+		Ref<VulkanAllocator> allocator;
 		Ref<Window> window;
 	};
 }

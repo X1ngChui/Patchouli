@@ -23,7 +23,7 @@ namespace Patchouli
 		VkShaderStageFlagBits vkShaderStage;
 		std::string entryPoint;
 
-		Ref<VulkanDevice> vkDevice;
-		Ref<VulkanAllocator> vkAllocator;
+		Ref<VulkanDevice> device;
+		Ref<VulkanAllocator> allocator;
 	};
 }

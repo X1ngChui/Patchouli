@@ -4,7 +4,7 @@
 namespace Patchouli
 {
 	Patchouli::VulkanSurface::VulkanSurface(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator, Ref<Window> window)
-		: vkInstance(instance), vkAllocator(allocator), window(window)
+		: instance(instance), allocator(allocator), window(window)
 	{
 		switch (window->getAPI())
 		{
@@ -12,7 +12,7 @@ namespace Patchouli
 			vkSurface = VK_NULL_HANDLE;
 			break;
 		case WindowAPI::GLFW:
-			VkResult status = glfwCreateWindowSurface(*vkInstance, *(GLFWwindow**)window->getNative(), *vkAllocator, &vkSurface);
+			VkResult status = glfwCreateWindowSurface(*instance, *(GLFWwindow**)window->getNative(), *allocator, &vkSurface);
 			assert(status == VK_SUCCESS);
 			break;
 		}
@@ -25,7 +25,7 @@ namespace Patchouli
 		case WindowAPI::None:
 			break;
 		case WindowAPI::GLFW:
-			vkDestroySurfaceKHR(*vkInstance, vkSurface, *vkAllocator);
+			vkDestroySurfaceKHR(*instance, vkSurface, *allocator);
 			break;
 		}
 	}

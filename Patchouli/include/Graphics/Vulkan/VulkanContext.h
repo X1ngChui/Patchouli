@@ -8,6 +8,7 @@
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanSurface.h"
 #include "Graphics/Vulkan/VulkanSwapchain.h"
+#include "Graphics/Vulkan/VulkanRenderPass.h"
 #include "Graphics/Vulkan/VulkanPipeline.h"
 #include <vulkan/vulkan.h>
 
@@ -28,26 +29,24 @@ namespace Patchouli
         GraphicsContextCreateInfo graphicsContextInfo;
 
         // Vulkan memory allocator.
-        // Note: vkAllocator must be placed as the first member
-        // to ensure correct destruction order specified by the standard.
-        Ref<VulkanAllocator> vkAllocator = nullptr;
+        Ref<VulkanAllocator> allocator = nullptr;
 
         // Vulkan instance.
-        // Note: vkInstance must be placed as the second member
-        // to ensure correct destruction order specified by the standard.
-        Ref<VulkanInstance> vkInstance = nullptr;
+        Ref<VulkanInstance> instance = nullptr;
 
 #ifdef PATCHOULI_VULKAN_VALIDATION
         // Vulkan debug messenger (optional, enabled by preprocessor macro).
-        Ref<VulkanDebugMessenger> vkDebugMessenger = nullptr;
+        Ref<VulkanDebugMessenger> debugMessenger = nullptr;
 #endif
 
-        Ref<VulkanSurface> vkSurface = nullptr; // Vulkan surface to display image
+        Ref<VulkanSurface> surface = nullptr; // Vulkan surface to display image
 
-        Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device used by the context
+        Ref<VulkanDevice> device = nullptr; // Vulkan device used by the context
 
-        Ref<VulkanSwapchain> vkSwapchain = nullptr; // Vulkan sawpchain to display image
+        Ref<VulkanSwapchain> swapchain = nullptr; // Vulkan sawpchain to display image
 
-        Ref<VulkanPipeline> vkPipeline = nullptr; // Vulkan pipeline for rendering
+        Ref<VulkanRenderPass> renderPass = nullptr;
+
+        Ref<VulkanPipeline> pipeline = nullptr; // Vulkan pipeline for rendering
     };
 }

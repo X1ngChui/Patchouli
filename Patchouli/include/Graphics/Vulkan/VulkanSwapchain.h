@@ -2,6 +2,7 @@
 
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanSurface.h"
+#include "Graphics/Vulkan/VulkanRenderPass.h"
 #include <Vulkan/Vulkan.h>
 
 namespace Patchouli
@@ -16,10 +17,13 @@ namespace Patchouli
 		// Destructor to destroy a Vulkan Swapchain
 		virtual ~VulkanSwapchain();
 
+		void createFramebuffers(Ref<VulkanRenderPass> renderPass);
+		VkFormat getFormat() const { return vkFormat; }
+
 	private:
 		// Friend declaration to allow access to struct VulkanSwapchainSupports
 		template <GraphicsPolicy>
-		friend struct VulkanSwapchainSettingsSelect;
+		friend struct VulkanSwapchainSettingsSelector;
 
 		// Structure to hold information about Vulkan Swapchain supports
 		struct VulkanSwapchainSupports
@@ -38,14 +42,15 @@ namespace Patchouli
 
 	private:
 		VkSwapchainKHR vkSwapchain; // Vulkan Swapchain handle
-		Ref<VulkanDevice> vkDevice = nullptr; // Vulkan device
-		Ref<VulkanSurface> vkSurface = nullptr; // Vulkan surface
-		Ref<VulkanAllocator> vkAllocator = nullptr; // Vulkan allocator
+		Ref<VulkanDevice> device = nullptr; // Vulkan device
+		Ref<VulkanSurface> surface = nullptr; // Vulkan surface
+		Ref<VulkanAllocator> allocator = nullptr; // Vulkan allocator
 
 		VkFormat vkFormat; // Vulkan image format
 		VkExtent2D vkExtent; // Vulkan image extent
 
 		VulkanVector<VkImage> vkImages; // Vulkan images
 		VulkanVector<VkImageView> vkImageViews; // Vulkan image views
+		VulkanVector<VkFramebuffer> vkFramebuffers; // Vulkan frame buffers
 	};
 }

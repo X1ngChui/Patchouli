@@ -9,26 +9,64 @@ namespace Patchouli
         : graphicsContextInfo(info)
     {
         // Initialize Vulkan allocator
-        vkAllocator = makeRef<VulkanAllocator>();
+        allocator = makeRef<VulkanAllocator>();
 
         // Create Vulkan instance using the provided GraphicsInfo object and Vulkan allocator
-        vkInstance = makeRef<VulkanInstance>(vkAllocator, graphicsContextInfo);
+        instance = makeRef<VulkanInstance>(allocator, graphicsContextInfo);
 
 #ifdef PATCHOULI_VULKAN_VALIDATION
         // Create Vulkan debug messenger for validation purposes, if enabled
-        vkDebugMessenger = makeRef<VulkanDebugMessenger>(vkInstance, vkAllocator);
+        debugMessenger = makeRef<VulkanDebugMessenger>(instance, allocator);
 #endif
         // Create Vulkan surface for displaying
-        vkSurface = makeRef<VulkanSurface>(vkInstance, vkAllocator, graphicsContextInfo.window);
+        surface = makeRef<VulkanSurface>(instance, allocator, graphicsContextInfo.window);
 
         // Select and create graphics Device
-        auto vkDevices = VulkanDevice::getDevices(vkInstance);
+        auto vkDevices = VulkanDevice::getDevices(instance);
         auto devices = std::vector<Ref<GraphicsDevice>>(vkDevices.begin(), vkDevices.end());
-        vkDevice = std::static_pointer_cast<VulkanDevice>(graphicsContextInfo.deviceSelector(devices));
-        vkDevice->onSelect(vkAllocator, vkSurface, graphicsContextInfo);
+        device = std::static_pointer_cast<VulkanDevice>(graphicsContextInfo.deviceSelector(devices));
+        device->onSelect(allocator, surface, graphicsContextInfo);
 
-        vkSwapchain = makeRef<VulkanSwapchain>(graphicsContextInfo, vkDevice, vkSurface, vkAllocator);
+        swapchain = makeRef<VulkanSwapchain>(graphicsContextInfo, device, surface, allocator);
+        
+        // Create Vulkan render pass
+        VkAttachmentReference attachmentReference = {
+            .attachment = 0,
+            .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+        };
+        VkSubpassDependency dependency = {
+            .srcSubpass = VK_SUBPASS_EXTERNAL,
+            .dstSubpass = 0,
+            .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            .srcAccessMask = 0,
+            .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+            .dependencyFlags = 0
+        };
+        VulkanSubpassCreateInfo subpassCreateInfo = {
+            .colorAttachmentRefs = { attachmentReference }
+        };
+        VulkanSubpass subpass(subpassCreateInfo);
 
-        vkPipeline = makeRef<VulkanPipeline>(vkDevice, vkAllocator);
+        VkAttachmentDescription attachmentDescription = {
+           .flags = 0,
+           .format = swapchain->getFormat(),
+           .samples = VK_SAMPLE_COUNT_1_BIT,
+           .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+           .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+           .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+           .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+           .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+           .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+        };
+        VulkanRenderPassCreateInfo renderPassCreateInfo = {
+            .subpasses = { subpass },
+            .subpassDependencies = { dependency },
+            .attachmentDescriptions = { attachmentDescription }
+        };
+        renderPass = makeRef<VulkanRenderPass>(renderPassCreateInfo, device, allocator);
+        swapchain->createFramebuffers(renderPass);
+
+        pipeline = makeRef<VulkanPipeline>(renderPass, device, allocator);
     }
 }

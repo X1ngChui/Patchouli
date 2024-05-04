@@ -9,7 +9,7 @@ namespace Patchouli
     // Constructor for VulkanInstance.
     // It initializes Vulkan instance based on the provided GraphicsInfo and VulkanAllocator.
     VulkanInstance::VulkanInstance(Ref<VulkanAllocator> allocator, const GraphicsContextCreateInfo& info)
-        : vkAllocator(allocator)
+        : allocator(allocator)
     {
         // Get required Vulkan extensions and layers
         VulkanVector<const char*> extensions = getEnabledExtensions(info.window->getAPI());
@@ -39,7 +39,7 @@ namespace Patchouli
         };
 
         // Create Vulkan instance
-        VkResult result = vkCreateInstance(&instanceInfo, *vkAllocator, &(this->vkInstance));
+        VkResult result = vkCreateInstance(&instanceInfo, *allocator, &vkInstance);
         assert(result == VK_SUCCESS);
     }
 
@@ -48,7 +48,7 @@ namespace Patchouli
     VulkanInstance::~VulkanInstance()
     {
         // Destroy Vulkan instance
-        vkDestroyInstance(this->vkInstance, *vkAllocator);
+        vkDestroyInstance(this->vkInstance, *allocator);
     }
 
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.

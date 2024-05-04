@@ -2,8 +2,8 @@
 
 namespace Patchouli
 {
-	VulkanPipeline::VulkanPipeline(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
-		: vkDevice(device), vkAllocator(allocator)
+	VulkanPipeline::VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
+		: device(device), allocator(allocator)
 	{
 		VkViewport viewport = {
 			.x = 0.0f,
@@ -147,7 +147,7 @@ namespace Patchouli
 			.pDepthStencilState = nullptr, // Depth and stencil test is now neglected
 			.pColorBlendState = &vkColorBlendStateCreateInfo,
 			.layout = vkPipelineLayout,
-			.renderPass = VK_NULL_HANDLE,
+			.renderPass = *renderPass,
 			.subpass = 0,
 			.basePipelineHandle = VK_NULL_HANDLE,
 			.basePipelineIndex = -1
@@ -160,9 +160,9 @@ namespace Patchouli
 	VulkanPipeline::~VulkanPipeline()
 	{
 		if (vkPipelineLayout != VK_NULL_HANDLE)
-			vkDestroyPipelineLayout(*vkDevice, vkPipelineLayout, *vkAllocator);
+			vkDestroyPipelineLayout(*device, vkPipelineLayout, *allocator);
 
 		if (vkPipeline != VK_NULL_HANDLE)
-			vkDestroyPipeline(*vkDevice, vkPipeline, *vkAllocator);
+			vkDestroyPipeline(*device, vkPipeline, *allocator);
 	}
 }

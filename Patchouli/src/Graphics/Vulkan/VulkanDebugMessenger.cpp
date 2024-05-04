@@ -7,7 +7,7 @@ namespace Patchouli
     // Constructor for VulkanDebugMessenger.
     // It creates a Vulkan debug messenger associated with the provided VulkanInstance and VulkanAllocator.
     VulkanDebugMessenger::VulkanDebugMessenger(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator)
-        : vkInstance(instance), vkAllocator(allocator)
+        : instance(instance), allocator(allocator)
     {
         // Configure Vulkan debug messenger creation info
         VkDebugUtilsMessengerCreateInfoEXT info = {
@@ -21,12 +21,12 @@ namespace Patchouli
         };
 
         // Retrieve function pointer for vkCreateDebugUtilsMessengerEXT
-        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance, PATCHOULI_VULKAN_CREATE_DEBUG_UTILS_MESSENGER);
+        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, PATCHOULI_VULKAN_CREATE_DEBUG_UTILS_MESSENGER);
 
         assert(createDebugMessenger != nullptr);
 
         // Create Vulkan debug messenger
-        VkResult result = createDebugMessenger(*vkInstance, &info, *vkAllocator, &debugMessenger);
+        VkResult result = createDebugMessenger(*instance, &info, *allocator, &vkDebugMessenger);
 
         // Assert if Vulkan debug messenger creation fails
         assert(result == VK_SUCCESS);
@@ -37,13 +37,13 @@ namespace Patchouli
     VulkanDebugMessenger::~VulkanDebugMessenger()
     {
         // Retrieve function pointer for vkDestroyDebugUtilsMessengerEXT
-        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*vkInstance, PATCHOULI_VULKAN_DESTROY_DEBUG_UTILS_MESSENGER);
+        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, PATCHOULI_VULKAN_DESTROY_DEBUG_UTILS_MESSENGER);
 
         // Assert if function pointer retrieval fails
         assert(destroyDebugMessenger != nullptr);
 
         // Destroy Vulkan debug messenger
-        destroyDebugMessenger(*vkInstance, debugMessenger, *vkAllocator);
+        destroyDebugMessenger(*instance, vkDebugMessenger, *allocator);
     }
 
     // Member function for handling Vulkan debug messages.

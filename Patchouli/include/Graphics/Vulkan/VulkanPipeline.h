@@ -4,6 +4,7 @@
 #include "Core/PObject.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanShader.h"
+#include "Graphics/Vulkan/VulkanRenderPass.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -11,7 +12,7 @@ namespace Patchouli
 	class VulkanPipeline : public PObject
 	{
 	public:
-		VulkanPipeline(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);
+		VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);
 		virtual ~VulkanPipeline();
 
 		void setShaders(const VulkanVector<Ref<VulkanShader>>& shaders) { this->shaders = shaders; }
@@ -33,8 +34,8 @@ namespace Patchouli
 		VkPipeline vkPipeline = VK_NULL_HANDLE;
 		VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
 
-		Ref<VulkanDevice> vkDevice = nullptr;
-		Ref<VulkanAllocator> vkAllocator = nullptr;
+		Ref<VulkanDevice> device = nullptr;
+		Ref<VulkanAllocator> allocator = nullptr;
 		VulkanVector<Ref<VulkanShader>> shaders;
 
 		VulkanVector<VkViewport> viewports;

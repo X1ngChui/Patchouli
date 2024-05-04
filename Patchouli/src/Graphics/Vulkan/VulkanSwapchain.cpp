@@ -43,9 +43,9 @@ namespace Patchouli
 
 	// Template struct to select Vulkan Swapchain settings
 	template <GraphicsPolicy P>
-	struct VulkanSwapchainSettingsSelect
+	struct VulkanSwapchainSettingsSelector
 	{
-		constexpr VulkanSwapchainSettingsSelect() = default;
+		constexpr VulkanSwapchainSettingsSelector() = default;
 
 		// Operator to select the swapchain settings based on the supported formats, present modes, and surface capabilities
 		VulkanSwapchainSettings operator()(const VulkanSwapchain::VulkanSwapchainSupports& supports, const GraphicsContextCreateInfo& info) const
@@ -145,7 +145,7 @@ namespace Patchouli
 	// Constructor for Vulkan Swapchain class
 	VulkanSwapchain::VulkanSwapchain(const GraphicsContextCreateInfo& graphicsInfo, Ref<VulkanDevice> device,
 		Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator)
-		: vkDevice(device), vkSurface(surface), vkAllocator(allocator)
+		: device(device), surface(surface), allocator(allocator)
 	{
 		// Get swapchain supports and select appropriate settings based on the graphics policy
 		VulkanSwapchainSupports supports = getSwapchainSupports();
@@ -153,12 +153,12 @@ namespace Patchouli
 		switch (graphicsInfo.graphicsPolicy)
 		{
 		case GraphicsPolicy::PerformancePriority:
-			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PerformancePriority> performancePrioritySelect;
-			settings = performancePrioritySelect(supports, graphicsInfo);
+			constexpr VulkanSwapchainSettingsSelector<GraphicsPolicy::PerformancePriority> performancePrioritySelector;
+			settings = performancePrioritySelector(supports, graphicsInfo);
 			break;
 		case GraphicsPolicy::PowerSavingPriority:
-			constexpr VulkanSwapchainSettingsSelect<GraphicsPolicy::PowerSavingPriority> powerSavingPrioritySelect;
-			settings = powerSavingPrioritySelect(supports, graphicsInfo);
+			constexpr VulkanSwapchainSettingsSelector<GraphicsPolicy::PowerSavingPriority> powerSavingPrioritySelector;
+			settings = powerSavingPrioritySelector(supports, graphicsInfo);
 			break;
 		}
 
@@ -169,18 +169,18 @@ namespace Patchouli
 
 		// Determine queue families for sharing or exclusive ownership
 		VulkanVector<uint32_t> queueFamilies = {
-			vkDevice->getQueueFamilies().graphics,
-			vkDevice->getQueueFamilies().present
+			device->getQueueFamilies().graphics,
+			device->getQueueFamilies().present
 		};
 
-		bool sharedQueue = vkDevice->getQueueFamilies().graphics == vkDevice->getQueueFamilies().present;
+		bool sharedQueue = device->getQueueFamilies().graphics == device->getQueueFamilies().present;
 
 		// Create swapchain creation info
 		VkSwapchainCreateInfoKHR info = {
 			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 			.pNext = nullptr,
 			.flags = 0,
-			.surface = *vkSurface,
+			.surface = *surface,
 			.minImageCount = nImages,
 			.imageFormat = settings.surfaceFormat.format,
 			.imageColorSpace = settings.surfaceFormat.colorSpace,
@@ -197,17 +197,18 @@ namespace Patchouli
 		};
 
 		// Create the Vulkan swapchain
-		VkResult status = vkCreateSwapchainKHR(*vkDevice, &info, *vkAllocator, &vkSwapchain);
+		VkResult status = vkCreateSwapchainKHR(*device, &info, *allocator, &vkSwapchain);
 		assert(status == VK_SUCCESS);
 
 		// Store swapchain format and extent
 		vkFormat = settings.surfaceFormat.format;
 		vkExtent = settings.extent;
 
-		vkGetSwapchainImagesKHR(*vkDevice, vkSwapchain, &nImages, nullptr);
+		vkGetSwapchainImagesKHR(*device, vkSwapchain, &nImages, nullptr);
 		vkImages.resize(nImages);
-		vkGetSwapchainImagesKHR(*vkDevice, vkSwapchain, &nImages, vkImages.data());
+		vkGetSwapchainImagesKHR(*device, vkSwapchain, &nImages, vkImages.data());
 
+		// Create image views
 		vkImageViews.reserve(nImages);
 		for (uint32_t i = 0; i < nImages; i++)
 			vkImageViews.push_back(createImageView(vkImages[i], vkFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1));
@@ -218,10 +219,38 @@ namespace Patchouli
 	{
 		// Destory ecah Vulkan image view
 		for (auto& imageView : vkImageViews)
-			vkDestroyImageView(*vkDevice, imageView, *vkAllocator);
+			vkDestroyImageView(*device, imageView, *allocator);
+
+		// Destroy each Vulkan framebuffer
+		for (auto& framebuffer : vkFramebuffers)
+			vkDestroyFramebuffer(*device, framebuffer, *allocator);
 
 		// Destroy the Vulkan swapchain
-		vkDestroySwapchainKHR(*vkDevice, vkSwapchain, *vkAllocator);
+		vkDestroySwapchainKHR(*device, vkSwapchain, *allocator);
+	}
+
+	void VulkanSwapchain::createFramebuffers(Ref<VulkanRenderPass> renderPass)
+	{
+		vkFramebuffers.resize(vkImageViews.size());
+		for (uint32_t i = 0; i < vkImageViews.size(); i++)
+		{
+			std::array<VkImageView, 1> attachments = { vkImageViews[i] };
+
+			VkFramebufferCreateInfo framebufferCreateInfo = {
+				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.renderPass = *renderPass,
+				.attachmentCount = static_cast<uint32_t>(attachments.size()),
+				.pAttachments = attachments.data(),
+				.width = vkExtent.width,
+				.height = vkExtent.height,
+				.layers = 1
+			};
+
+			VkResult result = vkCreateFramebuffer(*device, &framebufferCreateInfo, *allocator, &vkFramebuffers[i]);
+			assert(result == VK_SUCCESS);
+		}
 	}
 
 	// Function to retrieve Vulkan Swapchain supports
@@ -230,21 +259,21 @@ namespace Patchouli
 		VulkanSwapchainSupports supports;
 
 		// Get surface capabilities
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*vkDevice, *vkSurface, &supports.surfaceCapabilities);
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(*device, *surface, &supports.surfaceCapabilities);
 
 		// Get surface format
 		uint32_t nFormats = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(*vkDevice, *vkSurface, &nFormats, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(*device, *surface, &nFormats, nullptr);
 		supports.surfaceFormats.resize(nFormats);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(*vkDevice, *vkSurface, &nFormats,
+		vkGetPhysicalDeviceSurfaceFormatsKHR(*device, *surface, &nFormats,
 			supports.surfaceFormats.data());
 		assert(nFormats > 0);
 
 		// Get present modes
 		uint32_t nPresentModes = 0;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(*vkDevice, *vkSurface, &nPresentModes, nullptr);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(*device, *surface, &nPresentModes, nullptr);
 		supports.presentModes.resize(nPresentModes);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(*vkDevice, *vkSurface, &nPresentModes,
+		vkGetPhysicalDeviceSurfacePresentModesKHR(*device, *surface, &nPresentModes,
 			supports.presentModes.data());
 		assert(nPresentModes > 0);
 
@@ -270,7 +299,7 @@ namespace Patchouli
 		};
 
 		VkImageView imageView = VK_NULL_HANDLE;
-		VkResult status = vkCreateImageView(*vkDevice, &info, *vkAllocator, &imageView);
+		VkResult status = vkCreateImageView(*device, &info, *allocator, &imageView);
 		assert(status == VK_SUCCESS);
 
 		return imageView;

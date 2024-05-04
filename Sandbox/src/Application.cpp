@@ -58,6 +58,7 @@ namespace Sandbox
             for (Ref<GraphicsDevice> device : devices)
                 if (device->getProperties().discreteGPU)
                     return device;
+            return devices[0];
             }
         };
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
