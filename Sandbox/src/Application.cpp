@@ -30,7 +30,7 @@ namespace Sandbox
             [this](Ref<Event> event) { this->onUpdate(); }
         ); // Event handler for application update event
 
-        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_KEYBOARD, PATCHOULI_EVENT_TOPIC_MOUSE>>(
+        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_MOUSE, PATCHOULI_EVENT_TOPIC_KEYBOARD>>(
             [](Ref<Event> event) { Console::info(*event); }
         );
 

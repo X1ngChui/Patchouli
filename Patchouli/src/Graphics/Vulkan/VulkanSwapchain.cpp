@@ -143,7 +143,7 @@ namespace Patchouli
 	}
 
 	// Constructor for Vulkan Swapchain class
-	VulkanSwapchain::VulkanSwapchain(const GraphicsContextCreateInfo& graphicsInfo, Ref<VulkanDevice> device,
+	VulkanSwapchain::VulkanSwapchain(const GraphicsContextCreateInfo& graphicsInfo, Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device,
 		Ref<VulkanSurface> surface, Ref<VulkanAllocator> allocator)
 		: device(device), surface(surface), allocator(allocator)
 	{
@@ -231,6 +231,7 @@ namespace Patchouli
 
 	void VulkanSwapchain::createFramebuffers(Ref<VulkanRenderPass> renderPass)
 	{
+		// Create frame buffers
 		vkFramebuffers.resize(vkImageViews.size());
 		for (uint32_t i = 0; i < vkImageViews.size(); i++)
 		{

@@ -27,7 +27,7 @@ namespace Patchouli
         device = std::static_pointer_cast<VulkanDevice>(graphicsContextInfo.deviceSelector(devices));
         device->onSelect(allocator, surface, graphicsContextInfo);
 
-        swapchain = makeRef<VulkanSwapchain>(graphicsContextInfo, device, surface, allocator);
+        swapchain = makeRef<VulkanSwapchain>(graphicsContextInfo, renderPass, device, surface, allocator);
         
         // Create Vulkan render pass
         VkAttachmentReference attachmentReference = {

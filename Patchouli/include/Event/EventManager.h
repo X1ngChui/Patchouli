@@ -8,9 +8,9 @@ namespace Patchouli
     // Forward declaration of EventHandlerBase class
     class EventHandlerBase;
 
-    // Forward declaration of EventHandler template class
+    // Forward declaration of EventHandlerImpl template class
     template <TypeEvent... Args>
-    class EventHandler;
+    class EventHandlerImpl;
 
     // EventDispatcher class for managing event handlers and dispatching events
     class PATCHOULI_API EventManager : public PObject
@@ -26,7 +26,7 @@ namespace Patchouli
         // Add an event handler for a specific event type
         // Returns a reference to the EventManager for chaining
         template <TypeEvent E>
-        inline EventManager& addHandler(Ref<EventHandler<E>> handler)
+        inline EventManager& addHandler(Ref<EventHandlerImpl<E>> handler)
         {
             addHandlerImpl(handler, E::getStaticType());
             return *this;
@@ -35,17 +35,17 @@ namespace Patchouli
         // Add an event handler for specific event types
         // Returns a reference to the EventManager for chaining
         template <TypeEvent E, TypeEvent... Rest>
-        inline EventManager& addHandler(Ref<EventHandler<E, Rest...>> handler)
+        inline EventManager& addHandler(Ref<EventHandlerImpl<E, Rest...>> handler)
         {
             addHandlerImpl(handler, E::getStaticType());
-            (void)addHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            (void)addHandler<Rest...>(std::static_pointer_cast<EventHandlerImpl<Rest...>>(handler));
             return *this;
         }
 
         // Remove an event handler for a specific event type
         // Returns a reference to the EventManager for chaining
         template <TypeEvent E>
-        inline EventManager& removeHandler(Ref<EventHandler<E>> handler)
+        inline EventManager& removeHandler(Ref<EventHandlerImpl<E>> handler)
         {
             removeHandlerImpl(handler, E::getStaticType());
             return *this;
@@ -54,10 +54,10 @@ namespace Patchouli
         // Remove an event handler for specific event types
         // Returns a reference to the EventManager for chaining
         template <TypeEvent E, TypeEvent... Rest>
-        inline EventManager& removeHandler(Ref<EventHandler<E, Rest...>> handler)
+        inline EventManager& removeHandler(Ref<EventHandlerImpl<E, Rest...>> handler)
         {
             removeHandlerImpl(handler, E::getStaticType());
-            (void)removeHandler<Rest...>(std::static_pointer_cast<EventHandler<Rest...>>(handler));
+            (void)removeHandler<Rest...>(std::static_pointer_cast<EventHandlerImpl<Rest...>>(handler));
             return *this;
         }
 
