@@ -50,77 +50,109 @@ namespace Patchouli
     };
 
     namespace _EventHandlerInternal {
-        template <TypeEvent... Seq>
-        struct Sequence {
-            using type = EventHandlerImpl<Seq...>;
-        };
-
-        template <typename S1, typename S2>
-        struct SequenceExtension;
-
-        template <typename... Seq1, typename... Seq2>
-        struct SequenceExtension<Sequence<Seq1...>, Sequence<Seq2...>> {
-            using type = Sequence<Seq1..., Seq2...>;
-        };
-
-        template <typename T1, typename T2>
+        // Template struct to compare two TypeEvent types
+        template <TypeEvent T1, TypeEvent T2>
         struct compare {
             static constexpr bool less = T1::getStaticType() < T2::getStaticType();
         };
 
-        template <typename P, typename S>
+        // Template struct representing a sequence of TypeEvent types
+        template <TypeEvent... Seq>
+        struct Sequence {
+            using handler_type = EventHandlerImpl<Seq...>;
+        };
+
+        // Template struct to extend a sequence by appending another sequence
+        template <typename S1, typename S2>
+        struct SequenceExtend;
+
+        // Specialization for extending two sequences
+        template <TypeEvent... Seq1, TypeEvent... Seq2>
+        struct SequenceExtend<Sequence<Seq1...>, Sequence<Seq2...>> {
+            using type = Sequence<Seq1..., Seq2...>;
+        };
+
+        // Template struct to append a TypeEvent to a sequence
+        template <typename Seq, TypeEvent T>
+        struct SequenceAppend;
+
+        // Specialization for appending a TypeEvent to a sequence
+        template <TypeEvent... Seq, TypeEvent T>
+        struct SequenceAppend<Sequence<Seq...>, T> {
+            using type = Sequence<Seq..., T>;
+        };
+
+        // Template struct to partition a sequence based on a pivot TypeEvent
+        template <TypeEvent Pivot, typename Seq>
         struct SequencePartition;
 
-        template <typename P, typename T>
-        struct SequencePartition<P, Sequence<T>> {
-            using less = std::conditional_t<compare<T, P>::less, Sequence<T>, Sequence<>>;
-            using greater = std::conditional_t<!compare<T, P>::less, Sequence<T>, Sequence<>>;
+        // Specialization for partitioning a sequence with a single TypeEvent
+        template <TypeEvent Pivot, TypeEvent T>
+        struct SequencePartition<Pivot, Sequence<T>> {
+            using less = std::conditional_t<compare<T, Pivot>::less, Sequence<T>, Sequence<>>;
+            using greater = std::conditional_t<!compare<T, Pivot>::less, Sequence<T>, Sequence<>>;
         };
 
-        template <typename P, typename T, typename...Others>
-        struct SequencePartition<P, Sequence<T, Others...>> {
+        // Specialization for partitioning a sequence with multiple TypeEvents
+        template <TypeEvent Pivot, TypeEvent First, TypeEvent...Rest>
+        struct SequencePartition<Pivot, Sequence<First, Rest...>> {
             using less = std::conditional_t<
-                compare<T, P>::less,
-                typename SequenceExtension<Sequence<T>, typename SequencePartition<P, Sequence<Others...>>::less>::type,
-                typename SequencePartition<P, Sequence<Others...>>::less
+                compare<First, Pivot>::less,
+                typename SequenceAppend<
+                    typename SequencePartition<Pivot, Sequence<Rest...>>::less,
+                    First
+                >::type,
+                typename SequencePartition<Pivot, Sequence<Rest...>>::less
             >;
-            using greater = std::conditional_t <
-                !compare<T, P>::less,
-                typename SequenceExtension<Sequence<T>, typename SequencePartition<P, Sequence<Others...>>::greater>::type,
-                typename SequencePartition<P, Sequence<Others...>>::greater
+
+            using greater = std::conditional_t<
+                !compare<First, Pivot>::less,
+                typename SequenceAppend<
+                    typename SequencePartition<Pivot, Sequence<Rest...>>::greater,
+                    First
+                >::type,
+                typename SequencePartition<Pivot, Sequence<Rest...>>::greater
             >;
         };
 
-        template <typename... Ts>
-        struct TemplateSort {
+        // Template struct for quick sorting a sequence of TypeEvents
+        template <TypeEvent... E>
+        struct QuickSort {
         private:
+            // Template struct for inner operations during sorting
             template <typename S>
-            struct Partition;
+            struct SortPass;
 
-            template <typename T>
-            struct Partition<Sequence<T>> {
+            // Specialization for a single TypeEvent in the sequence
+            template <TypeEvent T>
+            struct SortPass<Sequence<T>> {
                 using type = Sequence<T>;
             };
 
+            // Specialization for an empty sequence
             template <>
-            struct Partition<Sequence<>> {
+            struct SortPass<Sequence<>> {
                 using type = Sequence<>;
             };
 
-            template <typename Pivot, typename... Rest>
-            struct Partition<Sequence<Pivot, Rest...>> {
+            // Specialization for a sequence with multiple TypeEvents
+            template <TypeEvent Pivot, TypeEvent... Rest>
+            struct SortPass<Sequence<Pivot, Rest...>> {
                 using less = typename SequencePartition<Pivot, Sequence<Rest...>>::less;
                 using greater = typename SequencePartition<Pivot, Sequence<Rest...>>::greater;
-                using type = typename SequenceExtension<
-                    typename SequenceExtension<typename Partition<less>::type, Sequence<Pivot>>::type,
-                    typename Partition<greater>::type
+                using type = typename SequenceExtend<
+                    typename SequenceAppend<typename SortPass<less>::type, Pivot>::type,
+                    typename SortPass<greater>::type
                 >::type;
             };
 
         public:
-            using type = typename Partition<Sequence<Ts...>>::type;
+            using sorted = typename SortPass<Sequence<E...>>::type;
         };
     }
+
+    // The template parameters here are unordered, meaning that
+    // EventHandler<A, B, C> is equivalent to EventHandler<B, C, A>
     template <TypeEvent... E>
-    using EventHandler = _EventHandlerInternal::TemplateSort<E...>::type::type;
+    using EventHandler = typename _EventHandlerInternal::QuickSort<E...>::sorted::handler_type;
 }

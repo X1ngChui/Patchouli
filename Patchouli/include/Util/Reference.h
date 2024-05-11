@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include <cassert> // assert
 #include <cstddef> // nullptr_t
-#include <atomic> // atomic<long>, atomic<T *>
+#include <atomic> // atomic<long>, atomic<First *>
 #include <memory> // default_delete, unique_ptr
 #include <exception> // terminate
 #include <utility> // declval
