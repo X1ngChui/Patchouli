@@ -57,7 +57,7 @@ namespace Patchouli
 
     /*
      * Concept TypeEvent checks if a type meets the requirements to be considered as an Event type.
-     * A type First satisfies TypeEvent if it:
+     * A type T satisfies TypeEvent if it:
      * - Is derived from the base class Event.
      * - Is not an abstract class.
      * - Provides a static member function getStaticType() that returns a constexpr EventType.
