@@ -1,5 +1,7 @@
 #include "Graphics/Vulkan/VulkanPipeline.h"
 
+#define PATCHOULI_VULKAN_SHADER_ENTRY "main"
+
 namespace Patchouli
 {
 	VulkanPipeline::VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
@@ -23,12 +25,12 @@ namespace Patchouli
 		this->setScissors({ scissor });
 
 		// Load shaders
-		Ref<VulkanShader> shaderVertex = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT, "main");
-		Ref<VulkanShader> shaderFragment = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT, "main");
+		Ref<VulkanShader> shaderVertex = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		Ref<VulkanShader> shaderFragment = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		this->setShaders({ shaderVertex, shaderFragment });
 
-		VulkanVector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
+		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
 		for (auto shader : shaders)
 		{
 			VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {
@@ -37,7 +39,7 @@ namespace Patchouli
 				.flags = 0,
 				.stage = shader->getShaderStage(),
 				.module = shader->getShaderModule(),
-				.pName = shader->getEntryPoint().c_str(),
+				.pName = PATCHOULI_VULKAN_SHADER_ENTRY,
 				.pSpecializationInfo = nullptr
 			};
 			shaderStageCreateInfos.push_back(shaderStageCreateInfo);
@@ -159,10 +161,7 @@ namespace Patchouli
 
 	VulkanPipeline::~VulkanPipeline()
 	{
-		if (vkPipelineLayout != VK_NULL_HANDLE)
-			vkDestroyPipelineLayout(*device, vkPipelineLayout, *allocator);
-
-		if (vkPipeline != VK_NULL_HANDLE)
-			vkDestroyPipeline(*device, vkPipeline, *allocator);
+		vkDestroyPipelineLayout(*device, vkPipelineLayout, *allocator);
+		vkDestroyPipeline(*device, vkPipeline, *allocator);
 	}
 }

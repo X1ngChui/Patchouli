@@ -10,11 +10,12 @@ namespace Patchouli
 	GLFWWindow::GLFWWindow(const WindowCreateInfo& info)
 	{
 		attribute = {
-			.title = info.windowTitle,
 			.width = info.windowWidth,
 			.height = info.windowHeight,
 			.eventCallback = info.windowEventCallback
 		};
+
+		std::strncpy(attribute.title, info.windowTitle, PATCHOULI_WINDOW_TITLE_SIZE);
 
 		if (!glfwInitialized)
 		{
@@ -26,7 +27,7 @@ namespace Patchouli
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-		window = glfwCreateWindow(attribute.width, attribute.height, attribute.title.c_str(), nullptr, nullptr);
+		window = glfwCreateWindow(attribute.width, attribute.height, attribute.title, nullptr, nullptr);
 		assert(window != NULL);
 
 		glfwSetWindowUserPointer(window, &attribute);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PatchouliPch.h"
 #include "Event/Event.h"
 #include "Event/EventManager.h"
 
@@ -123,16 +122,16 @@ namespace Patchouli
             template <typename S>
             struct SortPass;
 
-            // Specialization for a single TypeEvent in the sequence
-            template <TypeEvent T>
-            struct SortPass<Sequence<T>> {
-                using type = Sequence<T>;
-            };
-
             // Specialization for an empty sequence
             template <>
             struct SortPass<Sequence<>> {
                 using type = Sequence<>;
+            };
+
+            // Specialization for a single TypeEvent in the sequence
+            template <TypeEvent T>
+            struct SortPass<Sequence<T>> {
+                using type = Sequence<T>;
             };
 
             // Specialization for a sequence with multiple TypeEvents

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PatchouliPch.h"
 #include "Core/Base.h"
 #include "Core/PObject.h"
 #include "Log/LogBase.h"

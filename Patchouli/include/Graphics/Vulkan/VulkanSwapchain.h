@@ -29,8 +29,8 @@ namespace Patchouli
 		struct VulkanSwapchainSupports
 		{
 			VkSurfaceCapabilitiesKHR surfaceCapabilities; // Surface capabilities
-			VulkanVector<VkSurfaceFormatKHR> surfaceFormats; // Surface formats
-			VulkanVector<VkPresentModeKHR> presentModes; // Present modes
+			std::vector<VkSurfaceFormatKHR> surfaceFormats; // Surface formats
+			std::vector<VkPresentModeKHR> presentModes; // Present modes
 		};
 
 		// Function to retrieve Vulkan Swapchain supports
@@ -49,8 +49,8 @@ namespace Patchouli
 		VkFormat vkFormat; // Vulkan image format
 		VkExtent2D vkExtent; // Vulkan image extent
 
-		VulkanVector<VkImage> vkImages; // Vulkan images
-		VulkanVector<VkImageView> vkImageViews; // Vulkan image views
-		VulkanVector<VkFramebuffer> vkFramebuffers; // Vulkan frame buffers
+		std::vector<VkImage> vkImages; // Vulkan images
+		std::vector<VkImageView> vkImageViews; // Vulkan image views
+		std::vector<VkFramebuffer> vkFramebuffers; // Vulkan frame buffers
 	};
 }

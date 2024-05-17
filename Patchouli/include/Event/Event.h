@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PatchouliPch.h"
 #include "Core/Base.h"
 #include "Core/PObject.h"
-#include "Util/TypeTraits.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
+
+#define PATCHOULI_EVENT_STRING_SIZE 128
 
 namespace Patchouli
 {
@@ -52,7 +52,7 @@ namespace Patchouli
         // static constexpr EventType getStaticType();
 
         // Convert the event to a string representation
-        virtual std::string toString() const = 0;
+        virtual std::size_t toString(char* buffer, std::size_t size) const = 0;
     };
 
     /*
@@ -73,12 +73,17 @@ namespace Patchouli
 }
 
 // Specialization of the formatter for Event types in fmt library
-template <typename T>
-struct fmt::formatter<T, std::enable_if_t<std::is_base_of_v<Patchouli::Event, T>, char>> : fmt::formatter<std::string>
+template <>
+struct fmt::formatter<Patchouli::Event, char> : fmt::formatter<std::string_view>
 {
     template <typename FormatCtx>
     auto format(const Patchouli::Event& evt, FormatCtx& ctx) const
     {
-        return fmt::formatter<std::string>::format(evt.toString(), ctx);
+        std::array<char, PATCHOULI_EVENT_STRING_SIZE> string;
+        std::size_t len = evt.toString(string.data(), string.size());
+        std::string_view view(string.data(), len);
+        return fmt::format_to(ctx.out(), "{}", view);
     }
 };
+
+

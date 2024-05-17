@@ -24,7 +24,7 @@ namespace Patchouli
     VulkanRenderPass::VulkanRenderPass(const VulkanRenderPassCreateInfo& info, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
         : info(info), device(device), allocator(allocator)
     {
-        VulkanVector<VkSubpassDescription> subpassDescriptions;
+        std::vector<VkSubpassDescription> subpassDescriptions;
         for (auto& subpass : info.subpasses)
             subpassDescriptions.push_back(subpass.getDescription());
 
@@ -46,7 +46,6 @@ namespace Patchouli
 
     VulkanRenderPass::~VulkanRenderPass()
     {
-        if (vkRenderPass != VK_NULL_HANDLE)
-            vkDestroyRenderPass(*device, vkRenderPass, *allocator);
+        vkDestroyRenderPass(*device, vkRenderPass, *allocator);
     }
 }

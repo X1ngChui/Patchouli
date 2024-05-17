@@ -12,14 +12,14 @@ namespace Patchouli
         : allocator(allocator)
     {
         // Get required Vulkan extensions and layers
-        VulkanVector<const char*> extensions = getEnabledExtensions(info.window->getAPI());
-        VulkanVector<const char*> layers = getEnabledLayers();
+        std::vector<const char*> extensions = getEnabledExtensions(info.window->getAPI());
+        std::vector<const char*> layers = getEnabledLayers();
 
         // Fill VkApplicationInfo structure
         VkApplicationInfo appInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = info.window->getTitle().c_str(),
+            .pApplicationName = info.window->getTitle(),
             .applicationVersion = 0,
             .pEngineName = "Patchouli",
             .engineVersion = VK_MAKE_API_VERSION(0, 0, 0, 0),
@@ -52,9 +52,9 @@ namespace Patchouli
     }
 
     // Private member function to retrieve required Vulkan extensions based on WindowAPI.
-    VulkanVector<const char*> VulkanInstance::getEnabledExtensions(WindowAPI windowAPI) const
+    std::vector<const char*> VulkanInstance::getEnabledExtensions(WindowAPI windowAPI) const
     {
-        VulkanVector<const char*> extensions;
+        std::vector<const char*> extensions;
 
         switch (windowAPI)
         {
@@ -72,9 +72,9 @@ namespace Patchouli
         return extensions;
     }
 
-    VulkanVector<const char*> VulkanInstance::getEnabledLayers() const
+    std::vector<const char*> VulkanInstance::getEnabledLayers() const
     {
-        VulkanVector<const char*> layers;
+        std::vector<const char*> layers;
 
 #ifdef PATCHOULI_VULKAN_VALIDATION
         layers.push_back(PATCHOULI_VULKAN_VALIDATION);
@@ -86,12 +86,12 @@ namespace Patchouli
     }
 
     // Private member function to check if specified Vulkan layers are supported.
-    bool VulkanInstance::checkLayers(VulkanVector<const char*>& layers) const
+    bool VulkanInstance::checkLayers(std::vector<const char*>& layers) const
     {
         // Retrieve information about supported Vulkan layers
         uint32_t nSupported = 0;
         vkEnumerateInstanceLayerProperties(&nSupported, nullptr);
-        VulkanVector<VkLayerProperties> supported(nSupported);
+        std::vector<VkLayerProperties> supported(nSupported);
         vkEnumerateInstanceLayerProperties(&nSupported, supported.data());
 
         // Create a set of supported layer names for efficient lookup

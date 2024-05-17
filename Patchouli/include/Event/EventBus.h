@@ -2,7 +2,6 @@
 
 #include "Core/Base.h"
 #include "Event/Event.h"
-#include "PatchouliPch.h"
 
 namespace Patchouli
 {

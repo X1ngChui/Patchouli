@@ -5,7 +5,7 @@
 
 namespace Patchouli
 {
-	void Console::init(const std::string& appName, const LogLevel level)
+	void Console::init(const char* appName, const LogLevel level)
 	{
 #ifdef PATCHOULI_CONSOLE_ENABLE
 		coreLogger = spdlog::stdout_color_mt(PATCHOULI_CORE_CONSOLE_NAME);

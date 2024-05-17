@@ -20,19 +20,16 @@ endif()
 # Add include directory
 target_include_directories(Patchouli
 PRIVATE
+	"${CMAKE_SOURCE_DIR}/third-party/glfw/include"
+	"${Vulkan_INCLUDE_DIRS}"
+PUBLIC
 	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/third-party/mimalloc/include"
 	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
 	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
-	"${CMAKE_SOURCE_DIR}/third-party/glfw/include"
-	"${Vulkan_INCLUDE_DIRS}"
 INTERFACE
 	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/pch"
-	"${CMAKE_SOURCE_DIR}/third-party/fmt/include"
-	"${CMAKE_SOURCE_DIR}/third-party/spdlog/include"
 )
 
 # Link the static library
@@ -40,14 +37,14 @@ target_link_libraries(Patchouli
 PRIVATE
 	${Vulkan_LIBRARIES}
 	glfw
-	mimalloc-static
 PUBLIC
+	mimalloc-static
 	spdlog_header_only
 	fmt-header-only
 )
 
 # Specify the precompiled header file
-target_precompile_headers(Patchouli PRIVATE "pch/PatchouliPch.h")
+target_precompile_headers(Patchouli PUBLIC "pch/PatchouliPch.h")
 
 # Define configuration-specific macros
 define_config_macros(Patchouli)

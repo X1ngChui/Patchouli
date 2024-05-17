@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PatchouliPch.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include <vulkan/vulkan.h>
@@ -11,17 +10,15 @@ namespace Patchouli
 	{
 	public:
 		VulkanShader(Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator,
-			const std::filesystem::path& path, VkShaderStageFlagBits shaderStage, const std::string& entryPoint);
+			const std::filesystem::path& path, VkShaderStageFlagBits shaderStage);
 		~VulkanShader();
 
 		auto getShaderStage() const { return vkShaderStage; }
 		auto getShaderModule() const { return vkShaderModule; }
-		const std::string& getEntryPoint() const { return entryPoint; }
 
 	private:
 		VkShaderModule vkShaderModule;
 		VkShaderStageFlagBits vkShaderStage;
-		std::string entryPoint;
 
 		Ref<VulkanDevice> device;
 		Ref<VulkanAllocator> allocator;

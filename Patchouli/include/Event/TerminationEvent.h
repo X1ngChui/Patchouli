@@ -16,9 +16,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::Termination; }
 
 		// Convert the event to a string representation
-		virtual std::string toString() const override 
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return "TerminationEvent"; 
+			auto result = fmt::format_to_n(buffer, size, "TerminationEvent");
+			return result.size;
 		}
 	};
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PatchouliPch.h"
 #include "Core/PObject.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
@@ -26,13 +25,13 @@ namespace Patchouli
 
     private:
         // Private member function to retrieve required Vulkan extensions based on WindowAPI.
-        VulkanVector<const char*> getEnabledExtensions(WindowAPI windowAPI) const;
+        std::vector<const char*> getEnabledExtensions(WindowAPI windowAPI) const;
 
         // Private member function to retrieve required Vulkan layers.
-        VulkanVector<const char*> getEnabledLayers() const;
+        std::vector<const char*> getEnabledLayers() const;
 
         // Private member function to check if specified Vulkan layers are supported.
-        bool checkLayers(VulkanVector<const char*>& layers) const;
+        bool checkLayers(std::vector<const char*>& layers) const;
 
     private:
         VkInstance vkInstance; // Vulkan instance handle

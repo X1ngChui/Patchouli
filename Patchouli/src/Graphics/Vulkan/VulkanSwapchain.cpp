@@ -18,7 +18,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainSurfaceFormatSelect() = default;
 
 		// Operator to select the surface format based on given formats
-		VkSurfaceFormatKHR operator()(const VulkanVector<VkSurfaceFormatKHR>& formats) const;
+		VkSurfaceFormatKHR operator()(const std::vector<VkSurfaceFormatKHR>& formats) const;
 	};
 
 	// Template struct to select Vulkan Swapchain present mode
@@ -28,7 +28,7 @@ namespace Patchouli
 		constexpr VulkanSwapchainPresentModeSelect() = default;
 
 		// Operator to select the present mode based on given present modes
-		VkPresentModeKHR operator()(const VulkanVector<VkPresentModeKHR>& presentModes) const;
+		VkPresentModeKHR operator()(const std::vector<VkPresentModeKHR>& presentModes) const;
 	};
 
 	// Template struct to select Vulkan Swapchain extent
@@ -65,7 +65,7 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain surface format selection
 	template<GraphicsPolicy P>
 	VkSurfaceFormatKHR VulkanSwapchainSurfaceFormatSelect<P>::operator()
-		(const VulkanVector<VkSurfaceFormatKHR>& formats) const
+		(const std::vector<VkSurfaceFormatKHR>& formats) const
 	{
 		assert(formats.size() > 0);
 		constexpr VkSurfaceFormatKHR defaultFormat = { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
@@ -87,7 +87,7 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain present mode selection with performance priority
 	template<>
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PerformancePriority>::operator()
-		(const VulkanVector<VkPresentModeKHR>& presentModes) const
+		(const std::vector<VkPresentModeKHR>& presentModes) const
 	{
 		// Try to find the mailbox present mode, if not available, fallback to FIFO
 		auto it = std::ranges::find(presentModes, VK_PRESENT_MODE_MAILBOX_KHR);
@@ -101,7 +101,7 @@ namespace Patchouli
 	// Template specialization for Vulkan Swapchain present mode selection with power-saving priority
 	template<>
 	VkPresentModeKHR VulkanSwapchainPresentModeSelect<GraphicsPolicy::PowerSavingPriority>::operator()
-		(const VulkanVector<VkPresentModeKHR>& presentModes) const
+		(const std::vector<VkPresentModeKHR>& presentModes) const
 	{
 		// For power-saving priority, always use FIFO present mode
 		assert(std::ranges::find(presentModes, VK_PRESENT_MODE_FIFO_KHR) != presentModes.end());
@@ -168,7 +168,7 @@ namespace Patchouli
 			nImages = supports.surfaceCapabilities.maxImageCount;
 
 		// Determine queue families for sharing or exclusive ownership
-		VulkanVector<uint32_t> queueFamilies = {
+		std::vector<uint32_t> queueFamilies = {
 			device->getQueueFamilies().graphics,
 			device->getQueueFamilies().present
 		};

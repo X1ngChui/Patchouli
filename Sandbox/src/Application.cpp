@@ -30,7 +30,7 @@ namespace Sandbox
             [this](Ref<Event> event) { this->onUpdate(); }
         ); // Event handler for application update event
 
-        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_MOUSE, PATCHOULI_EVENT_TOPIC_KEYBOARD>>(
+        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_INPUT>>(
             [](Ref<Event> event) { Console::info(*event); }
         );
 
@@ -54,11 +54,12 @@ namespace Sandbox
             .graphicsAPI = GraphicsAPI::Vulkan,
             .graphicsPolicy = GraphicsPolicy::PerformancePriority,
             .window = window,
-            .deviceSelector = [](const std::vector<Ref<GraphicsDevice>>& devices) {
-            for (Ref<GraphicsDevice> device : devices)
-                if (device->getProperties().discreteGPU)
-                    return device;
-            return devices[0];
+            .deviceSelector = [](const Ref<GraphicsDevice> devices[], std::size_t size) {
+                assert(devices != nullptr && size > 0);
+                for (std::size_t i = 0; i < size; i++)
+                    if (devices[i]->getProperties().discreteGPU)
+                        return devices[i];
+                return devices[0];
             }
         };
         graphicsContext = GraphicsContext::create(graphicsCreateInfo);
@@ -79,7 +80,7 @@ namespace Sandbox
         std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::milli> timeElapsed = currentTime - lastUpdateTime;
         double interval = timeElapsed.count();
-        Console::info("Time interval since last update: {} milliseconds", interval);
+        // Console::info("Time interval since last update: {} milliseconds", interval);
         lastUpdateTime = currentTime;
 
         window->onUpdate();

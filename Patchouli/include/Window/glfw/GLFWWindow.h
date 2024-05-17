@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #undef APIENTRY
 
+#define PATCHOULI_WINDOW_TITLE_SIZE 256
+
 namespace Patchouli
 {
 	class GLFWWindow : public Window
@@ -12,7 +14,7 @@ namespace Patchouli
 		GLFWWindow(const WindowCreateInfo& info);
 		virtual ~GLFWWindow();
 		
-		virtual const std::string& getTitle() const override { return attribute.title; }
+		virtual const char* getTitle() const override { return attribute.title; }
 		virtual uint32_t getWidth() const override { return attribute.width; }
 		virtual uint32_t getHeight() const override { return attribute.height; }
 
@@ -38,7 +40,7 @@ namespace Patchouli
 	private:
 		struct WindowAttribute
 		{
-			std::string title;
+			char title[PATCHOULI_WINDOW_TITLE_SIZE];
 			uint32_t width;
 			uint32_t height;
 

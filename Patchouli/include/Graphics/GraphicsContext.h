@@ -26,7 +26,7 @@ namespace Patchouli
 
         Ref<Window> window;
 
-        using DeviceSelector = std::function<Ref<GraphicsDevice>(const std::vector<Ref<GraphicsDevice>>&)>;
+        using DeviceSelector = std::function<Ref<GraphicsDevice>(const Ref<GraphicsDevice>[], std::size_t)>;
         DeviceSelector deviceSelector;
     };
 

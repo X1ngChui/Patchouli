@@ -1,5 +1,4 @@
 #pragma once
-#include "PatchouliPch.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/Vulkan/VulkanBase.h"
 #include "Graphics/Vulkan/VulkanInstance.h"
@@ -10,6 +9,7 @@
 #include "Graphics/Vulkan/VulkanSwapchain.h"
 #include "Graphics/Vulkan/VulkanRenderPass.h"
 #include "Graphics/Vulkan/VulkanPipeline.h"
+#include "Graphics/Vulkan/VulkanCommandPool.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -48,5 +48,7 @@ namespace Patchouli
         Ref<VulkanRenderPass> renderPass = nullptr;
 
         Ref<VulkanPipeline> pipeline = nullptr; // Vulkan pipeline for rendering
+
+        Ref<VulkanCommandPool> commandPool = nullptr;
     };
 }

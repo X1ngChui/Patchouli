@@ -16,7 +16,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::AppUpdate; }
 
 		// Convert the event to a string representation
-		virtual std::string toString() const override { return "AppUpdateEvent"; }
+		virtual std::size_t toString(char* buffer, std::size_t size) const override {
+			auto result = fmt::format_to_n(buffer, size, "AppUpdateEvent");
+			return result.size;
+		}
 	};
 
 
@@ -32,6 +35,9 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::AppRender; }
 
 		// Convert the event to a string representation
-		virtual std::string toString() const { return "AppRenderEvent"; }
+		virtual std::size_t toString(char* buffer, std::size_t size) const override {
+			auto result = fmt::format_to_n(buffer, size, "AppRenderEvent");
+			return result.size;
+		}
 	};
 }

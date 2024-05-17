@@ -1,5 +1,4 @@
 #include "Core/Layer.h"
-#include "PatchouliPch.h"
 
 namespace Patchouli
 {

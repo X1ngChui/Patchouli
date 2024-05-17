@@ -1,18 +1,9 @@
 #pragma once
 #include "Core/PObject.h"
-#include <mimalloc.h>
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
 {
-    template <typename T>
-    using VulkanRawAllocator = mi_stl_allocator<T>;
-
-    template <typename T>
-    using VulkanVector = std::conditional_t<std::is_base_of_v<PObject, T>,
-        std::vector<T>,
-        std::vector<T, VulkanRawAllocator<T>>>;
-
     // VulkanAllocator class is responsible for managing Vulkan memory allocation.
     class VulkanAllocator : public PObject
     {

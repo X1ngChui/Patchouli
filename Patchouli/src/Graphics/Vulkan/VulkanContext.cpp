@@ -22,9 +22,8 @@ namespace Patchouli
         surface = makeRef<VulkanSurface>(instance, allocator, graphicsContextInfo.window);
 
         // Select and create graphics Device
-        auto vkDevices = VulkanDevice::getDevices(instance);
-        auto devices = std::vector<Ref<GraphicsDevice>>(vkDevices.begin(), vkDevices.end());
-        device = std::static_pointer_cast<VulkanDevice>(graphicsContextInfo.deviceSelector(devices));
+        auto devices = VulkanDevice::getDevices(instance);
+        device = std::static_pointer_cast<VulkanDevice>(graphicsContextInfo.deviceSelector(devices.data(), devices.size()));
         device->onSelect(allocator, surface, graphicsContextInfo);
 
         swapchain = makeRef<VulkanSwapchain>(graphicsContextInfo, renderPass, device, surface, allocator);
@@ -68,5 +67,7 @@ namespace Patchouli
         swapchain->createFramebuffers(renderPass);
 
         pipeline = makeRef<VulkanPipeline>(renderPass, device, allocator);
+
+        commandPool = makeRef<VulkanCommandPool>(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, allocator);
     }
 }

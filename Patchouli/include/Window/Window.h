@@ -15,7 +15,7 @@ namespace Patchouli
 	struct WindowCreateInfo
 	{
 		WindowAPI windowAPI = WindowAPI::GLFW;
-		std::string windowTitle = "Patchouli";
+		const char* windowTitle = "Patchouli";
 		uint32_t windowWidth = 1280;
 		uint32_t windowHeight = 720;
 
@@ -28,7 +28,7 @@ namespace Patchouli
 		Window() = default;
 		virtual ~Window() = default;
 
-		virtual const std::string& getTitle() const = 0;
+		virtual const char* getTitle() const = 0;
 		virtual uint32_t getWidth() const = 0;
 		virtual uint32_t getHeight() const = 0;
 

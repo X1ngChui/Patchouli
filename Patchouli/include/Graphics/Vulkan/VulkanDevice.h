@@ -26,20 +26,11 @@ namespace Patchouli
         // Retrieves device features.
         virtual GraphicsDeviceFeatures getFeatures() const override;
 
-        // Private member function to retrieve required Vulkan device extensions.
-        VulkanVector<const char*> getEnabledExtensions(const GraphicsContextCreateInfo& info) const;
-
-        // Private member function to retrieve required Vulkan device layers.
-        VulkanVector<const char*> getEnabledLayers() const;
-
-        // Private member function to retrieve required Vulkan device features.
-        VkPhysicalDeviceFeatures getEnabledFeatures() const;
-
         // Selects the Vulkan device and initializes its properties.
         void onSelect(Ref<VulkanAllocator> allocator, Ref<VulkanSurface> surface, const GraphicsContextCreateInfo& info);
 
         // Retrieves a list of Vulkan devices associated with a Vulkan instance.
-        static VulkanVector<Ref<GraphicsDevice>> getDevices(Ref<VulkanInstance> instance);
+        static std::vector<Ref<GraphicsDevice>> getDevices(Ref<VulkanInstance> instance);
 
         // Conversion operator to VkDevice.
         // It allows VulkanDevice objects to be implicitly converted to VkDevice.
@@ -65,6 +56,15 @@ namespace Patchouli
     private:
         // Initialize queue families based on the surface.
         void initQueueFamilies(Ref<VulkanSurface> surface);
+
+        // Private member function to retrieve required Vulkan device extensions.
+        std::vector<const char*> getEnabledExtensions(const GraphicsContextCreateInfo& info) const;
+
+        // Private member function to retrieve required Vulkan device layers.
+        std::vector<const char*> getEnabledLayers() const;
+
+        // Private member function to retrieve required Vulkan device features.
+        VkPhysicalDeviceFeatures getEnabledFeatures() const;
 
     private:
         VkPhysicalDevice vkPhysicalDevice; // Vulkan physical device

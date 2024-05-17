@@ -37,9 +37,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::KeyPressed; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override 
 		{
-			return fmt::format("KeyPressedEvent (Keycode: {}, Repeated: {})", keyCode, repeated);
+			auto result = fmt::format_to_n(buffer, size, "KeyPressedEvent (Keycode: {}, Repeated: {})", keyCode, repeated);
+			return result.size;
 		}
 
 	private:
@@ -61,9 +62,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::KeyReleased; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("KeyRelaesedEvent (Keycode: {})", keyCode);
+			auto result = fmt::format_to_n(buffer, size, "KeyRelaesedEvent (Keycode: {})", keyCode);
+			return result.size;
 		}
 	};
 
@@ -82,9 +84,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::KeyTyped; }
 
 		// Convert the event to a string representation
-		std::string toString() const override 
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("KeyTypedEvent (Char: {})", (char)keyCode);
+			auto result = fmt::format_to_n(buffer, size, "KeyTypedEvent (Char: {})", (char)keyCode);
+			return result.size;
 		}
 	};
 }

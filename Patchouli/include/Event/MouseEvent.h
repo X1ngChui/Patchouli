@@ -36,9 +36,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::MouseButtonPressed; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("MouseButtonPressedEvent (Button: {})", button);
+			auto result = fmt::format_to_n(buffer, size, "MouseButtonPressedEvent (Button: {})", button);
+			return result.size;
 		}
 	};
 
@@ -58,9 +59,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::MouseButtonReleased; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("MouseButtonReleaseEvent (Button: {})", button);
+			auto result = fmt::format_to_n(buffer, size, "MouseButtonReleaseEvent (Button: {})", button);
+			return result.size;
 		}
 	};
 	
@@ -83,9 +85,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::MouseMoved; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("MouseMovedEvent (Pos: ({}, {}))", posX, posY);
+			auto result = fmt::format_to_n(buffer, size, "MouseMovedEvent (Pos: ({}, {}))", posX, posY);
+			return result.size;
 		}
 
 	private:
@@ -111,9 +114,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::MouseScrolled; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("MouseScrolledEvent (Offset: ({}, {}))", offsetX, offsetY);
+			auto result = fmt::format_to_n(buffer, size, "MouseScrolledEvent (Offset: ({}, {}))", offsetX, offsetY);
+			return result.size;
 		}
 
 	private:

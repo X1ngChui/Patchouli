@@ -16,9 +16,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::WindowClose; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return "WindowCloseEvent";
+			auto result = fmt::format_to_n(buffer, size, "WindowCloseEvent");
+			return result.size;
 		}
 	};
 
@@ -40,9 +41,10 @@ namespace Patchouli
 		static constexpr EventType getStaticType() { return EventType::WindowResize; }
 
 		// Convert the event to a string representation
-		std::string toString() const override
+		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			return fmt::format("WindowResizeEvent (Size: ({}, {}))", windowWidth, windowHeight);
+			auto result = fmt::format_to_n(buffer, size, "WindowResizeEvent (Size: ({}, {}))", windowWidth, windowHeight);
+			return result.size;
 		}
 
 	private:

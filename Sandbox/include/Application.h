@@ -45,7 +45,7 @@ namespace Sandbox
             Patchouli::Ref<Patchouli::EventHandler<Patchouli::AppUpdateEvent>> onAppUpdate = nullptr;
 
             // Evnet handler for input event
-            Patchouli::Ref<Patchouli::EventHandler<PATCHOULI_EVENT_TOPIC_KEYBOARD, PATCHOULI_EVENT_TOPIC_MOUSE>> onInput = nullptr;
+            Patchouli::Ref<Patchouli::EventHandler<PATCHOULI_EVENT_TOPIC_INPUT>> onInput = nullptr;
         };
 
         EventHandlerGroup handlers; // Group of event handler

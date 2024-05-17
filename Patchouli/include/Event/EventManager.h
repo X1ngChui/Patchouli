@@ -17,7 +17,6 @@ namespace Patchouli
     {
     public:
         EventManager() = default;
-
         virtual ~EventManager() = default;
 
         EventManager(const EventManager&) = delete;

@@ -9,8 +9,8 @@ namespace Patchouli
 {
 	struct VulkanSubpassCreateInfo
 	{
-		VulkanVector<VkAttachmentReference> colorAttachmentRefs;
-		VulkanVector<VkAttachmentReference> inputAttachmentRefs;
+		std::vector<VkAttachmentReference> colorAttachmentRefs;
+		std::vector<VkAttachmentReference> inputAttachmentRefs;
 		VkAttachmentReference depthStencilAttachmentRef;
 	};
 
@@ -29,9 +29,9 @@ namespace Patchouli
 
 	struct VulkanRenderPassCreateInfo
 	{
-		VulkanVector<VulkanSubpass> subpasses;
-		VulkanVector<VkSubpassDependency> subpassDependencies;
-		VulkanVector<VkAttachmentDescription> attachmentDescriptions;
+		std::vector<VulkanSubpass> subpasses;
+		std::vector<VkSubpassDependency> subpassDependencies;
+		std::vector<VkAttachmentDescription> attachmentDescriptions;
 	};
 
 	class VulkanRenderPass : public PObject
