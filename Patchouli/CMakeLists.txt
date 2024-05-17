@@ -38,7 +38,7 @@ PRIVATE
 	${Vulkan_LIBRARIES}
 	glfw
 PUBLIC
-	mimalloc-static
+	mimalloc
 	spdlog_header_only
 	fmt-header-only
 )
