@@ -49,7 +49,5 @@ namespace Patchouli
 
 		GLFWwindow* window;
 		WindowAttribute attribute;
-
-		static inline bool glfwInitialized = false;
 	};
 }

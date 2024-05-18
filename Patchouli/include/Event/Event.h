@@ -82,7 +82,7 @@ struct fmt::formatter<Patchouli::Event, char> : fmt::formatter<std::string_view>
         std::array<char, PATCHOULI_EVENT_STRING_SIZE> string;
         std::size_t len = evt.toString(string.data(), string.size());
         std::string_view view(string.data(), len);
-        return fmt::format_to(ctx.out(), "{}", view);
+        return fmt::formatter<std::string_view>::format(view, ctx);
     }
 };
 

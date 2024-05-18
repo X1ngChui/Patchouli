@@ -1,12 +1,39 @@
-#include "Window/glfw/GLFWWindow.h"
 #include "Log/Console.h"
+#include "Window/glfw/GLFWWindow.h"
 #include "Event/ApplicationEvent.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/MouseEvent.h"
 #include "Event/WindowEvent.h"
+#include <mimalloc.h>
 
 namespace Patchouli
 {
+	class GLFWProxy
+	{
+	public:
+		GLFWProxy()
+		{
+			GLFWallocator allocator = {
+				.allocate = [](std::size_t size, void*) { return mi_malloc(size); },
+				.reallocate = [](void* block, std::size_t size, void*) { return mi_realloc(block, size); },
+				.deallocate = [](void* block, void*) { mi_free(block); },
+				.user = nullptr
+			};
+
+			glfwInitAllocator(&allocator);
+			auto status = glfwInit();
+			assert(status == GLFW_TRUE);
+		}
+
+		~GLFWProxy()
+		{
+			glfwTerminate();
+		}
+
+		GLFWProxy(const GLFWProxy&) = delete;
+		GLFWProxy& operator=(const GLFWProxy&) = delete;
+	};
+
 	GLFWWindow::GLFWWindow(const WindowCreateInfo& info)
 	{
 		attribute = {
@@ -17,18 +44,13 @@ namespace Patchouli
 
 		std::strncpy(attribute.title, info.windowTitle, PATCHOULI_WINDOW_TITLE_SIZE);
 
-		if (!glfwInitialized)
-		{
-			auto status = glfwInit();
-			assert(status == GLFW_TRUE);
-			glfwInitialized = true;
-		}
+		static GLFWProxy glfwProxy;
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 		window = glfwCreateWindow(attribute.width, attribute.height, attribute.title, nullptr, nullptr);
-		assert(window != NULL);
+		assert(window != nullptr);
 
 		glfwSetWindowUserPointer(window, &attribute);
 
