@@ -33,11 +33,6 @@ if (WIN32)
 	add_dependencies(Sandbox UpdateResources)
 endif()
 
-
-# Custom target for shared library loading on Windows
-include(${PROJECT_SOURCE_DIR}/cmakes/MimallocOverride.cmake)
-mimalloc_override(Sandbox)
-
 # Platform-specific settings
 if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
 	set_target_properties(Sandbox PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")

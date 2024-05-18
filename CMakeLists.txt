@@ -25,18 +25,18 @@ set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin/d
 if(MSVC)
     # MSVC compiler settings
     # Debug mode settings (with pdb, no optimization)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi")
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd /Zi")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Zi")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
     
     # Testing mode settings (with pdb, optimization enabled)
-    set(CMAKE_CXX_FLAGS_TESTING "${CMAKE_CXX_FLAGS_TESTING} /MD /Ox /Zi")
-    set(CMAKE_C_FLAGS_TESTING "${CMAKE_C_FLAGS_TESTING} /MD /Ox /Zi")
+    set(CMAKE_CXX_FLAGS_TESTING "${CMAKE_CXX_FLAGS_TESTING} /Ox /Zi")
+    set(CMAKE_C_FLAGS_TESTING "${CMAKE_C_FLAGS_TESTING} /Ox /Zi")
     set(CMAKE_EXE_LINKER_FLAGS_TESTING "${CMAKE_EXE_LINKER_FLAGS_TESTING} /INCREMENTAL:NO /OPT:REF /OPT:ICF /DEBUG")
 
     # Release mode settings (no pdb, optimization enabled)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /Ox")
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD /Ox")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
 else()
     # GNU or Clang compiler settings
@@ -53,17 +53,18 @@ else()
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast")
 endif()
 
-# Include custom fuctions
-include(cmakes/ThirdParty.cmake)
-include(cmakes/ConfigMacros.cmake)
+# Include custom functions
+include(${CMAKE_SOURCE_DIR}/cmakes/ThirdParty.cmake)
+include(${CMAKE_SOURCE_DIR}/cmakes/ConfigMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmakes/MimallocOverride.cmake)
+
+# Add third-party libraries
+add_third_party(mimalloc)
+add_third_party(fmt)
+add_third_party(spdlog)
+add_third_party(glfw)
+
 
 # Add subdirectory
 add_subdirectory(Patchouli)
 add_subdirectory(Sandbox)
-
-# Add third-party library
-add_third_party(mimalloc)
-set_target_properties(mimalloc PROPERTIES OUTPUT_NAME "mimalloc-override")
-add_third_party(fmt)
-add_third_party(spdlog)
-add_third_party(glfw)

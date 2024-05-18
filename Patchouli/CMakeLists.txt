@@ -43,9 +43,6 @@ PUBLIC
 	fmt-header-only
 )
 
-include(${PROJECT_SOURCE_DIR}/cmakes/MimallocOverride.cmake)
-mimalloc_override(Patchouli)
-
 # Specify the precompiled header file
 target_precompile_headers(Patchouli PUBLIC "pch/PatchouliPch.h")
 

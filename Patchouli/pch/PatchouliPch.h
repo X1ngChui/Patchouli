@@ -94,10 +94,10 @@ inline void operator delete[](void* ptr, std::size_t sz, std::align_val_t al) no
 inline void operator delete  (void* ptr, const std::nothrow_t& tag) noexcept { mi_free(ptr); }
 inline void operator delete[](void* ptr, const std::nothrow_t& tag) noexcept { mi_free(ptr); }
 
-void operator delete  (void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept {
+inline void operator delete  (void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept {
     mi_free_aligned(ptr, static_cast<std::size_t>(al));
 }
 
-void operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept {
+inline void operator delete[](void* ptr, std::align_val_t al, const std::nothrow_t& tag) noexcept {
     mi_free_aligned(ptr, static_cast<std::size_t>(al));
 }
