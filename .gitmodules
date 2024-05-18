@@ -4,9 +4,9 @@
 [submodule "third-party/spdlog"]
 	path = third-party/spdlog
 	url = https://github.com/X1ngChui/spdlog
-[submodule "third-party/glfw"]
-	path = third-party/glfw
-	url = https://github.com/X1ngChui/glfw.git
 [submodule "third-party/mimalloc"]
 	path = third-party/mimalloc
 	url = https://github.com/X1ngChui/mimalloc.git
+[submodule "third-party/glfw"]
+	path = third-party/glfw
+	url = https://github.com/X1ngChui/glfw.git
