@@ -45,6 +45,7 @@ namespace Sandbox
             .windowTitle = "Patchouli",
             .windowWidth = 1280,
             .windowHeight = 720,
+            .flags = WindowResizable | WindowDecorated,
             .windowEventCallback = [this](Ref<Event> event) { manager.publish(event); }
         };
         window = Window::create(windowCreateInfo);

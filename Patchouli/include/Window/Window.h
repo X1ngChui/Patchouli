@@ -12,12 +12,20 @@ namespace Patchouli
 		GLFW        // GLFW windowing API
 	};
 
+	using WindowOptionFlags = uint32_t;
+	enum WindowOptionFlagBits : uint32_t
+	{
+		WindowResizable = 0x00000001,
+		WindowDecorated = 0x00000002
+	};
+
 	struct WindowCreateInfo
 	{
 		WindowAPI windowAPI = WindowAPI::GLFW;
 		const char* windowTitle = "Patchouli";
 		uint32_t windowWidth = 1280;
 		uint32_t windowHeight = 720;
+		WindowOptionFlags flags = 0;
 
 		EventCallback windowEventCallback;
 	};

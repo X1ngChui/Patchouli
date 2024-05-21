@@ -11,18 +11,120 @@ namespace Patchouli
 	class GLFWProxy
 	{
 	public:
+		GLFWProxy(const GLFWProxy&) = delete;
+		GLFWProxy& operator=(const GLFWProxy&) = delete;
+
+		static GLFWProxy& getInstance()
+		{
+			static GLFWProxy proxy;
+			return proxy;
+		}
+
+		GLFWwindow* createWindow(const WindowCreateInfo& info)
+		{
+			// Set window hints
+			glfwWindowHint(GLFW_RESIZABLE, test(info.flags, WindowResizable));
+			glfwWindowHint(GLFW_DECORATED, test(info.flags, WindowDecorated));
+
+			GLFWwindow* window = glfwCreateWindow(info.windowWidth, info.windowHeight, info.windowTitle, nullptr, nullptr);
+			assert(window != nullptr);
+			return window;
+		}
+
+		void destroyWindow(GLFWwindow* window)
+		{
+			glfwDestroyWindow(window);
+		}
+
+		void showWindow(GLFWwindow* window)
+		{
+			glfwShowWindow(window);
+		}
+
+		void hideWindow(GLFWwindow* window)
+		{
+			glfwHideWindow(window);
+		}
+
+		void pollEvents()
+		{
+			glfwPollEvents();
+		}
+
+		void setWindowUserData(GLFWwindow* window, void* data)
+		{
+			glfwSetWindowUserPointer(window, data);
+		}
+
+		void* getWindowUserData(GLFWwindow* window)
+		{
+			return glfwGetWindowUserPointer(window);
+		}
+
+		void setWindowResizeCallback(GLFWwindow* window, GLFWwindowsizefun func)
+		{
+			glfwSetWindowSizeCallback(window, func);
+		}
+
+		void setWindowCloseCallback(GLFWwindow* window, GLFWwindowclosefun func)
+		{
+			glfwSetWindowCloseCallback(window, func);
+		}
+
+		void setKeyCallback(GLFWwindow* window, GLFWkeyfun func)
+		{
+			glfwSetKeyCallback(window, func);
+		}
+
+		void setCharCallback(GLFWwindow* window, GLFWcharfun func)
+		{
+			glfwSetCharCallback(window, func);
+		}
+
+		void setMouseButtonCallback(GLFWwindow* window, GLFWmousebuttonfun func)
+		{
+			glfwSetMouseButtonCallback(window, func);
+		}
+
+		void setScrollCallback(GLFWwindow* window, GLFWscrollfun func)
+		{
+			glfwSetScrollCallback(window, func);
+		}
+
+		void setCursorPosCallback(GLFWwindow* winodw, GLFWcursorposfun func)
+		{
+			glfwSetCursorPosCallback(winodw, func);
+		}
+	private:
 		GLFWProxy()
 		{
-			GLFWallocator allocator = {
+			// Set allocator for glfw
+			constexpr GLFWallocator allocator = {
 				.allocate = [](std::size_t size, void*) { return mi_malloc(size); },
 				.reallocate = [](void* block, std::size_t size, void*) { return mi_realloc(block, size); },
 				.deallocate = [](void* block, void*) { mi_free(block); },
 				.user = nullptr
 			};
-
 			glfwInitAllocator(&allocator);
+
+			// Initialize glfw
 			auto status = glfwInit();
 			assert(status == GLFW_TRUE);
+
+			// Set glfw error output
+			glfwSetErrorCallback([](int error_code, const char* description)
+				{
+					Console::coreError("glfwError({}): {}", error_code, description);
+				}
+			);
+
+			// Set default window options
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+			glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+			glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+			glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+			glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
 		}
 
 		~GLFWProxy()
@@ -30,53 +132,46 @@ namespace Patchouli
 			glfwTerminate();
 		}
 
-		GLFWProxy(const GLFWProxy&) = delete;
-		GLFWProxy& operator=(const GLFWProxy&) = delete;
+		inline int test(WindowOptionFlags flags, WindowOptionFlagBits bit)
+		{
+			return (flags & bit) ? GL_TRUE : GL_FALSE;
+		}
 	};
 
 	GLFWWindow::GLFWWindow(const WindowCreateInfo& info)
-	{
-		attribute = {
+		: attribute({
 			.width = info.windowWidth,
 			.height = info.windowHeight,
 			.eventCallback = info.windowEventCallback
-		};
-
+			})
+	{
 		std::strncpy(attribute.title, info.windowTitle, PATCHOULI_WINDOW_TITLE_SIZE);
+		
+		auto& glfwProxy = GLFWProxy::getInstance();
+		window = glfwProxy.createWindow(info);
 
-		static GLFWProxy glfwProxy;
-
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
-		window = glfwCreateWindow(attribute.width, attribute.height, attribute.title, nullptr, nullptr);
-		assert(window != nullptr);
-
-		glfwSetWindowUserPointer(window, &attribute);
+		glfwProxy.setWindowUserData(window, &attribute);
 
 		// Set glfw callbacks
-		glfwSetErrorCallback([](int error_code, const char* description)
+		glfwProxy.setWindowResizeCallback(window, [](GLFWwindow* window, int width, int height)
 			{
-				Console::coreError("glfwError({}): {}", error_code, description);
-			});
-
-		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
-			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->width = width;
 				attrib->height = height;
 				attrib->eventCallback(makeRef<WindowResizeEvent>(width, height));
-			});
+			}
+		);
 
-		glfwSetWindowCloseCallback(window, [](GLFWwindow* window)
+		glfwProxy.setWindowCloseCallback(window, [](GLFWwindow* window)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->eventCallback(makeRef<WindowCloseEvent>());
-			});
+			}
+		);
 
-		glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwProxy.setKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 
 				switch (action) 
 				{
@@ -92,15 +187,15 @@ namespace Patchouli
 				}
 			});
 
-		glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int character)
+		glfwProxy.setCharCallback(window, [](GLFWwindow* window, unsigned int character)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->eventCallback(makeRef<KeyTypedEvent>(character));
 			});
 
-		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
+		glfwProxy.setMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 
 				switch (action)
 				{
@@ -113,36 +208,36 @@ namespace Patchouli
 				}
 			});
 
-		glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)
+		glfwProxy.setScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->eventCallback(makeRef<MouseScrolledEvent>((float)xoffset, (float)yoffset));
 			});
 
-		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
+		glfwProxy.setCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
 			{
-				WindowAttribute* attrib = (WindowAttribute*)glfwGetWindowUserPointer(window);
+				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->eventCallback(makeRef<MouseMovedEvent>((float)xpos, (float)ypos));
 			});
 	}
 
 	GLFWWindow::~GLFWWindow()
 	{
-		glfwDestroyWindow(this->window);
+		GLFWProxy::getInstance().destroyWindow(window);
 	}
 
 	void GLFWWindow::show()
 	{
-		glfwShowWindow(this->window);
+		GLFWProxy::getInstance().showWindow(window);
 	}
 
 	void GLFWWindow::hide()
 	{
-		glfwHideWindow(this->window);
+		GLFWProxy::getInstance().hideWindow(window);
 	}
 
 	void GLFWWindow::onUpdate()
 	{
-		glfwPollEvents();
+		GLFWProxy::getInstance().pollEvents();
 	}
 }
