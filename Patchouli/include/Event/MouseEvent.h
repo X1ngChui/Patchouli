@@ -21,7 +21,7 @@ namespace Patchouli
 	};
 
 
-	class PATCHOULI_API MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -98,15 +98,21 @@ namespace Patchouli
 	class PATCHOULI_API MouseScrolledEvent : public Event
 	{
 	public:
-		MouseScrolledEvent(float offsetX, float offsetY)
-			: offsetX(offsetX), offsetY(offsetY)
+		MouseScrolledEvent(glm::vec2 pos)
+			: pos(pos)
 		{
 		}
+
+		MouseScrolledEvent(float offsetX, float offsetY)
+			: pos({ offsetX, offsetY })
+		{
+		}
+
 		virtual ~MouseScrolledEvent() = default;
 
-		float getOffsetX() const { return offsetX; }
-		float getOffsetY() const { return offsetY; }
-		std::pair<float, float> getOffset() const { return { offsetX, offsetY }; }
+		float getOffsetX() const { return pos.x; }
+		float getOffsetY() const { return pos.y; }
+		glm::vec2 getOffset() const { return pos; }
 
 		// Get the type identifier of the event
 		virtual EventType getType() const override { return EventType::MouseScrolled; }
@@ -116,11 +122,11 @@ namespace Patchouli
 		// Convert the event to a string representation
 		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			auto result = fmt::format_to_n(buffer, size, "MouseScrolledEvent (Offset: ({}, {}))", offsetX, offsetY);
+			auto result = fmt::format_to_n(buffer, size, "MouseScrolledEvent (Offset: ({}, {}))", pos.x, pos.y);
 			return result.size;
 		}
 
 	private:
-		float offsetX, offsetY;
+		glm::vec2 pos;
 	};
 }

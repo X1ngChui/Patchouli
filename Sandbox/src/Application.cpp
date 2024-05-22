@@ -43,8 +43,7 @@ namespace Sandbox
         WindowCreateInfo windowCreateInfo = {
             .windowAPI = WindowAPI::GLFW,
             .windowTitle = "Patchouli",
-            .windowWidth = 1280,
-            .windowHeight = 720,
+            .windowSize = { 1280, 720 },
             .flags = WindowResizable | WindowDecorated,
             .windowEventCallback = [this](Ref<Event> event) { manager.publish(event); }
         };

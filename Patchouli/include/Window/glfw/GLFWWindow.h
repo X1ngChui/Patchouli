@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Window/Window.h"
-#include <GLFW/glfw3.h>
-#undef APIENTRY
+#include "Window/glfw/GLFWProxy.h"
 
 #define PATCHOULI_WINDOW_TITLE_SIZE 256
 
@@ -15,8 +14,9 @@ namespace Patchouli
 		virtual ~GLFWWindow();
 		
 		virtual const char* getTitle() const override { return attribute.title; }
-		virtual uint32_t getWidth() const override { return attribute.width; }
-		virtual uint32_t getHeight() const override { return attribute.height; }
+		virtual glm::vec2 getSize() const override { return attribute.size; }
+		virtual uint32_t getWidth() const override { return attribute.size.x; }
+		virtual uint32_t getHeight() const override { return attribute.size.y; }
 
 		virtual void show() override;
 		virtual void hide() override;
@@ -41,8 +41,7 @@ namespace Patchouli
 		struct WindowAttribute
 		{
 			char title[PATCHOULI_WINDOW_TITLE_SIZE];
-			uint32_t width;
-			uint32_t height;
+			glm::vec2 size;
 
 			EventCallback eventCallback;
 		};

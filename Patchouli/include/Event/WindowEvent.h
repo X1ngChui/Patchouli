@@ -26,14 +26,20 @@ namespace Patchouli
 	class PATCHOULI_API WindowResizeEvent final : public Event
 	{
 	public:
+		WindowResizeEvent(glm::uvec2 size)
+			: size(size)
+		{
+		}
+
 		WindowResizeEvent(unsigned int width, unsigned int height)
-			: windowWidth(width), windowHeight(height)
+			: size({ width, height })
 		{
 		}
 		virtual ~WindowResizeEvent() = default;
 		
-		unsigned int getWidth() const { return windowWidth; }
-		unsigned int getHeight() const { return windowHeight; }
+		glm::uvec2 getSize() const { return size; }
+		unsigned int getWidth() const { return size.x; }
+		unsigned int getHeight() const { return size.y; }
 
 		// Get the type identifier of the event
 		virtual EventType getType() const override { return EventType::WindowResize; }
@@ -43,12 +49,13 @@ namespace Patchouli
 		// Convert the event to a string representation
 		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
-			auto result = fmt::format_to_n(buffer, size, "WindowResizeEvent (Size: ({}, {}))", windowWidth, windowHeight);
+			auto result = fmt::format_to_n(buffer, size, "WindowResizeEvent (Size: ({}, {}))", 
+				this->size.x, this->size.y);
 			return result.size;
 		}
 
 	private:
-		unsigned int windowWidth, windowHeight;
+		glm::uvec2 size;
 	};
 }
 

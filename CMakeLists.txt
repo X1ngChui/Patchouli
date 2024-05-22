@@ -63,7 +63,7 @@ add_third_party(mimalloc)
 add_third_party(fmt)
 add_third_party(spdlog)
 add_third_party(glfw)
-
+add_third_party(glm)
 
 # Add subdirectory
 add_subdirectory(Patchouli)

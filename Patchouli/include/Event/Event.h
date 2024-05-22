@@ -4,6 +4,7 @@
 #include "Core/PObject.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
+#include <glm/glm.hpp>
 
 #define PATCHOULI_EVENT_STRING_SIZE 128
 

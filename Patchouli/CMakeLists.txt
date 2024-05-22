@@ -41,6 +41,7 @@ PUBLIC
 	mimalloc
 	spdlog_header_only
 	fmt-header-only
+	glm-header-only
 )
 
 # Specify the precompiled header file
