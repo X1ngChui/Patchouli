@@ -4,7 +4,6 @@
 #include "Core/PObject.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
-#include <glm/glm.hpp>
 
 #define PATCHOULI_EVENT_STRING_SIZE 128
 
@@ -41,7 +40,7 @@ namespace Patchouli
     };
 
     // Abstract base class for events
-    class PATCHOULI_API Event : public PObject
+    class PATCHOULI_API Event
     {
     public:
         Event() = default;
@@ -54,6 +53,12 @@ namespace Patchouli
 
         // Convert the event to a string representation
         virtual std::size_t toString(char* buffer, std::size_t size) const = 0;
+
+        bool isHandled() const { return handled; }
+
+    private:
+        friend class EventDispatcher;
+        mutable bool handled = false;
     };
 
     /*
@@ -70,7 +75,36 @@ namespace Patchouli
     };
 
     // Type alias for event callback function
-    using EventCallback = std::function<void(Ref<Event>)>;
+    using EventCallback = std::function<void(const Event&)>;
+
+    class EventDispatcher
+    {
+    public:
+        EventDispatcher(const Event& event)
+            : event(event)
+        {
+        }
+        
+        ~EventDispatcher() = default;
+
+        template <TypeEvent E>
+        using EventFn = std::function<bool(const E&)>;
+
+        template <TypeEvent E>
+        bool dispatch(EventFn<E> func)
+        {
+            if (event.handled)
+                return true;
+
+            if (event.getType() == E::getStaticType())
+                return event.handled |= func(static_cast<const E&>(event));
+
+            return false;
+        }
+
+    private:
+        const Event& event;
+    };
 }
 
 // Specialization of the formatter for Event types in fmt library

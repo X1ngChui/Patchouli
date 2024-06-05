@@ -19,33 +19,13 @@ namespace Sandbox
         Console::info("Hello Patchouli!");
 #endif
 
-        // Set up event handlers
-        handlers.onWindowClose = makeRef<EventHandler<WindowCloseEvent>>(
-            [this](Ref<Event> event) {
-                manager.publish<TerminationEvent>();
-            } // Event handler for window close event
-        );
-
-        handlers.onAppUpdate = makeRef<EventHandler<AppUpdateEvent>>(
-            [this](Ref<Event> event) { this->onUpdate(); }
-        ); // Event handler for application update event
-
-        handlers.onInput = makeRef<EventHandler<PATCHOULI_EVENT_TOPIC_INPUT>>(
-            [](Ref<Event> event) { Console::info(*event); }
-        );
-
-        // Add event handlers to the manager
-        manager.addHandler(handlers.onWindowClose)
-            .addHandler(handlers.onAppUpdate)
-            .addHandler(handlers.onInput);
-
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
             .windowAPI = WindowAPI::GLFW,
             .windowTitle = "Patchouli",
             .windowSize = { 1280, 720 },
             .flags = WindowResizable | WindowDecorated,
-            .windowEventCallback = [this](Ref<Event> event) { manager.publish(event); }
+            .windowEventCallback = [this](const Event& event) { onEvent(event); }
         };
         window = Window::create(windowCreateInfo);
 
@@ -68,10 +48,6 @@ namespace Sandbox
     // Destructor
     Application::~Application()
     {
-        // Remove event handlers from the manager
-        manager.removeHandler(handlers.onWindowClose)
-            .removeHandler(handlers.onAppUpdate)
-            .removeHandler(handlers.onInput);
     }
 
     // Method called when the application is updated
@@ -84,15 +60,26 @@ namespace Sandbox
         lastUpdateTime = currentTime;
 
         window->onUpdate();
-        manager.publish<AppUpdateEvent>();
+    }
+
+    void Application::onEvent(const Event& event)
+    {
+        EventDispatcher dispatcher(event);
+        dispatcher.dispatch<WindowCloseEvent>([this](const WindowCloseEvent& e) -> bool
+            {
+                running = false;
+                return true;
+            }
+        );
     }
 
     // Method to start the application
     void Application::run()
     {
+        running = true;
         window->show(); // Show the window
-        manager.publish<AppUpdateEvent>(); // Publish an application update event
-        manager.run(); // Run the event manager
+        while (running)
+            onUpdate();
     }
 
     // Method to get the instance of the application (singleton pattern)

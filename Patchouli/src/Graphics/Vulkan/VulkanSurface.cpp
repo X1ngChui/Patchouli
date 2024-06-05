@@ -1,4 +1,5 @@
 #include "Graphics/Vulkan/VulkanSurface.h"
+#include <Window/glfw/GLFWWindow.h>
 #include <GLFW/glfw3.h>
 
 namespace Patchouli
@@ -12,7 +13,7 @@ namespace Patchouli
 			vkSurface = VK_NULL_HANDLE;
 			break;
 		case WindowAPI::GLFW:
-			VkResult status = glfwCreateWindowSurface(*instance, *(GLFWwindow**)window->getNative(), *allocator, &vkSurface);
+			VkResult status = glfwCreateWindowSurface(*instance, *(GLFWWindow::NativeData)window->getNativeData(), *allocator, &vkSurface);
 			assert(status == VK_SUCCESS);
 			break;
 		}

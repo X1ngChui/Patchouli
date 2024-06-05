@@ -1,5 +1,4 @@
 #include "Log/Console.h"
-#include "Event/ApplicationEvent.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/MouseEvent.h"
 #include "Event/WindowEvent.h"
@@ -16,7 +15,7 @@ namespace Patchouli
 			}
 		)
 	{
-		std::strncpy(attribute.title, info.windowTitle, PATCHOULI_WINDOW_TITLE_SIZE);
+		std::strncpy(attribute.title, info.windowTitle, windowTitleSize);
 		
 		window = GLFWProxy::getInstance().createWindow(info);
 		GLFWProxy::getInstance().setWindowUserData(window, &attribute);
@@ -26,14 +25,14 @@ namespace Patchouli
 			.closeCallback = [](GLFWwindow* window)
 			{
 				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
-				attrib->eventCallback(makeRef<WindowCloseEvent>());
+				attrib->eventCallback(WindowCloseEvent());
 			},
 
 			.resizeCallback = [](GLFWwindow* window, int width, int height)
 			{
 				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
 				attrib->size = { width, height };
-				attrib->eventCallback(makeRef<WindowResizeEvent>(width, height));
+				attrib->eventCallback(WindowResizeEvent(width, height));
 			},
 
 			.keyCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -43,13 +42,13 @@ namespace Patchouli
 				switch (action)
 				{
 				case GLFW_PRESS:
-					attrib->eventCallback(makeRef<KeyPressedEvent>(key, false));
+					attrib->eventCallback(KeyPressedEvent(key, false));
 					break;
 				case GLFW_REPEAT:
-					attrib->eventCallback(makeRef<KeyPressedEvent>(key, true));
+					attrib->eventCallback(KeyPressedEvent(key, true));
 					break;
 				case GLFW_RELEASE:
-					attrib->eventCallback(makeRef<KeyReleasedEvent>(key));
+					attrib->eventCallback(KeyReleasedEvent(key));
 					break;
 				}
 			},
@@ -57,7 +56,7 @@ namespace Patchouli
 			.charCallback = [](GLFWwindow* window, unsigned int character)
 			{
 				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
-				attrib->eventCallback(makeRef<KeyTypedEvent>(character));
+				attrib->eventCallback(KeyTypedEvent(character));
 			},
 
 			.mouseButtonCallback = [](GLFWwindow* window, int button, int action, int mods)
@@ -67,10 +66,10 @@ namespace Patchouli
 				switch (action)
 				{
 				case GLFW_PRESS:
-					attrib->eventCallback(makeRef<MouseButtonPressedEvent>(button));
+					attrib->eventCallback(MouseButtonPressedEvent(button));
 					break;
 				case GLFW_RELEASE:
-					attrib->eventCallback(makeRef<MouseButtonReleasedEvent>(button));
+					attrib->eventCallback(MouseButtonReleasedEvent(button));
 					break;
 				}
 			},
@@ -78,13 +77,13 @@ namespace Patchouli
 			.scrollCallback = [](GLFWwindow* window, double xoffset, double yoffset)
 			{
 				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
-				attrib->eventCallback(makeRef<MouseScrolledEvent>((float)xoffset, (float)yoffset));
+				attrib->eventCallback(MouseScrolledEvent((float)xoffset, (float)yoffset));
 			},
 
 			.cursorPosCallback = [](GLFWwindow* window, double xpos, double ypos)
 			{
 				auto attrib = (WindowAttribute*)GLFWProxy::getInstance().getWindowUserData(window);
-				attrib->eventCallback(makeRef<MouseMovedEvent>((float)xpos, (float)ypos));
+				attrib->eventCallback(MouseMovedEvent((float)xpos, (float)ypos));
 			}
 		};
 

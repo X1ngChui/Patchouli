@@ -121,7 +121,7 @@ namespace Patchouli
 		{
 		case WindowAPI::GLFW:
 			int width = 0, height = 0;
-			glfwGetFramebufferSize(*(GLFWwindow**)info.window->getNative(),
+			glfwGetFramebufferSize(*(GLFWwindow**)info.window->getNativeData(),
 				&width, &height);
 			extent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 		}

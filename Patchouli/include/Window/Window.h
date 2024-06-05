@@ -2,7 +2,6 @@
 #include "Core/PObject.h"
 #include "Event/Event.h"
 #include "Util/Reference.h"
-#include <glm/glm.hpp>
 
 namespace Patchouli
 {
@@ -24,7 +23,7 @@ namespace Patchouli
 	{
 		WindowAPI windowAPI = WindowAPI::GLFW;
 		const char* windowTitle = "Patchouli";
-		glm::uvec2 windowSize = { 1280, 720 };
+		std::pair<uint32_t, uint32_t> windowSize = { 1280, 720 };
 		WindowOptionFlags flags = 0;
 
 		EventCallback windowEventCallback;
@@ -37,7 +36,7 @@ namespace Patchouli
 		virtual ~Window() = default;
 
 		virtual const char* getTitle() const = 0;
-		virtual glm::vec2 getSize() const = 0;
+		virtual std::pair<uint32_t, uint32_t> getSize() const = 0;
 		virtual uint32_t getWidth() const = 0;
 		virtual uint32_t getHeight() const = 0;
 
@@ -45,11 +44,11 @@ namespace Patchouli
 		virtual void hide() = 0;
 
 		virtual void setEventCallback(const EventCallback& eventCallback) = 0;
-		virtual void setEventCallback(const EventCallback&& eventCallback) = 0;
+		virtual void setEventCallback(EventCallback&& eventCallback) = 0;
 
 		virtual void onUpdate() = 0;
 
-		virtual void* getNative() const = 0;
+		virtual void* getNativeData() const = 0;
 		virtual WindowAPI getAPI() const = 0;
 
 		static Ref<Window> create(const WindowCreateInfo& info);

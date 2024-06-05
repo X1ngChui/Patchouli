@@ -52,7 +52,8 @@ namespace Patchouli
         glfwWindowHint(GLFW_RESIZABLE, test(info.flags, WindowResizable));
         glfwWindowHint(GLFW_DECORATED, test(info.flags, WindowDecorated));
 
-        GLFWwindow* window = glfwCreateWindow(info.windowSize.x, info.windowSize.y, info.windowTitle, nullptr, nullptr);
+        GLFWwindow* window = glfwCreateWindow(info.windowSize.first, info.windowSize.second,
+            info.windowTitle, nullptr, nullptr);
         assert(window != nullptr);
         return window;
     }

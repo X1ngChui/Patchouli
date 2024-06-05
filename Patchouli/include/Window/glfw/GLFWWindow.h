@@ -3,10 +3,10 @@
 #include "Window/Window.h"
 #include "Window/glfw/GLFWProxy.h"
 
-#define PATCHOULI_WINDOW_TITLE_SIZE 256
-
 namespace Patchouli
 {
+	constexpr std::size_t windowTitleSize = 256;
+
 	class GLFWWindow : public Window
 	{
 	public:
@@ -14,9 +14,9 @@ namespace Patchouli
 		virtual ~GLFWWindow();
 		
 		virtual const char* getTitle() const override { return attribute.title; }
-		virtual glm::vec2 getSize() const override { return attribute.size; }
-		virtual uint32_t getWidth() const override { return attribute.size.x; }
-		virtual uint32_t getHeight() const override { return attribute.size.y; }
+		virtual std::pair<uint32_t, uint32_t> getSize() const override { return attribute.size; }
+		virtual uint32_t getWidth() const override { return attribute.size.first; }
+		virtual uint32_t getHeight() const override { return attribute.size.second; }
 
 		virtual void show() override;
 		virtual void hide() override;
@@ -26,22 +26,23 @@ namespace Patchouli
 			attribute.eventCallback = eventCallback;
 		}
 
-		virtual void setEventCallback(const EventCallback&& eventCallback) override
+		virtual void setEventCallback(EventCallback&& eventCallback) override
 		{
-			attribute.eventCallback = eventCallback;
+			attribute.eventCallback = std::move(eventCallback);
 		}
 
 		virtual void onUpdate() override;
 
-		virtual void* getNative() const override { return (void*)(&window); };
+		using NativeData = GLFWwindow**;
+		virtual void* getNativeData() const override { return (void*)(&window); };
 
 		virtual WindowAPI getAPI() const override { return WindowAPI::GLFW; }
 
 	private:
 		struct WindowAttribute
 		{
-			char title[PATCHOULI_WINDOW_TITLE_SIZE];
-			glm::vec2 size;
+			char title[windowTitleSize];
+			std::pair<uint32_t, uint32_t> size;
 
 			EventCallback eventCallback;
 		};

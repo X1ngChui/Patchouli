@@ -15,6 +15,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
+#include <variant>
 #include <algorithm>
 #include <functional>
 #include <thread>

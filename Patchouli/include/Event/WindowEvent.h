@@ -26,7 +26,7 @@ namespace Patchouli
 	class PATCHOULI_API WindowResizeEvent final : public Event
 	{
 	public:
-		WindowResizeEvent(glm::uvec2 size)
+		WindowResizeEvent(std::pair<unsigned int, unsigned int>)
 			: size(size)
 		{
 		}
@@ -37,9 +37,9 @@ namespace Patchouli
 		}
 		virtual ~WindowResizeEvent() = default;
 		
-		glm::uvec2 getSize() const { return size; }
-		unsigned int getWidth() const { return size.x; }
-		unsigned int getHeight() const { return size.y; }
+		std::pair<unsigned int, unsigned int> getSize() const { return size; }
+		unsigned int getWidth() const { return size.first; }
+		unsigned int getHeight() const { return size.second; }
 
 		// Get the type identifier of the event
 		virtual EventType getType() const override { return EventType::WindowResize; }
@@ -50,12 +50,12 @@ namespace Patchouli
 		virtual std::size_t toString(char* buffer, std::size_t size) const override
 		{
 			auto result = fmt::format_to_n(buffer, size, "WindowResizeEvent (Size: ({}, {}))", 
-				this->size.x, this->size.y);
+				this->size.first, this->size.second);
 			return result.size;
 		}
 
 	private:
-		glm::uvec2 size;
+		std::pair<unsigned int, unsigned int> size;
 	};
 }
 
