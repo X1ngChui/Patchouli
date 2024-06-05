@@ -21,7 +21,7 @@ namespace Patchouli
 	};
 
 
-	class MouseButtonPressedEvent : public MouseButtonEvent
+	class PATCHOULI_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)

@@ -26,7 +26,7 @@ namespace Patchouli
 	class PATCHOULI_API WindowResizeEvent final : public Event
 	{
 	public:
-		WindowResizeEvent(std::pair<unsigned int, unsigned int>)
+		WindowResizeEvent(std::pair<unsigned int, unsigned int> size)
 			: size(size)
 		{
 		}

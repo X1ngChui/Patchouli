@@ -22,6 +22,8 @@
 #include <iterator>
 #include <compare>
 #include <ranges>
+#include <system_error>
+#include <stdexcept>
 
 // Standard C Library Headers
 #include <cstdint>
