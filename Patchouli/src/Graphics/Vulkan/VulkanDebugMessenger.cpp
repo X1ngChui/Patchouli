@@ -21,7 +21,7 @@ namespace Patchouli
         };
 
         // Retrieve function pointer for vkCreateDebugUtilsMessengerEXT
-        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, PATCHOULI_VULKAN_CREATE_DEBUG_UTILS_MESSENGER);
+        auto createDebugMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, CREATE_DEBUG_UTILS_MESSENGER);
 
         assert(createDebugMessenger != nullptr);
 
@@ -37,7 +37,7 @@ namespace Patchouli
     VulkanDebugMessenger::~VulkanDebugMessenger()
     {
         // Retrieve function pointer for vkDestroyDebugUtilsMessengerEXT
-        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, PATCHOULI_VULKAN_DESTROY_DEBUG_UTILS_MESSENGER);
+        auto destroyDebugMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*instance, DESTROY_DEBUG_UTILS_MESSENGER);
 
         // Assert if function pointer retrieval fails
         assert(destroyDebugMessenger != nullptr);

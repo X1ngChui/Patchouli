@@ -5,10 +5,10 @@
 #include "Util/Reference.h"
 #include <fmt/format.h>
 
-#define PATCHOULI_EVENT_STRING_SIZE 128
-
 namespace Patchouli
 {
+    constexpr std::size_t EVENT_STRING_SIZE = 128;
+
     // Type alias for event type identifier
     using EventID = uint64_t;
 
@@ -114,7 +114,7 @@ struct fmt::formatter<Patchouli::Event, char> : fmt::formatter<std::string_view>
     template <typename FormatCtx>
     auto format(const Patchouli::Event& evt, FormatCtx& ctx) const
     {
-        std::array<char, PATCHOULI_EVENT_STRING_SIZE> string;
+        std::array<char, Patchouli::EVENT_STRING_SIZE> string;
         std::size_t len = evt.toString(string.data(), string.size());
         std::string_view view(string.data(), len);
         return fmt::formatter<std::string_view>::format(view, ctx);

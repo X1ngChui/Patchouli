@@ -5,7 +5,7 @@
 
 namespace Patchouli
 {
-	constexpr std::size_t windowTitleSize = 256;
+	constexpr std::size_t WINDOW_TITLE_SIZE = 256;
 
 	class GLFWWindow : public Window
 	{
@@ -41,7 +41,7 @@ namespace Patchouli
 	private:
 		struct WindowAttribute
 		{
-			char title[windowTitleSize];
+			char title[WINDOW_TITLE_SIZE];
 			std::pair<uint32_t, uint32_t> size;
 
 			EventCallback eventCallback;

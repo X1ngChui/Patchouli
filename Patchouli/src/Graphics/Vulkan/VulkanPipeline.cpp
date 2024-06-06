@@ -1,7 +1,5 @@
 #include "Graphics/Vulkan/VulkanPipeline.h"
 
-#define PATCHOULI_VULKAN_SHADER_ENTRY "main"
-
 namespace Patchouli
 {
 	VulkanPipeline::VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
@@ -39,7 +37,7 @@ namespace Patchouli
 				.flags = 0,
 				.stage = shader->getShaderStage(),
 				.module = shader->getShaderModule(),
-				.pName = PATCHOULI_VULKAN_SHADER_ENTRY,
+				.pName = VULKAN_SHADER_ENTRY,
 				.pSpecializationInfo = nullptr
 			};
 			shaderStageCreateInfos.push_back(shaderStageCreateInfo);

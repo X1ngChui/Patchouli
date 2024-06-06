@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Base.h"
+#include "Core/PObject.h"
 
 #ifdef _WIN64
 #   include <Windows.h>
@@ -7,45 +8,43 @@
 
 namespace Patchouli
 {
-#ifdef _WIN64
-
     /**
-     * @brief A class for reading files in read-only mode.
+     * @brief A class for reading asset files in read-only mode.
      */
-    class PATCHOULI_API ReadOnlyFile final
+    class PATCHOULI_API AssetFile final
     {
     public:
         /**
-         * @brief Constructs a ReadOnlyFile object with the given file path.
+         * @brief Constructs a AssetFile object with the given file path.
          *
          * @param path The path to the file to be read.
          * @throws std::system_error if failed to open the file.
          */
-        explicit ReadOnlyFile(const std::filesystem::path& path);
+        explicit AssetFile(const std::filesystem::path& path);
 
         /**
          * @brief Destructor to release resources.
          */
-        ~ReadOnlyFile();
+        ~AssetFile();
 
         /**
          * @brief Move constructor.
          *
-         * @param other The other ReadOnlyFile object to be moved.
+         * @param other The other AssetFile object to be moved.
          */
-        ReadOnlyFile(ReadOnlyFile&& other) noexcept;
+        AssetFile(AssetFile&& other) noexcept;
 
         /**
          * @brief Move assignment operator.
          *
-         * @param other The other ReadOnlyFile object to be moved.
-         * @return Reference to this ReadOnlyFile object.
+         * @param other The other AssetFile object to be moved.
+         * @return Reference to this AssetFile object.
          */
-        ReadOnlyFile& operator=(ReadOnlyFile&& other) noexcept;
+        AssetFile& operator=(AssetFile&& other) noexcept;
 
         // Deleted copy constructor and assignment operator to prevent copying
-        ReadOnlyFile(const ReadOnlyFile&) = delete;
-        ReadOnlyFile& operator=(const ReadOnlyFile&) = delete;
+        AssetFile(const AssetFile&) = delete;
+        AssetFile& operator=(const AssetFile&) = delete;
 
         /**
          * @brief Gets the size of the file.
@@ -63,10 +62,11 @@ namespace Patchouli
         const std::byte* data();
 
     private:
+#ifdef _WIN64
         HANDLE file;          // File handle
         HANDLE fileMapping;   // File mapping handle
         std::size_t fsize;    // Size of the file
         std::byte* pdata;     // Pointer to the file data
-    };
 #endif
+    };
 }

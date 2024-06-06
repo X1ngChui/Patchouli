@@ -1,9 +1,9 @@
-#include "Util/File.h"
+#include "Util/AssetFile.h"
 
 namespace Patchouli
 {
 #ifdef _WIN64
-	ReadOnlyFile::ReadOnlyFile(const std::filesystem::path& path)
+	AssetFile::AssetFile(const std::filesystem::path& path)
 		: file(INVALID_HANDLE_VALUE), fileMapping(nullptr), fsize(INVALID_FILE_SIZE), pdata(nullptr)
 	{
 		// Open the file
@@ -15,7 +15,7 @@ namespace Patchouli
 		fsize = GetFileSize(file, nullptr);
 	}
 
-	ReadOnlyFile::~ReadOnlyFile()
+	AssetFile::~AssetFile()
 	{
 		// Unmap the file view
 		if (pdata != nullptr)
@@ -28,7 +28,7 @@ namespace Patchouli
 			CloseHandle(file);
 	}
 
-	ReadOnlyFile::ReadOnlyFile(ReadOnlyFile&& other) noexcept
+	AssetFile::AssetFile(AssetFile&& other) noexcept
 		: file(other.file), fileMapping(other.fileMapping), fsize(other.fsize), pdata(other.pdata)
 	{
 		// Invalidate the source object
@@ -38,7 +38,7 @@ namespace Patchouli
 		other.pdata = nullptr;
 	}
 
-	ReadOnlyFile& ReadOnlyFile::operator=(ReadOnlyFile&& other) noexcept
+	AssetFile& AssetFile::operator=(AssetFile&& other) noexcept
 	{
 		if (this != &other) 
 		{
@@ -65,7 +65,7 @@ namespace Patchouli
 		return *this;
 	}
 
-	const std::byte* ReadOnlyFile::data()
+	const std::byte* AssetFile::data()
 	{
 		if (pdata == nullptr)
 		{
@@ -79,6 +79,8 @@ namespace Patchouli
 			if (pdata == nullptr)
 				throw std::system_error(GetLastError(), std::system_category(), "Failed to map view of file");
 		}
+
+		assert(pdata != nullptr);
 		return pdata;
 	}
 

@@ -34,7 +34,7 @@ namespace Patchouli
         // Vulkan instance.
         Ref<VulkanInstance> instance = nullptr;
 
-#ifdef PATCHOULI_VULKAN_VALIDATION
+#ifdef VULKAN_VALIDATION_LAYER
         // Vulkan debug messenger (optional, enabled by preprocessor macro).
         Ref<VulkanDebugMessenger> debugMessenger = nullptr;
 #endif

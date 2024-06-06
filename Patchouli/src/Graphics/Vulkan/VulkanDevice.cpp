@@ -34,7 +34,7 @@ namespace Patchouli
             .deviceID = vkProperties.deviceID,
             .discreteGPU = (bool)(vkProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         };
-        std::strncpy(properties.name, vkProperties.deviceName, PATCHOULI_DEVICE_NAME_SIZE);
+        std::strncpy(properties.name, vkProperties.deviceName, DEVICE_NAME_SIZE);
 
         return properties;
     }
@@ -64,8 +64,8 @@ namespace Patchouli
     {
         std::vector<const char*> layers;
 
-#ifdef PATCHOULI_VULKAN_VALIDATION
-        layers.push_back(PATCHOULI_VULKAN_VALIDATION);
+#ifdef VULKAN_VALIDATION_LAYER
+        layers.push_back(VULKAN_VALIDATION_LAYER);
 #endif
 
         return layers;
@@ -84,7 +84,7 @@ namespace Patchouli
 
         // Get and determine queue families to be uesd
         initQueueFamilies(surface);
-        assert(queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE);
+        assert(queueFamilies.graphics != VULKAN_QUEUE_FAMILY_NONE);
 
         // Create queue create info array for device creation
         // Due to the possibility of different queues having the same index for various purposes,
@@ -97,7 +97,7 @@ namespace Patchouli
         static const float priority = 1.0f;
         for (uint32_t index : distinctIndices)
         {
-            if (index == PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+            if (index == VULKAN_QUEUE_FAMILY_NONE)
                 continue;
 
             VkDeviceQueueCreateInfo deviceQueueCreateInfo = {
@@ -136,9 +136,9 @@ namespace Patchouli
 
         // Retrieve queues for different queue families
         // Note: Now only graphis and present queues are used
-        if (queueFamilies.graphics != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+        if (queueFamilies.graphics != VULKAN_QUEUE_FAMILY_NONE)
             vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &vkGraphicsQueue);
-        if (queueFamilies.present != PATCHOULI_VULKAN_QUEUE_FAMILY_NONE)
+        if (queueFamilies.present != VULKAN_QUEUE_FAMILY_NONE)
             vkGetDeviceQueue(vkDevice, queueFamilies.present, 0, &vkPresentQueue);
     }
 

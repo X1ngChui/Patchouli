@@ -18,6 +18,9 @@
 
 namespace Patchouli
 {
+	constexpr const char* CORE_CONSOLE_NAME = ("Patchouli");
+	constexpr const char* CONSOLE_FORMAT = ("%^[%T][%n][%l] %v%$");
+
 	/*
 	 * @brief A utility class for logging messages using the spdlog library.
 	 */

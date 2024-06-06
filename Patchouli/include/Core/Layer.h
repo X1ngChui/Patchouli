@@ -19,7 +19,7 @@ namespace Patchouli
 		// Called every frame to update the layer.
 		virtual void onUpdate() {}
 		// Called to handle events for the layer.
-		virtual void onEvent(Event& evt) {}
+		virtual void onEvent(const Event& evt) {}
 
 		const char* getName() const { return name; }
 	private:

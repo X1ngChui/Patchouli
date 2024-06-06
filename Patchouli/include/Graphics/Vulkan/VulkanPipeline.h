@@ -9,6 +9,8 @@
 
 namespace Patchouli
 {
+	constexpr const char* VULKAN_SHADER_ENTRY = "main";
+
 	class VulkanPipeline : public PObject
 	{
 	public:

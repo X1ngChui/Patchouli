@@ -6,10 +6,10 @@
 #include "Graphics/Vulkan/VulkanSurface.h"
 #include <vulkan/vulkan.h>
 
-#define PATCHOULI_VULKAN_QUEUE_FAMILY_NONE (0xffffffff)
-
 namespace Patchouli
 {
+    constexpr std::size_t VULKAN_QUEUE_FAMILY_NONE = 0xffffffff;
+
     // Represents a Vulkan-compatible graphics device.
     class VulkanDevice : public GraphicsDevice
     {
@@ -43,11 +43,11 @@ namespace Patchouli
         // Structure to store queue families.
         struct VulkanQueueFamilies
         {
-            uint32_t graphics = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Index of the graphics queue family
-            uint32_t compute = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Index of the compute queue family
-            uint32_t transfer = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Index of the transfer queue family
-            uint32_t sparseBinding = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Index of the sparse binding queue family
-            uint32_t present = PATCHOULI_VULKAN_QUEUE_FAMILY_NONE; // Index of the present queue family
+            uint32_t graphics = VULKAN_QUEUE_FAMILY_NONE; // Index of the graphics queue family
+            uint32_t compute = VULKAN_QUEUE_FAMILY_NONE; // Index of the compute queue family
+            uint32_t transfer = VULKAN_QUEUE_FAMILY_NONE; // Index of the transfer queue family
+            uint32_t sparseBinding = VULKAN_QUEUE_FAMILY_NONE; // Index of the sparse binding queue family
+            uint32_t present = VULKAN_QUEUE_FAMILY_NONE; // Index of the present queue family
         };
 
         // Getter function for queue family indices.

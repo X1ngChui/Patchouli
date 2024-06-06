@@ -15,7 +15,7 @@ namespace Patchouli
 			}
 		)
 	{
-		std::strncpy(attribute.title, info.windowTitle, windowTitleSize);
+		std::strncpy(attribute.title, info.windowTitle, WINDOW_TITLE_SIZE);
 		
 		window = GLFWProxy::getInstance().createWindow(info);
 		GLFWProxy::getInstance().setWindowUserData(window, &attribute);

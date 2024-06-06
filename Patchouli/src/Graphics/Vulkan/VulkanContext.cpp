@@ -14,7 +14,7 @@ namespace Patchouli
         // Create Vulkan instance using the provided GraphicsInfo object and Vulkan allocator
         instance = makeRef<VulkanInstance>(allocator, graphicsContextInfo);
 
-#ifdef PATCHOULI_VULKAN_VALIDATION
+#ifdef VULKAN_VALIDATION_LAYER
         // Create Vulkan debug messenger for validation purposes, if enabled
         debugMessenger = makeRef<VulkanDebugMessenger>(instance, allocator);
 #endif

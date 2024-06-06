@@ -13,6 +13,7 @@
 #include "Event/WindowEvent.h"
 
 #include "Util/Reference.h"
+#include "Util/AssetFile.h"
 
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/GraphicsDevice.h"

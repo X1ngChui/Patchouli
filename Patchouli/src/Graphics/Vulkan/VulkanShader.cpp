@@ -1,5 +1,5 @@
 #include "Graphics/Vulkan/VulkanShader.h"
-#include "Util/File.h"
+#include "Util/AssetFile.h"
 
 namespace Patchouli
 {
@@ -7,14 +7,14 @@ namespace Patchouli
 		const std::filesystem::path& path, VkShaderStageFlagBits shaderStage)
 		: device(device), allocator(allocator), vkShaderStage(shaderStage)
 	{
-		ReadOnlyFile file(path);
+		AssetFile shaderFile(path);
 
 		VkShaderModuleCreateInfo shaderModuleInfo = {
 			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.codeSize = file.size(),
-			.pCode = (const uint32_t*)file.data()
+			.codeSize = shaderFile.size(),
+			.pCode = (const uint32_t*)shaderFile.data()
 		};
 
 		VkResult status = vkCreateShaderModule(*device, &shaderModuleInfo, *allocator, &vkShaderModule);
