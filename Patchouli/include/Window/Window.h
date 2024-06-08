@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/PObject.h"
+
 #include "Event/Event.h"
 #include "Util/Reference.h"
 
@@ -29,7 +29,7 @@ namespace Patchouli
 		EventCallback windowEventCallback;
 	};
 
-	class PATCHOULI_API Window : public PObject
+	class PATCHOULI_API Window : public RefBase<Window>
 	{
 	public:
 		Window() = default;

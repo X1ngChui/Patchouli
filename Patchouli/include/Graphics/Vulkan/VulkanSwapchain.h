@@ -8,7 +8,7 @@
 namespace Patchouli
 {
 	// Class representing a Vulkan Swapchain
-	class VulkanSwapchain : public PObject
+	class VulkanSwapchain : public RefBase<VulkanSwapchain>
 	{
 	public:
 		// Constructor to create a Vulkan Swapchain

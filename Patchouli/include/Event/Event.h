@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Core/PObject.h"
 #include "Util/Reference.h"
 #include <fmt/format.h>
 

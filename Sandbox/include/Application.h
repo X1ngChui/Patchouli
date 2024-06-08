@@ -11,7 +11,7 @@
 namespace Sandbox
 {
     // Class representing the application
-    class Application : public Patchouli::PObject
+    class Application : public Patchouli::RefBase<Application>
     {
     public:
         // Constructor
@@ -28,7 +28,7 @@ namespace Sandbox
         void run();
 
         // Method to get the instance of the application (singleton pattern)
-        static Patchouli::Ref<Application> getInstance();
+        static Patchouli::BorRef<Application> getInstance();
 
     private:
         // Method called when the application is updated

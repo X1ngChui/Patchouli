@@ -1,16 +1,17 @@
 #pragma once
-#include "Core/PObject.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
 {
-	class VulkanCommandPool : public PObject
+	class VulkanCommandPool : public RefBase<VulkanCommandPool>
 	{
 	public:
 		VulkanCommandPool(Ref<VulkanDevice> device, VkCommandPoolCreateFlags flag, Ref<VulkanAllocator> allocator);
 		~VulkanCommandPool();
+
+		operator VkCommandPool() const { return vkCommandPool; }
 
 	private:
 		VkCommandPool vkCommandPool = VK_NULL_HANDLE;

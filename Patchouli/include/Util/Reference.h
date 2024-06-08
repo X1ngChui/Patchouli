@@ -778,15 +778,26 @@ namespace Patchouli
 	template <typename T, typename D = std::default_delete<T>>
 	using RefBase = std::intrusive_base<T, D>;
 
+	// `Ref` is a smart pointer alias for managing shared ownership of an object through a pointer. 
+	// It ensures proper management of the object's lifetime by tracking shared references to the object.
 	template <typename T>
 	using Ref = std::intrusive_ptr<T>;
+
+	// `BorRef` is a borrowed reference alias to a `Ref`, allowing temporary access to the managed object 
+	// without changing its reference count. It avoids the overhead of modifying the reference count 
+	// and is useful for accessing objects without taking ownership.
+	template <typename T>
+	using BorRef = std::intrusive_ptr<T>&;
+
+	// `WeakRef` is a weak reference alias for holding non-owning references to objects managed by `Ref`. 
+	// It is used to break circular references and to check if the object still exists without extending 
+	// its lifetime. It must be converted to a `Ref` to access the object.
+	template <typename T>
+	using WeakRef = std::intrusive_weak_ptr<T>;
 
 	template <typename T, typename... Args>
 	constexpr Ref<T> makeRef(Args&&... args)
 	{
 		return std::make_intrusive<T>(std::forward<Args>(args)...);
 	}
-
-	template <typename T>
-	using WeakRef = std::intrusive_weak_ptr<T>;
 }

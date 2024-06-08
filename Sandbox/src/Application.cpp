@@ -4,8 +4,7 @@ using namespace Patchouli; // Using Patchouli namespace for convenience
 
 int main()
 {
-    auto app = Sandbox::Application::getInstance(); // Get the instance of the application
-    app->run(); // Run the application
+    Sandbox::Application::getInstance()->run();
 }
 
 namespace Sandbox
@@ -18,7 +17,6 @@ namespace Sandbox
         Console::init("Sandbox", LogLevel::Trace);
         Console::info("Hello Patchouli!");
 #endif
-
         // Create window with specified parameters
         WindowCreateInfo windowCreateInfo = {
             .windowAPI = WindowAPI::GLFW,
@@ -83,9 +81,9 @@ namespace Sandbox
     }
 
     // Method to get the instance of the application (singleton pattern)
-    Ref<Application> Application::getInstance()
+    BorRef<Application> Application::getInstance()
     {
-        static Application app; // Create a static instance of the application
-        return std::static_pointer_cast<Application>(app.shared_from_this()); // Return a shared pointer to the application instance
+        static Ref<Application> app = makeRef<Application>(); // Create a static instance of the application
+        return app;
     }
 }

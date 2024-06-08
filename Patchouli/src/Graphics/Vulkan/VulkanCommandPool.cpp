@@ -9,7 +9,7 @@ namespace Patchouli
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = flag,
-			.queueFamilyIndex = device->getQueueFamilies().graphics
+			.queueFamilyIndex = device->getGraphicsQueueFamilyIndex()
 		};
 
 		VkResult result = vkCreateCommandPool(*device, &info, *allocator, &vkCommandPool);

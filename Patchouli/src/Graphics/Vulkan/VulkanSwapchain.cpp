@@ -149,7 +149,7 @@ namespace Patchouli
 	{
 		// Get swapchain supports and select appropriate settings based on the graphics policy
 		VulkanSwapchainSupports supports = getSwapchainSupports();
-		VulkanSwapchainSettings settings;
+		VulkanSwapchainSettings settings = {};
 		switch (graphicsInfo.graphicsPolicy)
 		{
 		case GraphicsPolicy::PerformancePriority:
@@ -168,12 +168,10 @@ namespace Patchouli
 			nImages = supports.surfaceCapabilities.maxImageCount;
 
 		// Determine queue families for sharing or exclusive ownership
-		std::vector<uint32_t> queueFamilies = {
-			device->getQueueFamilies().graphics,
-			device->getQueueFamilies().present
+		std::array<VulkanQueueFamilyIndex, 2> queueFamilies = {
+			device->getGraphicsQueueFamilyIndex(), device->getPresentQueueFamilyIndex()
 		};
-
-		bool sharedQueue = device->getQueueFamilies().graphics == device->getQueueFamilies().present;
+		bool sharedQueue = device->getGraphicsQueueFamilyIndex() == device->getPresentQueueFamilyIndex();
 
 		// Create swapchain creation info
 		VkSwapchainCreateInfoKHR info = {
@@ -188,8 +186,8 @@ namespace Patchouli
 			.imageArrayLayers = 1,
 			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 			.imageSharingMode = sharedQueue ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT,
-			.queueFamilyIndexCount = sharedQueue ? 0 : static_cast<uint32_t>(queueFamilies.size()),
-			.pQueueFamilyIndices = sharedQueue ? nullptr : queueFamilies.data(),
+			.queueFamilyIndexCount = sharedQueue ? 0u : (uint32_t)queueFamilies.size(),
+			.pQueueFamilyIndices = sharedQueue ? nullptr : (const uint32_t*)queueFamilies.data(),
 			.preTransform = supports.surfaceCapabilities.currentTransform,
 			.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 			.presentMode = settings.presentMode,

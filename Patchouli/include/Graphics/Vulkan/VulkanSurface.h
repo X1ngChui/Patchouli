@@ -7,7 +7,7 @@
 
 namespace Patchouli
 {
-	class VulkanSurface : public PObject
+	class VulkanSurface : public RefBase<VulkanSurface>
 	{
 	public:
 		VulkanSurface(Ref<VulkanInstance> instance, Ref<VulkanAllocator> allocator,

@@ -1,14 +1,13 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Core/PObject.h"
 #include "Log/LogBase.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
 namespace Patchouli
 {
-	class PATCHOULI_API Logger : public PObject
+	class PATCHOULI_API Logger
 	{
 	public:
 		Logger(const char* name, std::filesystem::path path, LogLevel level = LogLevel::Info);

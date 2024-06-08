@@ -64,8 +64,8 @@ namespace Patchouli
     {
         std::vector<const char*> layers;
 
-#ifdef VULKAN_VALIDATION_LAYER
-        layers.push_back(VULKAN_VALIDATION_LAYER);
+#ifdef PATCHOULI_VULKAN_VALIDATION_LAYER
+        layers.push_back(PATCHOULI_VULKAN_VALIDATION_LAYER);
 #endif
 
         return layers;
@@ -84,32 +84,29 @@ namespace Patchouli
 
         // Get and determine queue families to be uesd
         initQueueFamilies(surface);
-        assert(queueFamilies.graphics != VULKAN_QUEUE_FAMILY_NONE);
+        assert(graphicsQueueFamilyIndex != VulkanQueueFamilyIndex::None);
+        assert(presentQueueFamilyIndex != VulkanQueueFamilyIndex::None);
 
         // Create queue create info array for device creation
-        // Due to the possibility of different queues having the same index for various purposes,
-        // duplicate indices are removed
-        // Note: Now only graphis and present queues are used
-        std::set<uint32_t> distinctIndices = { queueFamilies.graphics, queueFamilies.present };
-
-        // Create device queue create info for each distinct queue index
-        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         static const float priority = 1.0f;
-        for (uint32_t index : distinctIndices)
-        {
-            if (index == VULKAN_QUEUE_FAMILY_NONE)
-                continue;
-
-            VkDeviceQueueCreateInfo deviceQueueCreateInfo = {
+        std::array<VkDeviceQueueCreateInfo, 2> queueCreateInfos = {
+            VkDeviceQueueCreateInfo {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
-                .queueFamilyIndex = index,
-                .queueCount = 1, // Note: Now only 1 queue is created
+                .queueFamilyIndex = graphicsQueueFamilyIndex,
+                .queueCount = 1,
                 .pQueuePriorities = &priority
-            };
-            queueCreateInfos.push_back(deviceQueueCreateInfo);
-        }
+            }, 
+            VkDeviceQueueCreateInfo {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                .pNext = nullptr,
+                .flags = 0,
+                .queueFamilyIndex = presentQueueFamilyIndex,
+                .queueCount = 1,
+                .pQueuePriorities = &priority
+            },
+        };
 
         // Get required extensions, layers and features
         std::vector<const char*> layers = getEnabledLayers();
@@ -121,7 +118,7 @@ namespace Patchouli
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
+            .queueCreateInfoCount = (graphicsQueueFamilyIndex == presentQueueFamilyIndex) ? 1u : 2u,
             .pQueueCreateInfos = queueCreateInfos.data(),
             .enabledLayerCount = static_cast<uint32_t>(layers.size()),
             .ppEnabledLayerNames = layers.data(),
@@ -136,10 +133,10 @@ namespace Patchouli
 
         // Retrieve queues for different queue families
         // Note: Now only graphis and present queues are used
-        if (queueFamilies.graphics != VULKAN_QUEUE_FAMILY_NONE)
-            vkGetDeviceQueue(vkDevice, queueFamilies.graphics, 0, &vkGraphicsQueue);
-        if (queueFamilies.present != VULKAN_QUEUE_FAMILY_NONE)
-            vkGetDeviceQueue(vkDevice, queueFamilies.present, 0, &vkPresentQueue);
+        if (graphicsQueueFamilyIndex != VulkanQueueFamilyIndex::None)
+            vkGetDeviceQueue(vkDevice, graphicsQueueFamilyIndex, 0, &vkGraphicsQueue);
+        if (presentQueueFamilyIndex != VulkanQueueFamilyIndex::None)
+            vkGetDeviceQueue(vkDevice, presentQueueFamilyIndex, 0, &vkPresentQueue);
     }
 
     // Function to retrieve a list of Vulkan devices associated with a Vulkan instance
@@ -179,16 +176,7 @@ namespace Patchouli
 
             // Extract each supported functionality from the queue family's flags
             if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-                queueFamilies.graphics = i;
-
-            if (property.queueFlags & VK_QUEUE_COMPUTE_BIT)
-                queueFamilies.compute = i;
-
-            if (property.queueFlags & VK_QUEUE_TRANSFER_BIT)
-                queueFamilies.transfer = i;
-
-            if (property.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT)
-                queueFamilies.sparseBinding = i;
+                graphicsQueueFamilyIndex = (VulkanQueueFamilyIndex)i;
 
             // Check if the queue family supports presentation
             if (*surface) // if a window surface is wanted by the application
@@ -196,7 +184,7 @@ namespace Patchouli
                 VkBool32 presentSupported = VK_FALSE;
                 vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &presentSupported);
                 if (presentSupported)
-                    queueFamilies.present = i;
+                    presentQueueFamilyIndex = (VulkanQueueFamilyIndex)i;
             }
         }
     }

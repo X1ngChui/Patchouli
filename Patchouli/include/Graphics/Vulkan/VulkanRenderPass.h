@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/PObject.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
 #include <vulkan/vulkan.h>
@@ -34,7 +33,7 @@ namespace Patchouli
 		std::vector<VkAttachmentDescription> attachmentDescriptions;
 	};
 
-	class VulkanRenderPass : public PObject
+	class VulkanRenderPass : public RefBase<VulkanRenderPass>
 	{
 	public:
 		VulkanRenderPass(const VulkanRenderPassCreateInfo& info, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Base.h"
-#include "Core/PObject.h"
+#include "Util/Reference.h"
 
 namespace Patchouli
 {
@@ -25,7 +25,7 @@ namespace Patchouli
     };
 
     // Class representing a graphics device
-    class PATCHOULI_API GraphicsDevice : public PObject
+    class PATCHOULI_API GraphicsDevice : public RefBase<GraphicsDevice>
     {
     public:
         virtual ~GraphicsDevice() = default;

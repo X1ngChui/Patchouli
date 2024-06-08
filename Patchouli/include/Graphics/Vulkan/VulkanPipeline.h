@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/PObject.h"
-#include "Core/PObject.h"
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanShader.h"
 #include "Graphics/Vulkan/VulkanRenderPass.h"
@@ -11,7 +9,7 @@ namespace Patchouli
 {
 	constexpr const char* VULKAN_SHADER_ENTRY = "main";
 
-	class VulkanPipeline : public PObject
+	class VulkanPipeline : public RefBase<VulkanPipeline>
 	{
 	public:
 		VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);

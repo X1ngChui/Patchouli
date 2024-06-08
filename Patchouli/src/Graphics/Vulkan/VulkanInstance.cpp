@@ -66,7 +66,7 @@ namespace Patchouli
             break;
         }
 
-#ifdef VULKAN_VALIDATION_LAYER
+#ifdef PATCHOULI_VULKAN_VALIDATION_LAYER
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
         return extensions;
@@ -76,8 +76,8 @@ namespace Patchouli
     {
         std::vector<const char*> layers;
 
-#ifdef VULKAN_VALIDATION_LAYER
-        layers.push_back(VULKAN_VALIDATION_LAYER);
+#ifdef PATCHOULI_VULKAN_VALIDATION_LAYER
+        layers.push_back(PATCHOULI_VULKAN_VALIDATION_LAYER);
 #endif
         // Check if all required layers are supported
         assert(checkLayers(layers));
