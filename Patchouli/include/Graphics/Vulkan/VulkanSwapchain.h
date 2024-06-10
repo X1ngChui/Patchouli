@@ -19,6 +19,11 @@ namespace Patchouli
 
 		void createFramebuffers(Ref<VulkanRenderPass> renderPass);
 		VkFormat getFormat() const { return vkFormat; }
+		std::size_t getImageCount() const { return vkImages.size(); }
+		VkFramebuffer getFrameBuffer(std::size_t index) const { return vkFramebuffers[index]; }
+		VkExtent2D getExtent() const { return vkExtent; }
+
+		operator VkSwapchainKHR() const { return vkSwapchain; }
 
 	private:
 		// Friend declaration to allow access to struct VulkanSwapchainSupports

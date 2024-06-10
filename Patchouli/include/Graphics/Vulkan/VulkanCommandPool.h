@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics/Vulkan/VulkanDevice.h"
 #include "Graphics/Vulkan/VulkanAllocator.h"
+#include "Graphics/Vulkan/VulkanCommandBuffer.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -12,6 +13,9 @@ namespace Patchouli
 		~VulkanCommandPool();
 
 		operator VkCommandPool() const { return vkCommandPool; }
+
+		Ref<VulkanPrimaryCommandBuffer> createPrimaryCommandBuffer();
+		Ref<VulkanSecondaryCommandBuffer> createSecondaryCommandBuffer();
 
 	private:
 		VkCommandPool vkCommandPool = VK_NULL_HANDLE;

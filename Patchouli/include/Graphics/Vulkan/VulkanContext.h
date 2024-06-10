@@ -50,5 +50,7 @@ namespace Patchouli
         Ref<VulkanPipeline> pipeline = nullptr; // Vulkan pipeline for rendering
 
         Ref<VulkanCommandPool> commandPool = nullptr;
+
+        std::vector<Ref<VulkanCommandBuffer>> commandBuffers;
     };
 }

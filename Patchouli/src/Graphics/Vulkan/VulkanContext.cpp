@@ -69,5 +69,27 @@ namespace Patchouli
         pipeline = makeRef<VulkanPipeline>(renderPass, device, allocator);
 
         commandPool = makeRef<VulkanCommandPool>(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, allocator);
+
+        commandBuffers.reserve(swapchain->getImageCount());
+        for (std::size_t i = 0; i < swapchain->getImageCount(); i++)
+        {
+            commandBuffers.push_back(commandPool->createPrimaryCommandBuffer());
+            commandBuffers[i]->begin();
+            VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            VkRenderPassBeginInfo beginInfo = {
+                .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+                .pNext = nullptr,
+                .renderPass = *renderPass,
+                .framebuffer = swapchain->getFrameBuffer(i),
+                .renderArea = {.offset = {0, 0}, .extent = swapchain->getExtent()},
+                .clearValueCount = 1,
+                .pClearValues = &clearColor
+            };
+            commandBuffers[i]->beginRenderPass(beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+            commandBuffers[i]->bindGraphicsPipeline(*pipeline);
+            commandBuffers[i]->draw(3);
+            commandBuffers[i]->endRenderPass();
+            commandBuffers[i]->end();
+        }
     }
 }

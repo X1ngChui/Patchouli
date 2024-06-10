@@ -20,4 +20,14 @@ namespace Patchouli
 	{
 		vkDestroyCommandPool(*device, vkCommandPool, *allocator);
 	}
+
+	Ref<VulkanPrimaryCommandBuffer> VulkanCommandPool::createPrimaryCommandBuffer()
+	{
+		return makeRef<VulkanPrimaryCommandBuffer>(device, this->shared_from_this());
+	}
+
+	Ref<VulkanSecondaryCommandBuffer> VulkanCommandPool::createSecondaryCommandBuffer()
+	{
+		return makeRef<VulkanSecondaryCommandBuffer>(device, this->shared_from_this());
+	}
 }
