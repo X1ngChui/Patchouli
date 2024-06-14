@@ -23,8 +23,8 @@ namespace Patchouli
 		this->setScissors({ scissor });
 
 		// Load shaders
-		Ref<VulkanShader> shaderVertex = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		Ref<VulkanShader> shaderFragment = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		Ref<VulkanShader> shaderVertex = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShader.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		Ref<VulkanShader> shaderFragment = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShader.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		this->setShaders({ shaderVertex, shaderFragment });
 
