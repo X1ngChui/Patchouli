@@ -10,6 +10,8 @@
 #include "Graphics/Vulkan/VulkanRenderPass.h"
 #include "Graphics/Vulkan/VulkanPipeline.h"
 #include "Graphics/Vulkan/VulkanCommandPool.h"
+#include "Graphics/Vulkan/VulkanSemaphore.h"
+#include "Graphics/Vulkan/VulkanFence.h"
 #include <vulkan/vulkan.h>
 
 namespace Patchouli
@@ -23,6 +25,8 @@ namespace Patchouli
 
         // Destructor for VulkanContext.
         virtual ~VulkanContext() = default;
+
+        virtual void render() override;
 
     private:
         // Graphics settings info.
@@ -52,5 +56,10 @@ namespace Patchouli
         Ref<VulkanCommandPool> commandPool = nullptr;
 
         std::vector<Ref<VulkanCommandBuffer>> commandBuffers;
+
+        std::size_t currentFrame = 0;
+        std::vector<Ref<VulkanSemaphore>> imageAvailableSemaphores;
+        std::vector<Ref<VulkanSemaphore>> renderFinishedSemaphores;
+        std::vector<Ref<VulkanFence>> fences;
     };
 }

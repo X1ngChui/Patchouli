@@ -19,13 +19,15 @@ namespace Patchouli
 
 	void VulkanCommandBuffer::end()
 	{
-		vkEndCommandBuffer(vkCommandBuffer);
+		VkResult result = vkEndCommandBuffer(vkCommandBuffer);
+		assert(result == VK_SUCCESS);
 	}
 
 	void VulkanCommandBuffer::beginRenderPass(
 		const VkRenderPassBeginInfo& beginInfo, const VkSubpassContents& subpassContents)
 	{
 		vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, subpassContents);
+
 	}
 
 	void VulkanCommandBuffer::endRenderPass()

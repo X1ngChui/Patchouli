@@ -11,6 +11,8 @@ namespace Patchouli
 	public:
 		virtual ~VulkanCommandBuffer() = default;
 
+		operator VkCommandBuffer() const { return vkCommandBuffer; }
+
 		void begin(VkCommandBufferUsageFlags flags = 0, const VkCommandBufferInheritanceInfo& inheritance = {});
 		void end();
 

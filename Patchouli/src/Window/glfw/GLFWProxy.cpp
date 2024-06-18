@@ -9,8 +9,8 @@ namespace Patchouli
         // Set allocator for glfw
         constexpr GLFWallocator allocator = {
             .allocate = [](std::size_t size, void*) { return mi_malloc(size); },
-            .reallocate = [](void* block, std::size_t size, void*) { return mi_realloc(block, size); },
-            .deallocate = [](void* block, void*) { mi_free(block); },
+            .reallocate = [](void* wait, std::size_t size, void*) { return mi_realloc(wait, size); },
+            .deallocate = [](void* wait, void*) { mi_free(wait); },
             .user = nullptr
         };
         glfwInitAllocator(&allocator);

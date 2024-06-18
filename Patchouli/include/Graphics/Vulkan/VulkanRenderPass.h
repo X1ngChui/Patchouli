@@ -43,7 +43,6 @@ namespace Patchouli
 	private:
 		VkRenderPass vkRenderPass = VK_NULL_HANDLE;
 
-		Ref<VulkanRenderPass> renderPass;
 		Ref<VulkanDevice> device;
 		Ref<VulkanAllocator> allocator;
 

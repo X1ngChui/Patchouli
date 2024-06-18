@@ -36,11 +36,9 @@ def main():
     root.withdraw()
     
     file_paths = filedialog.askopenfilenames(title="Select Shader Source Files", filetypes=[("GLSL files", "*.vert *.frag *.comp *.geom *.tesc *.tese"), ("All files", "*.*")])
-    
     if not file_paths:
-        messagebox.showinfo("Info", "No files selected.")
         return
-
+    
     for file_path in file_paths:
         compile_shader(file_path, vulkan_sdk)
 

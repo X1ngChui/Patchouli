@@ -88,23 +88,23 @@ namespace Patchouli
         assert(presentQueueFamilyIndex != VulkanQueueFamilyIndex::None);
 
         // Create queue create info array for device creation
-        static const float priority = 1.0f;
+        std::array<float, 1> priorities = { 1.0f };
         std::array<VkDeviceQueueCreateInfo, 2> queueCreateInfos = {
             VkDeviceQueueCreateInfo {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
                 .queueFamilyIndex = graphicsQueueFamilyIndex,
-                .queueCount = 1,
-                .pQueuePriorities = &priority
+                .queueCount = (uint32_t)priorities.size(),
+                .pQueuePriorities = priorities.data()
             }, 
             VkDeviceQueueCreateInfo {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
                 .queueFamilyIndex = presentQueueFamilyIndex,
-                .queueCount = 1,
-                .pQueuePriorities = &priority
+                .queueCount = (uint32_t)priorities.size(),
+                .pQueuePriorities = priorities.data()
             },
         };
 
@@ -133,10 +133,8 @@ namespace Patchouli
 
         // Retrieve queues for different queue families
         // Note: Now only graphis and present queues are used
-        if (graphicsQueueFamilyIndex != VulkanQueueFamilyIndex::None)
-            vkGetDeviceQueue(vkDevice, graphicsQueueFamilyIndex, 0, &vkGraphicsQueue);
-        if (presentQueueFamilyIndex != VulkanQueueFamilyIndex::None)
-            vkGetDeviceQueue(vkDevice, presentQueueFamilyIndex, 0, &vkPresentQueue);
+        vkGetDeviceQueue(vkDevice, graphicsQueueFamilyIndex, 0, &vkGraphicsQueue);
+        vkGetDeviceQueue(vkDevice, presentQueueFamilyIndex, 0, &vkPresentQueue);
     }
 
     // Function to retrieve a list of Vulkan devices associated with a Vulkan instance

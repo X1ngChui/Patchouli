@@ -8,16 +8,15 @@
 namespace Patchouli
 {
 	constexpr const char* VULKAN_SHADER_ENTRY = "main";
+	constexpr std::size_t VULKAN_MAX_SHADERS = 16;
+	constexpr std::size_t VULKAN_MAX_VIEWPORTS = 16;
+	constexpr std::size_t VULKAN_MAX_SCISSORS = 16;
 
 	class VulkanPipeline : public RefBase<VulkanPipeline>
 	{
 	public:
 		VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator);
 		virtual ~VulkanPipeline();
-
-		void setShaders(const std::vector<Ref<VulkanShader>>& shaders) { this->shaders = shaders; }
-		void setViewports(const std::vector<VkViewport>& viewports) { this->viewports = viewports; }
-		void setScissors(const std::vector<VkRect2D>& scissors) { this->scissors = scissors; }
 
 		operator VkPipeline() const { return vkPipeline; }
 
@@ -38,9 +37,8 @@ namespace Patchouli
 
 		Ref<VulkanDevice> device = nullptr;
 		Ref<VulkanAllocator> allocator = nullptr;
-		std::vector<Ref<VulkanShader>> shaders;
-
-		std::vector<VkViewport> viewports;
-		std::vector<VkRect2D> scissors;
+		
+		std::size_t nShaders = 0;
+		std::array<Ref<VulkanShader>, VULKAN_MAX_SHADERS> shaders;
 	};
 }

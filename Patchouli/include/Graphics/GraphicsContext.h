@@ -36,6 +36,8 @@ namespace Patchouli
         GraphicsContext() = default;
         virtual ~GraphicsContext() = default;
 
+        virtual void render() = 0;
+
         // Static function to create a graphics context
         static Ref<GraphicsContext> create(const GraphicsContextCreateInfo& info);
     };

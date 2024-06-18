@@ -46,9 +46,12 @@ namespace Patchouli
         // Getter function for graphics queue family indices.
         VulkanQueueFamilyIndex getGraphicsQueueFamilyIndex() const { return graphicsQueueFamilyIndex; }
 
+        VkQueue getGraphicsQueue() const { return vkGraphicsQueue; }
+
         // Getter function for graphics queue family indices.
         VulkanQueueFamilyIndex getPresentQueueFamilyIndex() const { return presentQueueFamilyIndex; }
-
+        
+        VkQueue getPresentQueue() const { return vkPresentQueue; }
     private:
         // Initialize queue families based on the surface.
         void initQueueFamilies(Ref<VulkanSurface> surface);

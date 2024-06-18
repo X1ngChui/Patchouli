@@ -21,13 +21,7 @@ namespace Patchouli
 
 	Patchouli::VulkanSurface::~VulkanSurface()
 	{
-		switch (window->getAPI())
-		{
-		case WindowAPI::None:
-			break;
-		case WindowAPI::GLFW:
+		if (vkSurface != VK_NULL_HANDLE)
 			vkDestroySurfaceKHR(*instance, vkSurface, *allocator);
-			break;
-		}
 	}
 }

@@ -1,37 +1,38 @@
 #include "Graphics/Vulkan/VulkanPipeline.h"
+#include <array>
 
 namespace Patchouli
 {
 	VulkanPipeline::VulkanPipeline(Ref<VulkanRenderPass> renderPass, Ref<VulkanDevice> device, Ref<VulkanAllocator> allocator)
 		: device(device), allocator(allocator)
 	{
-		VkViewport viewport = {
-			.x = 0.0f,
-			.y = 0.0f,
-			.width = 1920.0f,
-			.height = 1080.0f,
-			.minDepth = 0.0f,
-			.maxDepth = 1.0f,
+		std::array<VkViewport, 1> viewports = { 
+			VkViewport {
+				.x = 0.0f,
+				.y = 0.0f,
+				.width = 1920.0f,
+				.height = 1080.0f,
+				.minDepth = 0.0f,
+				.maxDepth = 1.0f,
+			}
 		};
 
-		VkRect2D scissor = {
-			.offset = { 0, 0 },
-			.extent = { 1920, 1080 }
+		std::array<VkRect2D, 1> scissors= {
+			VkRect2D {
+				.offset = { 0, 0 },
+				.extent = { 1920, 1080 }
+			}
 		};
-
-		this->setViewports({ viewport });
-		this->setScissors({ scissor });
 
 		// Load shaders
-		Ref<VulkanShader> shaderVertex = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShader.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		Ref<VulkanShader> shaderFragment = makeRef<VulkanShader>(device, allocator, "assets/shaders/spirV/simpleShader.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaders[nShaders++] = makeRef<VulkanVertexShader>("assets/shaders/spirV/simpleShader.vert.spv", device, allocator);
+		shaders[nShaders++] = makeRef<VulkanFragmentShader>("assets/shaders/spirV/simpleShader.frag.spv", device, allocator);
 
-		this->setShaders({ shaderVertex, shaderFragment });
-
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
-		for (auto shader : shaders)
+		std::array<VkPipelineShaderStageCreateInfo, VULKAN_MAX_SHADERS> shaderStageCreateInfos;
+		for (std::size_t i = 0; i < nShaders; i++)
 		{
-			VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {
+			BorRef<VulkanShader> shader = shaders[i];
+			shaderStageCreateInfos[i] = {
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
@@ -40,7 +41,6 @@ namespace Patchouli
 				.pName = VULKAN_SHADER_ENTRY,
 				.pSpecializationInfo = nullptr
 			};
-			shaderStageCreateInfos.push_back(shaderStageCreateInfo);
 		}
 
 		vkViewportStateCreateInfo = {
@@ -137,7 +137,7 @@ namespace Patchouli
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.stageCount = static_cast<uint32_t>(shaderStageCreateInfos.size()),
+			.stageCount = static_cast<uint32_t>(nShaders),
 			.pStages = shaderStageCreateInfos.data(),
 			.pVertexInputState = &vkVertexInputStateCreateInfo,
 			.pInputAssemblyState = &vkInputAssemblyStateCreateInfo,

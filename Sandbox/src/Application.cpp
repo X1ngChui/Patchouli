@@ -58,6 +58,7 @@ namespace Sandbox
         lastUpdateTime = currentTime;
 
         window->onUpdate();
+        graphicsContext->render();
     }
 
     void Application::onEvent(const Event& event)

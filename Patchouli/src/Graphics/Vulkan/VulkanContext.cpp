@@ -70,12 +70,12 @@ namespace Patchouli
 
         commandPool = makeRef<VulkanCommandPool>(device, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, allocator);
 
-        commandBuffers.reserve(swapchain->getImageCount());
         for (std::size_t i = 0; i < swapchain->getImageCount(); i++)
         {
-            commandBuffers.push_back(commandPool->createPrimaryCommandBuffer());
-            commandBuffers[i]->begin();
-            VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            auto commandBuffer = commandPool->createPrimaryCommandBuffer();
+
+            commandBuffer->begin();
+            VkClearValue clearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
             VkRenderPassBeginInfo beginInfo = {
                 .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
                 .pNext = nullptr,
@@ -85,11 +85,67 @@ namespace Patchouli
                 .clearValueCount = 1,
                 .pClearValues = &clearColor
             };
-            commandBuffers[i]->beginRenderPass(beginInfo, VK_SUBPASS_CONTENTS_INLINE);
-            commandBuffers[i]->bindGraphicsPipeline(*pipeline);
-            commandBuffers[i]->draw(3);
-            commandBuffers[i]->endRenderPass();
-            commandBuffers[i]->end();
+            commandBuffer->beginRenderPass(beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+            commandBuffer->bindGraphicsPipeline(*pipeline);
+            commandBuffer->draw(3);
+            commandBuffer->endRenderPass();
+            commandBuffer->end();
+
+            commandBuffers.push_back(commandBuffer);
         }
+
+        for (std::size_t i = 0; i < swapchain->getImageCount(); i++)
+        {
+            imageAvailableSemaphores.push_back(makeRef<VulkanSemaphore>(device, allocator));
+            renderFinishedSemaphores.push_back(makeRef<VulkanSemaphore>(device, allocator));
+            fences.push_back(makeRef<VulkanFence>(device, allocator, true));
+        }
+    }
+
+    void VulkanContext::render()
+    {
+        VkResult result = VK_SUCCESS;
+
+        fences[currentFrame]->wait();
+
+        uint32_t imageIndex = 0;
+        result = vkAcquireNextImageKHR(*device, *swapchain, std::numeric_limits<uint64_t>::max(), *imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+        assert(result == VK_SUCCESS);
+
+        std::array<VkSemaphore, 1> waitSemaphores = { *imageAvailableSemaphores[currentFrame] };
+        std::array<VkPipelineStageFlags, 1> waitStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+        std::array<VkCommandBuffer, 1> usingCommandBuffers = { *commandBuffers[imageIndex] };
+        std::array<VkSemaphore, 1> signalSemaphores = { *renderFinishedSemaphores[currentFrame] };
+
+        VkSubmitInfo submitInfo = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .pNext = nullptr,
+            .waitSemaphoreCount = (uint32_t)waitSemaphores.size(),
+            .pWaitSemaphores = waitSemaphores.data(),
+            .pWaitDstStageMask = waitStages.data(),
+            .commandBufferCount = 1,
+            .pCommandBuffers = usingCommandBuffers.data(),
+            .signalSemaphoreCount = (uint32_t)signalSemaphores.size(),
+            .pSignalSemaphores = signalSemaphores.data()
+        };
+
+        fences[currentFrame]->reset();
+        result = vkQueueSubmit(device->getGraphicsQueue(), 1, &submitInfo, *fences[currentFrame]);
+        assert(result == VK_SUCCESS);
+
+        std::array<VkSwapchainKHR, 1> swapchains = { *swapchain };
+        VkPresentInfoKHR presentInfo = {
+            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .waitSemaphoreCount = (uint32_t)signalSemaphores.size(),
+            .pWaitSemaphores = signalSemaphores.data(),
+            .swapchainCount = (uint32_t)swapchains.size(),
+            .pSwapchains = swapchains.data(),
+            .pImageIndices = &imageIndex
+        };
+
+        result = vkQueuePresentKHR(device->getPresentQueue(), &presentInfo);
+        assert(result == VK_SUCCESS);
+
+        currentFrame = (currentFrame + 1) % swapchain->getImageCount();
     }
 }
